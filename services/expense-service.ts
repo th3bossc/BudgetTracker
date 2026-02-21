@@ -46,11 +46,13 @@ const expenseConverter: FirestoreDataConverter<Expense> = {
     }
 }
 
+const TABLE_NAME = "expenses"
+
 export const getExpenses = async (): Promise<Expense[]> => {
     const uid = getCurrentUserId();
 
     const snapshot = await getDocs(
-        collection(db, 'users', uid, 'expenses').withConverter(expenseConverter)
+        collection(db, 'users', uid, TABLE_NAME).withConverter(expenseConverter)
     );
 
     return snapshot.docs.map(doc => doc.data());
@@ -61,7 +63,7 @@ export const addExpense = async (
 ) => {
     const uid = getCurrentUserId();
 
-    await addDoc(collection(db, 'users', uid, 'expenses').withConverter(expenseConverter), {
+    await addDoc(collection(db, 'users', uid, TABLE_NAME).withConverter(expenseConverter), {
         ...input,
         id: '',
         createdAt: new Date()
@@ -80,7 +82,7 @@ export const updateExpense = async (
         payload.date = Timestamp.fromDate(updates.date);
 
     await updateDoc(
-        doc(db, 'users', uid, 'expenses', expenseId),
+        doc(db, 'users', uid, TABLE_NAME, expenseId),
         payload,
     )
 }
@@ -91,6 +93,6 @@ export const deleteExpense = async (
     const uid = getCurrentUserId();
 
     await deleteDoc(
-        doc(db, 'users', uid, 'expenses', expenseId),
+        doc(db, 'users', uid, TABLE_NAME, expenseId),
     );
 }

@@ -44,12 +44,13 @@ const incomeConverter: FirestoreDataConverter<Income> = {
     }
 }
 
+const TABLE_NAME = "incomes"
 
 export const getIncomes = async (): Promise<Income[]> => {
     const uid = getCurrentUserId();
 
     const snapshot = await getDocs(
-        collection(db, 'users', uid, 'incomes').withConverter(incomeConverter)
+        collection(db, 'users', uid, TABLE_NAME).withConverter(incomeConverter)
     );
 
     return snapshot.docs.map(doc => doc.data());
@@ -60,7 +61,7 @@ export const addIncome = async (
 ) => {
     const uid = getCurrentUserId();
 
-    await addDoc(collection(db, 'users', uid, 'incomes').withConverter(incomeConverter), {
+    await addDoc(collection(db, 'users', uid, TABLE_NAME).withConverter(incomeConverter), {
         ...input,
         id: '',
         createdAt: new Date()
@@ -79,7 +80,7 @@ export const updateIncome = async (
         payload.date = Timestamp.fromDate(updates.date);
 
     await updateDoc(
-        doc(db, 'users', uid, 'incomes', incomeId),
+        doc(db, 'users', uid, TABLE_NAME, incomeId),
         payload,
     )
 }
@@ -90,6 +91,6 @@ export const deleteInvestment = async (
     const uid = getCurrentUserId();
 
     await deleteDoc(
-        doc(db, 'users', uid, 'incomes', incomeId),
+        doc(db, 'users', uid, TABLE_NAME, incomeId),
     );
 }

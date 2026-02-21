@@ -18,6 +18,8 @@ import {
 import { db } from "./firebase";
 import { getCurrentUserId } from "./firestore-helpers";
 
+const TABLE_NAME = "investmentTypes"
+
 const investmentTypeConverter: FirestoreDataConverter<InvestmentType> = {
   toFirestore(type: InvestmentType): InvestmentTypeDB {
     return {
@@ -48,7 +50,7 @@ export const getInvestmentTypes = async (): Promise<InvestmentType[]> => {
   const uid = getCurrentUserId();
 
   const snapshot = await getDocs(
-    collection(db, "users", uid, "investmentTypes").withConverter(investmentTypeConverter)
+    collection(db, "users", uid, TABLE_NAME).withConverter(investmentTypeConverter)
   );
 
   return snapshot.docs.map(doc => doc.data());
@@ -58,7 +60,7 @@ export const addInvestmentType = async (input: Omit<InvestmentType, "id" | "crea
   const uid = getCurrentUserId();
 
   await addDoc(
-    collection(db, "users", uid, "investmentTypes").withConverter(investmentTypeConverter),
+    collection(db, "users", uid, TABLE_NAME).withConverter(investmentTypeConverter),
     {
       ...input,
       id: "",
@@ -74,7 +76,7 @@ export const updateInvestmentType = async (
   const uid = getCurrentUserId();
 
   await updateDoc(
-    doc(db, "users", uid, "investmentTypes", typeId),
+    doc(db, "users", uid, TABLE_NAME, typeId),
     updates
   );
 };
@@ -83,6 +85,6 @@ export const deleteInvestmentType = async (typeId: string) => {
   const uid = getCurrentUserId();
 
   await deleteDoc(
-    doc(db, "users", uid, "investmentTypes", typeId)
+    doc(db, "users", uid, TABLE_NAME, typeId)
   );
 };

@@ -44,11 +44,13 @@ const categoryConverter: FirestoreDataConverter<ExpenseCategory> = {
   },
 };
 
+const TABLE_NAME = "expenseCategories"
+
 export const getExpenseCategories = async (): Promise<ExpenseCategory[]> => {
   const uid = getCurrentUserId();
 
   const snapshot = await getDocs(
-    collection(db, "users", uid, "categories").withConverter(categoryConverter)
+    collection(db, "users", uid, TABLE_NAME).withConverter(categoryConverter)
   );
 
   return snapshot.docs.map(doc => doc.data());
@@ -58,7 +60,7 @@ export const addExpenseCategory = async (input: Omit<ExpenseCategory, "id" | "cr
   const uid = getCurrentUserId();
 
   await addDoc(
-    collection(db, "users", uid, "categories").withConverter(categoryConverter),
+    collection(db, "users", uid, TABLE_NAME).withConverter(categoryConverter),
     {
       ...input,
       id: "",
@@ -74,7 +76,7 @@ export const updateExpenseCategory = async (
   const uid = getCurrentUserId();
 
   await updateDoc(
-    doc(db, "users", uid, "categories", categoryId),
+    doc(db, "users", uid, TABLE_NAME, categoryId),
     updates
   );
 };
@@ -83,6 +85,6 @@ export const deleteExpenseCategory = async (categoryId: string) => {
   const uid = getCurrentUserId();
 
   await deleteDoc(
-    doc(db, "users", uid, "categories", categoryId)
+    doc(db, "users", uid, TABLE_NAME, categoryId)
   );
 };

@@ -44,11 +44,13 @@ const incomeSourceConverter: FirestoreDataConverter<IncomeSource> = {
   },
 };
 
+const TABLE_NAME = "incomeSources";
+
 export const getIncomeSources = async (): Promise<IncomeSource[]> => {
   const uid = getCurrentUserId();
 
   const snapshot = await getDocs(
-    collection(db, "users", uid, "incomeSources").withConverter(incomeSourceConverter)
+    collection(db, "users", uid, TABLE_NAME).withConverter(incomeSourceConverter)
   );
 
   return snapshot.docs.map(doc => doc.data());
@@ -58,7 +60,7 @@ export const addIncomeSource = async (input: Omit<IncomeSource, "id" | "createdA
   const uid = getCurrentUserId();
 
   await addDoc(
-    collection(db, "users", uid, "incomeSources").withConverter(incomeSourceConverter),
+    collection(db, "users", uid, TABLE_NAME).withConverter(incomeSourceConverter),
     {
       ...input,
       id: "",
@@ -74,7 +76,7 @@ export const updateIncomeSource = async (
   const uid = getCurrentUserId();
 
   await updateDoc(
-    doc(db, "users", uid, "incomeSources", sourceId),
+    doc(db, "users", uid, TABLE_NAME, sourceId),
     updates
   );
 };
@@ -83,6 +85,6 @@ export const deleteIncomeSource = async (sourceId: string) => {
   const uid = getCurrentUserId();
 
   await deleteDoc(
-    doc(db, "users", uid, "incomeSources", sourceId)
+    doc(db, "users", uid, TABLE_NAME, sourceId)
   );
 };
