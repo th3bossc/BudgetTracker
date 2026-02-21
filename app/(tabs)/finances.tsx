@@ -1,4 +1,5 @@
 import CategoryBudgetSection from "@/components/dashboard/category-budget-section";
+import MonthlySummaryCard from "@/components/dashboard/monthly-summary-card";
 import Header from "@/components/header";
 import Loading from "@/components/loading";
 import { useBulkCategoryBudgets } from "@/hooks/use-bulk-category-budgets";
@@ -8,14 +9,14 @@ import { generateMonthOptions } from "@/utils/month-utils";
 import { router } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { ScrollView } from "react-native";
-import { FAB, useTheme } from "react-native-paper";
+import { Divider, FAB, useTheme } from "react-native-paper";
 import { Dropdown } from "react-native-paper-dropdown";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function FinancesPage() {
     const theme = useTheme();
     const [monthKey, setMonthKey] = useState<string>(getMonthKey(new Date()));
-    const { loading, budgetUsed } = useMonthlyBudgetData(monthKey);
+    const { loading, budgetUsed, summary } = useMonthlyBudgetData(monthKey);
 
     const monthOptions = useMemo(() => generateMonthOptions(24), []);
 
@@ -48,6 +49,14 @@ export default function FinancesPage() {
                     options={monthOptions}
                     onSelect={onSelectMonth}
                 />
+
+                <Divider style={{ marginVertical: 16 }} />
+
+                <MonthlySummaryCard
+                    summary={summary}
+                />
+
+                <Divider style={{ marginVertical: 16 }} />
 
                 <CategoryBudgetSection budgetUsed={budgetUsed} />
 
