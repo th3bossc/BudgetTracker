@@ -22,6 +22,7 @@ const investmentConverter: FirestoreDataConverter<Investment> = {
         return {
             name: investment.name,
             amount: investment.amount,
+            description: investment.description,
             type: investment.type,
             date: Timestamp.fromDate(investment.date),
             monthKey: investment.monthKey,
@@ -38,6 +39,7 @@ const investmentConverter: FirestoreDataConverter<Investment> = {
             id: snapshot.id,
             name: data.name,
             amount: data.amount,
+            description: data.description,
             type: data.type,
             date: data.date.toDate(),
             monthKey: data.monthKey,

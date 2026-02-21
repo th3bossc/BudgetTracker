@@ -65,12 +65,14 @@ export interface ExpenseBase {
 export interface IncomeBase {
     amount: number;
     source: { id: string, name?: string },
+    description?: string;
     monthKey: string;
 }
 
 export interface InvestmentBase {
     name: string;
     type: { id: string, name?: string };
+    description?: string;
     amount: number;
     monthKey: string;
 }
