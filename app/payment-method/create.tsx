@@ -5,6 +5,7 @@ import { Appbar, Surface, useTheme } from "react-native-paper";
 import { addInvestmentType } from "@/services/investment-type-service";
 import { PaymentMethodCreateInput } from "@/types/create";
 import PaymentMethodForm from "@/components/forms/payment-method-form";
+import { addPaymentMethod } from "@/services/payment-method-service";
 
 export default function CreatePaymentMethodPage() {
     const router = useRouter();
@@ -14,7 +15,7 @@ export default function CreatePaymentMethodPage() {
     const handleSubmit = async (data: PaymentMethodCreateInput) => {
         try {
             setLoading(true);
-            await addInvestmentType(data);
+            await addPaymentMethod(data);
             router.back();
         } catch (error) {
             console.error("Create investment type failed:", error);

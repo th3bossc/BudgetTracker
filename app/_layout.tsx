@@ -1,3 +1,4 @@
+import { AuthProvider } from "@/providers/auth-provider";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "react-native";
@@ -19,8 +20,10 @@ export default function RootLayout() {
     : lightTheme;
   return (
     <PaperProvider theme={theme}>
-      <Stack screenOptions={{ headerShown: false }} />
-      <StatusBar style="auto" />
+      <AuthProvider>
+        <Stack screenOptions={{ headerShown: false }} />
+        <StatusBar style="auto" />
+      </AuthProvider>
     </PaperProvider>
   );
 }

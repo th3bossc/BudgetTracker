@@ -1,9 +1,20 @@
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "react-native-paper";
+import { useAuth } from "@/hooks/use-auth";
+import Loading from "@/components/loading";
 
 export default function TabLayout() {
     const theme = useTheme();
+    const { loading, user } = useAuth();
+
+    if (loading) {
+        return <Loading />
+    }
+
+    if (!user) {
+        return <Redirect href='/login' />
+    }
 
     return (
         <Tabs

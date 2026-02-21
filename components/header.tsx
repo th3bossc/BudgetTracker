@@ -3,19 +3,24 @@ import { IconSource } from "react-native-paper/lib/typescript/components/Icon";
 
 interface Props {
     title: string;
-    icon: IconSource;
-    onPress: () => void;
+    flushed?: boolean;
+    icon?: IconSource;
+    onPress?: () => void;
 }
 
-const Header = ({ title, icon, onPress }: Props) => {
+const Header = ({ title, icon, onPress, flushed = false }: Props) => {
     return (
         <>
-            <Appbar.Header elevated style={{ borderRadius: 16 }}>
+            <Appbar.Header elevated={!flushed} style={{ borderRadius: 16 }}>
                 <Appbar.Content title={title} />
-                <Appbar.Action
-                    icon={icon}
-                    onPress={onPress}
-                />
+                {
+                    icon && (
+                        <Appbar.Action
+                            icon={icon}
+                            onPress={onPress}
+                        />
+                    )
+                }
             </Appbar.Header>
 
             <Divider style={{ marginVertical: 16}} />
