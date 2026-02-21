@@ -1,5 +1,5 @@
-import type { IncomeSource } from "@/types/schema";
-import type { IncomeSourceDB } from "@/types/firebase";
+import type { PaymentMethod } from "@/types/schema";
+import type { PaymentMethodDB } from "@/types/firebase";
 
 import {
   collection,
@@ -17,10 +17,10 @@ import {
 
 import { db } from "./firebase";
 import { getCurrentUserId } from "./firestore-helpers";
-import { IncomeSourceCreateInput, IncomeSourceUpdateInput } from "@/types/create";
+import { PaymentMethodCreateInput, PaymentMethodUpdateInput } from "@/types/create";
 
-const incomeSourceConverter: FirestoreDataConverter<IncomeSource> = {
-  toFirestore(source: IncomeSource): IncomeSourceDB {
+const paymentMethodConverter: FirestoreDataConverter<PaymentMethod> = {
+  toFirestore(source: PaymentMethod): PaymentMethodDB {
     return {
       name: source.name,
       color: source.color,
@@ -32,8 +32,8 @@ const incomeSourceConverter: FirestoreDataConverter<IncomeSource> = {
   fromFirestore(
     snapshot: QueryDocumentSnapshot,
     options: SnapshotOptions
-  ): IncomeSource {
-    const data = snapshot.data(options) as IncomeSourceDB;
+  ): PaymentMethod {
+    const data = snapshot.data(options) as PaymentMethodDB;
 
     return {
       id: snapshot.id,
@@ -45,23 +45,23 @@ const incomeSourceConverter: FirestoreDataConverter<IncomeSource> = {
   },
 };
 
-const TABLE_NAME = "incomeSources";
+const TABLE_NAME = "paymentMethods";
 
-export const getIncomeSources = async (): Promise<IncomeSource[]> => {
+export const getPaymentMethods = async (): Promise<PaymentMethod[]> => {
   const uid = getCurrentUserId();
 
   const snapshot = await getDocs(
-    collection(db, "users", uid, TABLE_NAME).withConverter(incomeSourceConverter)
+    collection(db, "users", uid, TABLE_NAME).withConverter(paymentMethodConverter)
   );
 
   return snapshot.docs.map(doc => doc.data());
 };
 
-export const addIncomeSource = async (input: IncomeSourceCreateInput) => {
+export const addPaymentMethod = async (input: PaymentMethodCreateInput) => {
   const uid = getCurrentUserId();
 
   await addDoc(
-    collection(db, "users", uid, TABLE_NAME).withConverter(incomeSourceConverter),
+    collection(db, "users", uid, TABLE_NAME).withConverter(paymentMethodConverter),
     {
       ...input,
       id: "",
@@ -70,22 +70,22 @@ export const addIncomeSource = async (input: IncomeSourceCreateInput) => {
   );
 };
 
-export const updateIncomeSource = async (
-  sourceId: string,
-  updates: IncomeSourceUpdateInput
+export const updatePaymentMethod = async (
+  paymentMethodId: string,
+  updates: PaymentMethodUpdateInput
 ) => {
   const uid = getCurrentUserId();
 
   await updateDoc(
-    doc(db, "users", uid, TABLE_NAME, sourceId),
+    doc(db, "users", uid, TABLE_NAME, paymentMethodId),
     updates
   );
 };
 
-export const deleteIncomeSource = async (sourceId: string) => {
+export const deletePaymentMethod = async (paymentMethodId: string) => {
   const uid = getCurrentUserId();
 
   await deleteDoc(
-    doc(db, "users", uid, TABLE_NAME, sourceId)
+    doc(db, "users", uid, TABLE_NAME, paymentMethodId)
   );
 };

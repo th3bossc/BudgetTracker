@@ -17,6 +17,7 @@ import {
 
 import { db } from "./firebase";
 import { getCurrentUserId } from "./firestore-helpers";
+import { ExpenseCategoryCreateInput, ExpenseCategoryUpdateInput } from "@/types/create";
 
 const categoryConverter: FirestoreDataConverter<ExpenseCategory> = {
   toFirestore(category: ExpenseCategory): ExpenseCategoryDB {
@@ -56,7 +57,7 @@ export const getExpenseCategories = async (): Promise<ExpenseCategory[]> => {
   return snapshot.docs.map(doc => doc.data());
 };
 
-export const addExpenseCategory = async (input: Omit<ExpenseCategory, "id" | "createdAt">) => {
+export const addExpenseCategory = async (input: ExpenseCategoryCreateInput) => {
   const uid = getCurrentUserId();
 
   await addDoc(
@@ -71,7 +72,7 @@ export const addExpenseCategory = async (input: Omit<ExpenseCategory, "id" | "cr
 
 export const updateExpenseCategory = async (
   categoryId: string,
-  updates: Partial<Omit<ExpenseCategory, "id" | "createdAt">>
+  updates: ExpenseCategoryUpdateInput
 ) => {
   const uid = getCurrentUserId();
 

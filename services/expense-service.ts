@@ -22,6 +22,7 @@ const expenseConverter: FirestoreDataConverter<Expense> = {
         return {
             amount: expense.amount,
             category: expense.category,
+            paymentMethod: expense.paymentMethod,
             description: expense.description,
             date: Timestamp.fromDate(expense.date),
             monthKey: expense.monthKey,
@@ -37,6 +38,7 @@ const expenseConverter: FirestoreDataConverter<Expense> = {
         return {
             id: snapshot.id,
             amount: data.amount,
+            paymentMethod: data.paymentMethod,
             category: data.category,
             description: data.description,
             monthKey: data.monthKey,

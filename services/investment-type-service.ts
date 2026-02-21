@@ -17,6 +17,7 @@ import {
 
 import { db } from "./firebase";
 import { getCurrentUserId } from "./firestore-helpers";
+import { InvestmentTypeCreateInput, InvestmentTypeUpdateInput } from "@/types/create";
 
 const TABLE_NAME = "investmentTypes"
 
@@ -56,7 +57,7 @@ export const getInvestmentTypes = async (): Promise<InvestmentType[]> => {
   return snapshot.docs.map(doc => doc.data());
 };
 
-export const addInvestmentType = async (input: Omit<InvestmentType, "id" | "createdAt">) => {
+export const addInvestmentType = async (input: InvestmentTypeCreateInput) => {
   const uid = getCurrentUserId();
 
   await addDoc(
@@ -71,7 +72,7 @@ export const addInvestmentType = async (input: Omit<InvestmentType, "id" | "crea
 
 export const updateInvestmentType = async (
   typeId: string,
-  updates: Partial<Omit<InvestmentType, "id" | "createdAt">>
+  updates: InvestmentTypeUpdateInput
 ) => {
   const uid = getCurrentUserId();
 
