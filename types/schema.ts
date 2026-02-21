@@ -56,7 +56,8 @@ export interface Income extends BaseDoc {
 export interface Investment extends BaseDoc {
     name: string;
     type: { id: string, name?: string };
-    investedAmount: number;
-    currentValue: number;
+    amount: number;
+    date: Date;
+    monthKey: string;
 }
 
