@@ -1,0 +1,70 @@
+import { useEffect, useRef } from "react";
+import { View, Animated } from "react-native";
+import { Card, Text, useTheme } from "react-native-paper";
+import type { ExpenseCategory } from "@/types/schema";
+import AnimatedProgress from "../animated-progress";
+
+interface Props {
+  category: ExpenseCategory;
+  amountUsed: number;
+  budgetAmount: number;
+}
+
+export default function CategoryBudgetCard({
+  category,
+  amountUsed,
+  budgetAmount,
+}: Props) {
+  const theme = useTheme();
+
+  const percentage =
+    budgetAmount > 0 ? amountUsed / budgetAmount : 0;
+
+  const animatedValue = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(animatedValue, {
+      toValue: Math.min(percentage, 1),
+      duration: 600,
+      useNativeDriver: false,
+    }).start();
+  }, [percentage]);
+
+  // Color logic
+  let barColor = theme.colors.primary;
+
+  if (percentage >= 1) {
+    barColor = theme.colors.error;
+  } else if (percentage >= 0.9) {
+    barColor = theme.colors.secondary; // 90% warning
+  }
+
+  return (
+    <Card style={{ marginBottom: 16 }}>
+      <Card.Content>
+        <Text variant="titleMedium">{category.name}</Text>
+
+        <AnimatedProgress
+          progress={animatedValue}
+          color={barColor}
+        />
+
+        <View style={{ marginTop: 6 }}>
+          <Text variant="bodySmall">
+            ₹ {amountUsed} / ₹ {budgetAmount} (
+            {Math.round(percentage * 100)}%)
+          </Text>
+
+          {percentage >= 0.9 && (
+            <Text
+              variant="bodySmall"
+              style={{ color: theme.colors.error }}
+            >
+              ⚠ Approaching budget limit
+            </Text>
+          )}
+        </View>
+      </Card.Content>
+    </Card>
+  );
+}

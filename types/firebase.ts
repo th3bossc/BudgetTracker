@@ -1,5 +1,5 @@
 import { FieldValue, Timestamp } from "firebase/firestore";
-import { ExpenseBase, ExpenseCategoryBase, IncomeBase, IncomeSourceBase, InvestmentBase, InvestmentTypeBase } from "./schema";
+import { CategoryBudgetBase, ExpenseBase, ExpenseCategoryBase, IncomeBase, IncomeSourceBase, InvestmentBase, InvestmentTypeBase } from "./schema";
 
 export interface ExpenseDB extends ExpenseBase {
     date: Timestamp;
@@ -25,5 +25,9 @@ export interface IncomeSourceDB extends IncomeSourceBase {
 }
 
 export interface InvestmentTypeDB extends InvestmentTypeBase {
+    createdAt: Timestamp | FieldValue;
+}
+
+export interface CategoryBudgetDB extends CategoryBudgetBase {
     createdAt: Timestamp | FieldValue;
 }

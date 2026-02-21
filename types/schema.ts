@@ -75,6 +75,12 @@ export interface InvestmentBase {
     monthKey: string;
 }
 
+export interface CategoryBudgetBase {
+    category: { id: string, name?: string };
+    monthKey: string;
+    amount: number;
+}
+
 /* main tables */ 
 export interface ExpenseCategory extends BaseDoc, ExpenseCategoryBase {};
 
@@ -93,4 +99,6 @@ export interface Income extends BaseDoc, IncomeBase {
 export interface Investment extends BaseDoc, InvestmentBase {
     date: Date;
 }
+
+export interface CategoryBudget extends BaseDoc, CategoryBudgetBase {};
 

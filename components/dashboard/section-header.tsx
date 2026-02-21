@@ -1,10 +1,11 @@
+import { useMemo } from "react";
 import { View } from "react-native";
 import { Text, Button } from "react-native-paper";
 
 interface Props {
   title: string;
-  onCreate: () => void;
-  onViewAll: () => void;
+  onCreate?: () => void;
+  onViewAll?: () => void;
 }
 
 export default function SectionHeader({
@@ -12,25 +13,37 @@ export default function SectionHeader({
   onCreate,
   onViewAll,
 }: Props) {
+  const showButtons = useMemo(() => onCreate || onViewAll, [onCreate || onViewAll]);
   return (
     <View
       style={{
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: 8,
+        margin: 8,
       }}
     >
-      <Text variant="titleMedium">{title}</Text>
+      <Text variant="headlineSmall">{title}</Text>
 
-      <View style={{ flexDirection: "row", gap: 8 }}>
-        <Button compact onPress={onCreate}>
-          Create
-        </Button>
-        <Button compact onPress={onViewAll}>
-          View All
-        </Button>
-      </View>
+      {
+        showButtons && (
+          <View style={{ flexDirection: "row", gap: 8 }}>
+            {
+              onCreate && 
+              <Button compact onPress={onCreate}>
+                Create
+              </Button>
+            }
+            {
+              onViewAll && (
+                <Button compact onPress={onViewAll}>
+                  View All
+                </Button>
+              )
+            }
+          </View>
+        )
+      }
     </View>
   );
 }
