@@ -6,18 +6,10 @@ import "react-native-reanimated";
 
 const lightTheme = {
   ...MD3LightTheme,
-  colors: {
-    ...MD3LightTheme.colors,
-    primary: "#4CAF50", // finance vibe
-  },
 };
 
 const darkTheme = {
   ...MD3DarkTheme,
-  colors: {
-    ...MD3DarkTheme.colors,
-    primary: '#2E7D32',
-  }
 }
 
 export default function RootLayout() {

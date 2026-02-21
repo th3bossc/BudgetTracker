@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, View } from "react-native";
 import {
@@ -15,6 +15,7 @@ import { useExpensesData } from "@/hooks/use-expenses-data"; // assume you creat
 import ExpenseFiltersModal from "@/components/filter-modals/expense-filter";
 import { ExpenseFilters } from "@/types/common";
 import Loading from "@/components/loading";
+import Header from "@/components/header";
 
 export default function ExpenseListPage() {
     const theme = useTheme();
@@ -35,6 +36,9 @@ export default function ExpenseListPage() {
         paymentMethodsMap,
     } = useExpensesData(filters);
 
+    const showFiltersHandler = useCallback(() => {
+        setFiltersVisible(true);
+    }, []);
 
     if (loading) {
         return <Loading />
@@ -46,13 +50,11 @@ export default function ExpenseListPage() {
             padding: 16,
             backgroundColor: theme.colors.background,
         }}>
-            <Appbar.Header>
-                <Appbar.Content title="All Expenses" />
-                <Appbar.Action
-                    icon="filter-variant"
-                    onPress={() => setFiltersVisible(true)}
-                />
-            </Appbar.Header>
+            <Header
+                title="All Expenses"
+                icon="filter-variant"
+                onPress={showFiltersHandler}
+            />
 
             <FlatList
                 contentContainerStyle={{ padding: 16, gap: 12 }}

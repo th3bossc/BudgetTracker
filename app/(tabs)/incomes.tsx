@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, View } from "react-native";
 import {
@@ -14,6 +14,7 @@ import { useIncomesData } from "@/hooks/use-incomes-data";
 import type { IncomeFilters } from "@/types/common";
 import IncomeFiltersModal from "@/components/filter-modals/incomes-filters";
 import Loading from "@/components/loading";
+import Header from "@/components/header";
 
 export default function IncomeListPage() {
     const theme = useTheme();
@@ -32,6 +33,10 @@ export default function IncomeListPage() {
         sourcesMap,
     } = useIncomesData(filters);
 
+    const showFiltersHandler = useCallback(() => {
+        setFiltersVisible(true);
+    }, []);
+
     if (loading) {
         return <Loading />
     }
@@ -43,13 +48,11 @@ export default function IncomeListPage() {
             padding: 16,
             backgroundColor: theme.colors.background,
         }}>
-            <Appbar.Header>
-                <Appbar.Content title="All Incomes" />
-                <Appbar.Action
-                    icon="filter-variant"
-                    onPress={() => setFiltersVisible(true)}
-                />
-            </Appbar.Header>
+            <Header
+                title="All Incomes"
+                icon="filter-variant"
+                onPress={showFiltersHandler}
+            />
 
             <FlatList
                 contentContainerStyle={{ padding: 16, gap: 12 }}

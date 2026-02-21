@@ -20,3 +20,12 @@ export interface IncomeFilters {
     sortBy?: "amount" | "date";
     sortOrder?: "asc" | "desc";
 }
+
+export interface InvestmentFilters {
+  typeId?: string;
+  minAmount?: number;
+  maxAmount?: number;
+
+  sortBy?: "amount" | "date";
+  sortOrder?: "asc" | "desc";
+}

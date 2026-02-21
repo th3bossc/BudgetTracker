@@ -1,42 +1,42 @@
 import { useEffect, useMemo, useState } from "react";
-import type { IncomeFilters } from "@/types/common";
-import { Income, IncomeSource } from "@/types/schema";
-import { getIncomes } from "@/services/income-service";
-import { getIncomeSources } from "@/services/income-source-service";
+import type { InvestmentFilters } from "@/types/common";
+import { Investment, InvestmentType } from "@/types/schema";
 import { createLookupMap } from "@/utils/create-lookup-map";
+import { getInvestments } from "@/services/investment-service";
+import { getInvestmentTypes } from "@/services/investment-type-service";
+// assume this fetches raw firestore data
 
-export const useIncomesData = (filters: IncomeFilters) => {
-    const [rawIncomes, setRawIncomes] = useState<Income[]>([])
-    const [sources, setSources] = useState<IncomeSource[]>([]);
-    const [initialLoading, setInitialLoading] = useState<boolean>(true);
+export const useInvestmentsData = (filters: InvestmentFilters) => {
+    const [initialLoding, setInitialLoading] = useState<boolean>(true);
+    const [rawInvestments, setRawInvestments] = useState<Investment[]>([]);
+    const [types, setTypes] = useState<InvestmentType[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const incomes = await getIncomes();
-                const sources = await getIncomeSources();
-                setRawIncomes(incomes);
-                setSources(sources);
+                const investments = await getInvestments();
+                const types = await getInvestmentTypes();
+                setRawInvestments(investments);
+                setTypes(types);
             }
             catch (error) {
-                console.error('Error fetching incomes data: ', error);
+                console.error('Error fetching investments data: ', error);
             }
             finally {
                 setInitialLoading(false);
             }
         }
-
         void fetchData();
     }, []);
 
-    const sourcesMap = useMemo(() => createLookupMap(sources), [sources]);
+    const typeMap = useMemo(() => createLookupMap(types), [types]);
 
-    const filteredIncomes = useMemo(() => {
-        let result = [...rawIncomes];
+    const filtered = useMemo(() => {
+        let result = [...rawInvestments];
 
-        if (filters.sourceId) {
+        if (filters.typeId) {
             result = result.filter(
-                i => i.source.id === filters.sourceId
+                i => i.type.id === filters.typeId
             );
         }
 
@@ -69,11 +69,11 @@ export const useIncomesData = (filters: IncomeFilters) => {
         }
 
         return result;
-    }, [rawIncomes, filters]);
+    }, [rawInvestments, filters]);
 
     return {
-        loading: initialLoading,
-        incomes: filteredIncomes,
-        sourcesMap,
+        loading: initialLoding,
+        investments: filtered,
+        typeMap,
     };
 };
