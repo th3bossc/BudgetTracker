@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { getExpenseCategories } from "@/services/expense-category-service";
 import { getIncomeSources } from "@/services/income-source-service";
 import { getInvestmentTypes } from "@/services/investment-type-service";
-import { CategoryBudget, ExpenseCategory, IncomeSource, InvestmentType } from "@/types/schema";
+import { CategoryBudget, ExpenseCategory, IncomeSource, InvestmentType, PaymentMethod } from "@/types/schema";
 import { getBudgets } from "@/services/category-budget-service";
 import { getMonthKey } from "@/utils/date";
+import { getPaymentMethods } from "@/services/payment-method-service";
 
 export interface FinanceFilterData {
   loading: boolean;
@@ -12,12 +13,14 @@ export interface FinanceFilterData {
   incomeSources: IncomeSource[];
   investmentTypes: InvestmentType[];
   categoryBudgets: CategoryBudget[];
+  paymentMethods: PaymentMethod[];
 }
 
 export const useFinanceConfig = (): FinanceFilterData => {
   const [loading, setLoading] = useState(true);
 
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [incomeSources, setIncomeSources] = useState<IncomeSource[]>([]);
   const [investmentTypes, setInvestmentTypes] = useState<InvestmentType[]>([]);
   const [categoryBudgets, setCategoryBudgets] = useState<CategoryBudget[]>([]);
@@ -27,17 +30,19 @@ export const useFinanceConfig = (): FinanceFilterData => {
       try {
         setLoading(true);
         const currentMonth = getMonthKey(new Date());
-        const [cats, sources, types, budgets] = await Promise.all([
+        const [cats, sources, types, budgets, paymentMethods] = await Promise.all([
           getExpenseCategories(),
           getIncomeSources(),
           getInvestmentTypes(),
           getBudgets(),
+          getPaymentMethods(),
         ]);
 
         setCategories(cats.filter(c => !c.isArchived));
         setIncomeSources(sources.filter(s => !s.isArchived));
         setInvestmentTypes(types.filter(t => !t.isArchived));
         setCategoryBudgets(budgets.filter(budget => budget.monthKey == currentMonth));
+        setPaymentMethods(paymentMethods.filter(p => !p.isArchived));
       } catch (err) {
         console.error("Config fetch error:", err);
       } finally {
@@ -54,5 +59,6 @@ export const useFinanceConfig = (): FinanceFilterData => {
     incomeSources,
     investmentTypes,
     categoryBudgets,
+    paymentMethods,
   };
 };

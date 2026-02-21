@@ -28,7 +28,7 @@ export default function ExpenseForm({
 }: Props) {
     const theme = useTheme();
     const router = useRouter();
-    const { categories } = useFinanceConfig();
+    const { categories, paymentMethods } = useFinanceConfig();
 
     const [amount, setAmount] = useState(
         initialData?.amount?.toString() ?? ""
@@ -43,6 +43,10 @@ export default function ExpenseForm({
         initialData?.date ?? new Date()
     );
 
+    const [paymentMethodId, setPaymentMethodId] = useState<string>(
+        initialData?.paymentMethod.id ?? ""
+    )
+
     const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -54,9 +58,17 @@ export default function ExpenseForm({
         { label: "+ Add New Category", value: "__add_new__" },
     ];
 
+    const paymentMethodOptions = [
+        ...paymentMethods.map(p => ({
+            label: p.name,
+            value: p.id,
+        })),
+        { label: "+ Add New Payment Method", value: "__add_new__"}
+    ]
+
     const handleSubmit = async () => {
-        if (!amount || !categoryId) {
-            setError("Amount and category are required.");
+        if (!amount || !categoryId || !paymentMethodId) {
+            setError("Amount, payment method and category are required.");
             return;
         }
 
@@ -64,6 +76,7 @@ export default function ExpenseForm({
             amount: Number(amount),
             description,
             category: { id: categoryId },
+            paymentMethod: { id: paymentMethodId },
             date,
             monthKey: getMonthKey(date),
         });
@@ -102,6 +115,22 @@ export default function ExpenseForm({
                         return;
                     }
                     setCategoryId(val);
+                }}
+            />
+
+            <Dropdown
+                label="Payment method"
+                mode="outlined"
+                value={paymentMethodId}
+                options={paymentMethodOptions}
+                onSelect={(val?: string) => {
+                    if (!val)
+                        return;
+                    if (val == "__add_new__") {
+                        router.push('/payment-method/create');
+                        return;
+                    }
+                    setPaymentMethodId(val);
                 }}
             />
 
