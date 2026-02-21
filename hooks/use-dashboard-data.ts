@@ -6,7 +6,7 @@ import { getMonthKey } from "@/utils/date";
 import { groupByMonth } from "@/utils/group-by-month";
 import { useEffect, useState } from "react";
 
-interface DashboardSummary {
+export interface DashboardSummary {
     income: number;
     expense: number;
     investment: number;
@@ -14,7 +14,7 @@ interface DashboardSummary {
     cashflow: number;
 }
 
-interface DashboardMonthlyData {
+export interface DashboardMonthlyData {
     incomes: MonthlyAggregate[],
     expenses: MonthlyAggregate[],
     investments: MonthlyAggregate[],

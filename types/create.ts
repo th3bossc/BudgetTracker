@@ -1,13 +1,24 @@
-import type { Category, Expense, Income, IncomeSource, Investment, InvestmentType } from "./schema";
+import type { ExpenseCategory, Expense, Income, IncomeSource, Investment, InvestmentType } from "./schema";
 
 export type OmittedKeys = 'id' | 'createdAt';
 
 export type CreateInput<T> = Omit<T, OmittedKeys>;
+export type UpdateInput<T> = Partial<Omit<T, OmittedKeys>>;
 
-export type CategoryCreateInput = CreateInput<Category>;
+/* CREATE types */
+export type CategoryCreateInput = CreateInput<ExpenseCategory>;
 export type IncomeSourceCreateInput = CreateInput<IncomeSource>;
 export type InvestmentTypeCreateInput = CreateInput<InvestmentType>;
 
 export type ExpenseCreateInput = CreateInput<Expense>;
 export type IncomeCreateInput = CreateInput<Income>;
 export type InvestmentCreateInput = CreateInput<Investment>;
+
+/* UPDATE types */
+export type CategoryUpdateInput = UpdateInput<ExpenseCategory>;
+export type IncomeSourceUpdateInput = UpdateInput<IncomeSource>;
+export type InvestmentTypeUpdateInput = UpdateInput<InvestmentType>;
+
+export type ExpenseUpdateInput = UpdateInput<Expense>;
+export type IncomeUpdateInput = UpdateInput<Income>;
+export type InvestmentUpdateInput = UpdateInput<Investment>;

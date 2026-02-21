@@ -11,7 +11,7 @@ export interface TimestampedInput {
 
 
 /* Categories */
-export interface Category extends BaseDoc {
+export interface ExpenseCategory extends BaseDoc {
     name: string;
     color: string;
     icon?: string;
@@ -36,28 +36,61 @@ export interface InvestmentType extends BaseDoc {
     isArchived?: boolean;
 }
 
+/* base types */
+export interface ExpenseCategoryBase {
+    name: string;
+    color: string;
+    icon?: string;
+    isArchived?: boolean;
+}
 
-/* main tables */ 
-export interface Expense extends BaseDoc {
+export interface IncomeSourceBase {
+    name: string;
+    color: string;
+    isArchived?: boolean;
+}
+
+export interface InvestmentTypeBase {
+    name: string;
+    riskLevel?: InvestmentRiskLevel;
+    isArchived?: boolean;
+}
+export interface ExpenseBase {
     amount: number;
-    cateogry: { id: string, name?: string };
+    category: { id: string, name?: string },
     description?: string;
-    date: Date;
     monthKey: string;
 }
 
-export interface Income extends BaseDoc {
+export interface IncomeBase {
     amount: number;
-    source: { id: string, name?: string };
-    date: Date;
+    source: { id: string, name?: string },
     monthKey: string;
 }
 
-export interface Investment extends BaseDoc {
+export interface InvestmentBase {
     name: string;
     type: { id: string, name?: string };
     amount: number;
-    date: Date;
     monthKey: string;
+}
+
+/* main tables */ 
+export interface ExpenseCategory extends BaseDoc, ExpenseCategoryBase {};
+
+export interface IncomeSource extends BaseDoc, IncomeSourceBase {};
+
+export interface InvestmentType extends BaseDoc, InvestmentTypeBase {};
+
+export interface Expense extends BaseDoc, ExpenseBase {
+    date: Date;
+}
+
+export interface Income extends BaseDoc, IncomeBase {
+    date: Date;
+}
+
+export interface Investment extends BaseDoc, InvestmentBase {
+    date: Date;
 }
 

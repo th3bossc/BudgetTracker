@@ -1,5 +1,96 @@
-import { Investment } from "@/types/schema";
+import type { Investment } from "@/types/schema";
+import type { InvestmentCreateInput, InvestmentUpdateInput } from "@/types/create";
+import type { InvestmentDB } from "@/types/firebase";
+import {
+    collection,
+    getDocs,
+    addDoc,
+    serverTimestamp,
+    FirestoreDataConverter,
+    QueryDocumentSnapshot,
+    SnapshotOptions,
+    Timestamp,
+    updateDoc,
+    doc,
+    deleteDoc,
+} from 'firebase/firestore';
+import { db } from "./firebase";
+import { getCurrentUserId } from "./firestore-helpers";
+
+const investmentConverter: FirestoreDataConverter<Investment> = {
+    toFirestore(investment: Investment): InvestmentDB {
+        return {
+            name: investment.name,
+            amount: investment.amount,
+            type: investment.type,
+            date: Timestamp.fromDate(investment.date),
+            monthKey: investment.monthKey,
+            createdAt: serverTimestamp(),
+        }
+    },
+    fromFirestore(
+        snapshot: QueryDocumentSnapshot,
+        options: SnapshotOptions,
+    ): Investment {
+        const data = snapshot.data(options) as InvestmentDB;
+
+        return {
+            id: snapshot.id,
+            name: data.name,
+            amount: data.amount,
+            type: data.type,
+            date: data.date.toDate(),
+            monthKey: data.monthKey,
+            createdAt: (data.createdAt as Timestamp)?.toDate?.() ?? new Date(),
+        }
+    }
+}
 
 export const getInvestments = async (): Promise<Investment[]> => {
-    return []
+    const uid = getCurrentUserId();
+
+    const snapshot = await getDocs(
+        collection(db, 'users', uid, 'investments').withConverter(investmentConverter)
+    );
+
+    return snapshot.docs.map(doc => doc.data());
+}
+
+export const addInvestment = async (
+    input: InvestmentCreateInput
+) => {
+    const uid = getCurrentUserId();
+
+    await addDoc(collection(db, 'users', uid, 'investments').withConverter(investmentConverter), {
+        ...input,
+        id: '',
+        createdAt: new Date(),
+    })
+}
+
+export const updateInvestment = async (
+    investmentId: string,
+    updates: InvestmentUpdateInput,
+) => {
+    const uid = getCurrentUserId();
+
+    const payload: any = { ...updates };
+
+    if (updates.date)
+        payload.date = Timestamp.fromDate(updates.date);
+
+    await updateDoc(
+        doc(db, 'users', uid, 'investments', investmentId),
+        payload,
+    )
+}
+
+export const deleteInvestment = async (
+    investmentId: string,
+) => {
+    const uid = getCurrentUserId();
+
+    await deleteDoc(
+        doc(db, 'users', uid, 'investments', investmentId),
+    );
 }
