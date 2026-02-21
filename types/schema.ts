@@ -9,31 +9,10 @@ export interface TimestampedInput {
     createdAt?: Date;
 }
 
-
-/* Categories */
-export interface ExpenseCategory extends BaseDoc {
-    name: string;
-    color: string;
-    icon?: string;
-    isArchived?: boolean;
-}
-
-export interface IncomeSource extends BaseDoc {
-    name: string;
-    color: string;
-    isArchived?: boolean;
-}
-
 export enum InvestmentRiskLevel {
     LOW = 'low',
     MEDIUM = 'medium',
     HIGH = 'high'
-}
-
-export interface InvestmentType extends BaseDoc {
-    name: string;
-    riskLevel?: InvestmentRiskLevel;
-    isArchived?: boolean;
 }
 
 /* base types */

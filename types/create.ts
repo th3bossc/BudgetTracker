@@ -6,7 +6,7 @@ export type CreateInput<T> = Omit<T, OmittedKeys>;
 export type UpdateInput<T> = Partial<Omit<T, OmittedKeys>>;
 
 /* CREATE types */
-export type CategoryCreateInput = CreateInput<ExpenseCategory>;
+export type ExpenseCategoryCreateInput = CreateInput<ExpenseCategory>;
 export type IncomeSourceCreateInput = CreateInput<IncomeSource>;
 export type InvestmentTypeCreateInput = CreateInput<InvestmentType>;
 
@@ -15,7 +15,7 @@ export type IncomeCreateInput = CreateInput<Income>;
 export type InvestmentCreateInput = CreateInput<Investment>;
 
 /* UPDATE types */
-export type CategoryUpdateInput = UpdateInput<ExpenseCategory>;
+export type ExpenseCategoryUpdateInput = UpdateInput<ExpenseCategory>;
 export type IncomeSourceUpdateInput = UpdateInput<IncomeSource>;
 export type InvestmentTypeUpdateInput = UpdateInput<InvestmentType>;
 
