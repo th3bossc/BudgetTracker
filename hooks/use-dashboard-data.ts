@@ -21,14 +21,8 @@ export interface DashboardMonthlyData {
     incomes: MonthlyAggregate[],
     expenses: MonthlyAggregate[],
     investments: MonthlyAggregate[],
-    budgetUsed: BudgetUsed[],
 }
 
-export interface BudgetUsed {
-    category: ExpenseCategory;
-    amountUsed: number;
-    budget: number;
-}
 
 export type DashboardData = {
     loading: boolean;
@@ -51,30 +45,7 @@ export const useDashboardData = (): DashboardData => {
         incomes: [],
         expenses: [],
         investments: [],
-        budgetUsed: [],
     });
-
-    const {
-        loading: financeConfigLoadingStatus,
-        categories,
-        investmentTypes,
-        incomeSources,
-        categoryBudgets,
-    } = useFinanceConfig();
-
-    const lookupMaps = useMemo(() => ({
-        categories: createLookupMap(categories),
-        investmentTypes: createLookupMap(investmentTypes),
-        incomeSources: createLookupMap(incomeSources),
-        categoryBudgets: createLookupMap(categoryBudgets),
-    }), [
-        categories,
-        investmentTypes,
-        incomeSources,
-        categoryBudgets,
-    ]);
-
-    const loading = useMemo(() => computationLoadingStatus || financeConfigLoadingStatus, [computationLoadingStatus, financeConfigLoadingStatus]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -114,24 +85,10 @@ export const useDashboardData = (): DashboardData => {
                 const expenseAgg = groupByMonth(expenses).slice(0, 3);
                 const investmentAgg = groupByMonth(investments).slice(0, 3);
 
-                const budgetUsedInfo: BudgetUsed[] = categoryBudgets.map(categoryBudget => {
-                    const amountUsed = expenses
-                        .filter(i => i.monthKey == currentMonth && i.category.id == categoryBudget.category.id)
-                        .reduce((sum, i) => sum + i.amount, 0);
-                    const category = lookupMaps.categories[categoryBudget.category.id] ?? 'Unknown'
-                    const budget = categoryBudget.amount ?? 0;
-                    return {
-                        category,
-                        amountUsed,
-                        budget,
-                    }
-                })
-
                 setMonthlyData({
                     incomes: incomeAgg,
                     expenses: expenseAgg,
                     investments: investmentAgg,
-                    budgetUsed: budgetUsedInfo,
                 });
             }
             catch (error) {
@@ -146,7 +103,7 @@ export const useDashboardData = (): DashboardData => {
     }, []);
 
     return {
-        loading,
+        loading: computationLoadingStatus,
         summary,
         monthlyData,
     }

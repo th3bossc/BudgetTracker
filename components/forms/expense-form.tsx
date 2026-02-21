@@ -26,7 +26,6 @@ export default function ExpenseForm({
     onSubmit,
     loading,
 }: Props) {
-    const theme = useTheme();
     const router = useRouter();
     const { categories, paymentMethods } = useFinanceConfig();
 

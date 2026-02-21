@@ -12,6 +12,8 @@ import {
   Timestamp,
   doc,
   updateDoc,
+  where,
+  query,
 } from "firebase/firestore";
 
 import { db } from "./firebase";
@@ -43,15 +45,30 @@ const budgetConverter: FirestoreDataConverter<CategoryBudget> = {
   },
 };
 
+const TABLE_NAME = "budgets"
+
 export const getBudgets = async (): Promise<CategoryBudget[]> => {
   const uid = getCurrentUserId();
 
   const snapshot = await getDocs(
-    collection(db, "users", uid, "budgets").withConverter(budgetConverter)
+    collection(db, "users", uid, TABLE_NAME).withConverter(budgetConverter)
   );
 
   return snapshot.docs.map(doc => doc.data());
 };
+
+export const getBudgetsByMonth = async (monthKey: string): Promise<CategoryBudget[]> => {
+  const uid = getCurrentUserId();
+
+  const snapshot = await getDocs(
+    query(
+      collection(db, 'users', uid, TABLE_NAME).withConverter(budgetConverter),
+      where('monthKey', '==', monthKey)
+    )
+  );
+
+  return snapshot.docs.map(doc => doc.data());
+}
 
 export const upsertBudget = async (
   categoryId: string,
@@ -65,17 +82,16 @@ export const upsertBudget = async (
   const existing = budgets.find(
     b => b.category.id === categoryId && b.monthKey === monthKey
   );
-
   if (existing) {
     await updateDoc(
-      doc(db, "users", uid, "budgets", existing.id),
+      doc(db, "users", uid, TABLE_NAME, existing.id),
       { amount }
     );
   } else {
     await addDoc(
-      collection(db, "users", uid, "budgets"),
+      collection(db, "users", uid, TABLE_NAME),
       {
-        categoryId,
+        category: { id: categoryId },
         monthKey,
         amount,
         createdAt: serverTimestamp(),

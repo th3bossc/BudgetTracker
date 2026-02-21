@@ -1,15 +1,17 @@
 import { View } from "react-native"
-import { ActivityIndicator } from "react-native-paper"
+import { ActivityIndicator, useTheme } from "react-native-paper"
 
 const Loading = () => {
+    const theme = useTheme();
     return <View
         style={{
             flex: 1,
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            backgroundColor: theme.colors.background,
         }}
     >
-        <ActivityIndicator size='large' />
+        <ActivityIndicator size='large' color={theme.colors.onBackground} />
     </View>
 }
 

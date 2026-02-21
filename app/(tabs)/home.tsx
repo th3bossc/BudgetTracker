@@ -3,7 +3,7 @@ import MonthlySummaryCard from "@/components/dashboard/monthly-summary-card";
 import MonthlyAggregateTable from "@/components/dashboard/monthly-aggregate-table";
 import SectionHeader from "@/components/dashboard/section-header";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
-import { Appbar, Divider, useTheme } from "react-native-paper";
+import { useTheme } from "react-native-paper";
 import CategoryBudgetSection from "@/components/dashboard/category-budget-section";
 import Loading from "@/components/loading";
 import { useCallback } from "react";
@@ -16,7 +16,7 @@ export default function HomeScreen() {
   const {
     loading,
     summary,
-    monthlyData: { incomes, expenses, investments, budgetUsed },
+    monthlyData: { incomes, expenses, investments },
   } = useDashboardData();
 
   if (loading) {
@@ -54,10 +54,10 @@ export default function HomeScreen() {
   }, [router]);
 
   return (
-    <ScrollView contentContainerStyle={{ 
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ 
       padding: 16,
       backgroundColor: theme.colors.background,
-      flex: 1,
+      flexGrow: 1,
     }}>
       <Header
         title="Dashboard"
@@ -88,12 +88,6 @@ export default function HomeScreen() {
         onViewAll={viewAllIncomes}
       />
       <MonthlyAggregateTable data={incomes} />
-
-      <SectionHeader
-        title="Cateogry Budgets"
-      />
-      <CategoryBudgetSection budgetUsed={budgetUsed} />
-
     </ScrollView>
   );
 }
