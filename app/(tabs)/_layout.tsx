@@ -19,8 +19,8 @@ export default function TabLayout() {
           height: 60,
           paddingBottom: 6,
           elevation: 4,
-          },
-        
+        },
+
         tabBarLabelStyle: {
           fontWeight: '600'
         }
@@ -66,6 +66,20 @@ export default function TabLayout() {
               color={color}
             />
           ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="incomes"
+        options={{
+          title: "Incomes",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="cash-plus"
+              size={size}
+              color={color}
+            />
+          )
         }}
       />
     </Tabs>

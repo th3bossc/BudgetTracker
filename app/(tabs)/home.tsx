@@ -36,6 +36,18 @@ export default function HomeScreen() {
     router.push('/investment/create');
   }, [router]);
 
+  const viewAllExpenses = useCallback(() => {
+    router.push('/(tabs)/expenses');
+  }, [router]);
+
+  const viewAllIncomes = useCallback(() => {
+    router.push('/(tabs)/incomes');
+  }, [router]);
+
+  const viewAllInvestments = useCallback(() => {
+    router.push('/(tabs)/investments');
+  }, [router]);
+
   return (
     <ScrollView contentContainerStyle={{ 
       padding: 16,
@@ -48,21 +60,21 @@ export default function HomeScreen() {
       <SectionHeader
         title="Expenses"
         onCreate={createExpenseItem}
-        onViewAll={() => {}}
+        onViewAll={viewAllExpenses}
       />
       <MonthlyAggregateTable data={expenses} />
 
       <SectionHeader
         title="Investments"
         onCreate={createInvestmentItem}
-        onViewAll={() => {}}
+        onViewAll={viewAllInvestments}
       />
       <MonthlyAggregateTable data={investments} />
 
       <SectionHeader
         title="Income"
         onCreate={createIncomeItem}
-        onViewAll={() => {}}
+        onViewAll={viewAllIncomes}
       />
       <MonthlyAggregateTable data={incomes} />
 
