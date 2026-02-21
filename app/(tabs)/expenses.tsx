@@ -22,7 +22,6 @@ export default function ExpenseListPage() {
 
     
     const [filtersVisible, setFiltersVisible] = useState(false);
-    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
     
     const [filters, setFilters] = useState<ExpenseFilters>({
         sortBy: "date",
@@ -36,13 +35,6 @@ export default function ExpenseListPage() {
         paymentMethodsMap,
     } = useExpensesData(filters);
 
-    const sortedExpenses = useMemo(() => {
-        return [...expenses].sort((a, b) =>
-            sortOrder === "asc"
-                ? a.amount - b.amount
-                : b.amount - a.amount
-        );
-    }, [expenses, sortOrder]);
 
     if (loading) {
         return <Loading />
@@ -64,7 +56,7 @@ export default function ExpenseListPage() {
 
             <FlatList
                 contentContainerStyle={{ padding: 16, gap: 12 }}
-                data={sortedExpenses}
+                data={expenses}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <Card onPress={() => router.push(`/expense/${item.id}`)}>

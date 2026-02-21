@@ -11,3 +11,12 @@ export interface ExpenseFilters {
     sortBy?: "amount" | "date";
     sortOrder?: "asc" | "desc";
 }
+
+export interface IncomeFilters {
+    sourceId?: string;
+    minAmount?: number;
+    maxAmount?: number;
+
+    sortBy?: "amount" | "date";
+    sortOrder?: "asc" | "desc";
+}
