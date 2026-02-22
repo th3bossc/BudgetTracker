@@ -98,13 +98,13 @@ export default function TabLayout() {
                 name="finances"
                 options={{
                     title: "Finances",
-                    tabBarIcon: ({ color, size }) => {
+                    tabBarIcon: ({ color, size }) => (
                         <MaterialCommunityIcons
                             name="abacus"
                             size={size}
                             color={color}
                         />
-                    }
+                    )
                 }}
             />
         </Tabs>
