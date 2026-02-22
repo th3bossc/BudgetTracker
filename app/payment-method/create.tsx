@@ -18,7 +18,7 @@ export default function CreatePaymentMethodPage() {
             await addPaymentMethod(data);
             router.back();
         } catch (error) {
-            console.error("Create investment type failed:", error);
+            console.error("Create payment method failed:", error);
         } finally {
             setLoading(false);
         }
@@ -28,7 +28,7 @@ export default function CreatePaymentMethodPage() {
         <SafeAreaView style={{ flex: 1 }}>
             <Appbar.Header>
                 <Appbar.BackAction onPress={() => router.back()} />
-                <Appbar.Content title="Create Investment Type" />
+                <Appbar.Content title="Create Payment Method" />
             </Appbar.Header>
 
             <Surface

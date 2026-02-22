@@ -7,6 +7,9 @@ import {
     Divider,
     Switch,
     Text,
+    Modal,
+    Portal,
+    useTheme,
 } from "react-native-paper";
 import type { IncomeSource } from "@/types/schema";
 import { IncomeSourceCreateInput, IncomeSourceUpdateInput } from "@/types/create";
@@ -22,6 +25,7 @@ export default function IncomeSourceForm({
     onSubmit,
     loading,
 }: Props) {
+    const theme = useTheme();
     const [name, setName] = useState(initialData?.name ?? "");
     const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
     const [color, setColor] = useState(initialData?.color ?? "#2196F3");
@@ -56,25 +60,54 @@ export default function IncomeSourceForm({
                 mode="outlined"
             />
 
+
             <Button
                 mode="outlined"
-                onPress={() => setShowColorPicker(prev => !prev)}
+                onPress={() => setShowColorPicker(true)}
             >
                 Pick color
             </Button>
 
-            {
-                showColorPicker && (
-                    <ColorPicker
-                        color={color}
-                        onColorChange={setColor}
-                        thumbSize={30}
-                        sliderSize={30}
-                        noSnap
-                        row={false}
-                    />
-                )
-            }
+            <Portal>
+                <Modal
+                    visible={showColorPicker}
+                    onDismiss={() => setShowColorPicker(false)}
+                    contentContainerStyle={{
+                        justifyContent: "flex-end",
+                        flex: 1,
+                    }}
+                >
+                    <View style={{
+                        backgroundColor: theme.colors.surface,
+                        padding: 20,
+                        borderTopLeftRadius: 20,
+                        borderTopRightRadius: 20,
+                    }}>
+                        <View style={{
+                            alignItems: "center",
+                            justifyContent: "center",
+                            height: 320, // 🔥 controls picker space
+                        }}>
+                            <ColorPicker
+                                color={color}
+                                onColorChangeComplete={setColor}
+                                thumbSize={30}
+                                sliderSize={30}
+                                noSnap
+                                row={false}
+                            />
+                        </View>
+
+                        <Button
+                            mode="contained"
+                            onPress={() => setShowColorPicker(false)}
+                            style={{ marginTop: 16, marginHorizontal: 20 }}
+                        >
+                            Done
+                        </Button>
+                    </View>
+                </Modal>
+            </Portal>
 
             <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
                 <Switch

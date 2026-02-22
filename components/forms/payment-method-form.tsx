@@ -9,6 +9,9 @@ import {
     Divider,
     Switch,
     Text,
+    Modal,
+    Portal,
+    useTheme,
 } from "react-native-paper";
 import ColorPicker from "react-native-wheel-color-picker";
 
@@ -23,6 +26,7 @@ export default function PaymentMethodForm({
     onSubmit,
     loading,
 }: Props) {
+    const theme = useTheme();
     const [name, setName] = useState(initialData?.name ?? "");
     const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
     const [color, setColor] = useState(initialData?.color ?? "#9C27B0");
@@ -51,25 +55,54 @@ export default function PaymentMethodForm({
             />
 
 
+
             <Button
                 mode="outlined"
-                onPress={() => setShowColorPicker(prev => !prev)}
+                onPress={() => setShowColorPicker(true)}
             >
                 Pick color
             </Button>
 
-            {
-                showColorPicker && (
-                    <ColorPicker
-                        color={color}
-                        onColorChange={setColor}
-                        thumbSize={30}
-                        sliderSize={30}
-                        noSnap
-                        row={false}
-                    />
-                )
-            }
+            <Portal>
+                <Modal
+                    visible={showColorPicker}
+                    onDismiss={() => setShowColorPicker(false)}
+                    contentContainerStyle={{
+                        justifyContent: "flex-end",
+                        flex: 1,
+                    }}
+                >
+                    <View style={{
+                        backgroundColor: theme.colors.surface,
+                        padding: 20,
+                        borderTopLeftRadius: 20,
+                        borderTopRightRadius: 20,
+                    }}>
+                        <View style={{
+                            alignItems: "center",
+                            justifyContent: "center",
+                            height: 320, // 🔥 controls picker space
+                        }}>
+                            <ColorPicker
+                                color={color}
+                                onColorChangeComplete={setColor}
+                                thumbSize={30}
+                                sliderSize={30}
+                                noSnap
+                                row={false}
+                            />
+                        </View>
+
+                        <Button
+                            mode="contained"
+                            onPress={() => setShowColorPicker(false)}
+                            style={{ marginTop: 16, marginHorizontal: 20 }}
+                        >
+                            Done
+                        </Button>
+                    </View>
+                </Modal>
+            </Portal>
 
             <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
                 <Switch value={isArchived} onValueChange={setIsArchived} />

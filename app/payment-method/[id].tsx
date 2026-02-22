@@ -48,7 +48,7 @@ export default function EditPaymentMethodPage() {
         <SafeAreaView style={{ flex: 1 }}>
             <Appbar.Header>
                 <Appbar.BackAction onPress={() => router.back()} />
-                <Appbar.Content title="Edit Investment Type" />
+                <Appbar.Content title="Edit Payment Method" />
             </Appbar.Header>
 
             <Surface
