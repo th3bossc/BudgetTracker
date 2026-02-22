@@ -12,9 +12,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: expo/expo-github-action@v8
-        with:
-          token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
         run: npm install
@@ -22,6 +19,10 @@ jobs:
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
+      - uses: expo/expo-github-action@v8
+        with:
+          token: ${{ secrets.EXPO_TOKEN }}
+          
       - name: Create .env file
         run: |
           cat <<EOF > .env
