@@ -79,7 +79,13 @@ export default function IncomeListPage() {
                             )}
 
                             <View style={{ marginTop: 8 }}>
-                                <Chip>
+                                <Chip
+                                    style={{
+                                        backgroundColor:
+                                            sourcesMap[item.source.id]?.color ?? "#E0E0E0",
+                                    }}
+                                    textStyle={{ color: "white" }}
+                                >
                                     {sourcesMap[item.source.id]?.name}
                                 </Chip>
                             </View>

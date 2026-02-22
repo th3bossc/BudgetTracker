@@ -79,11 +79,23 @@ export default function ExpenseListPage() {
                             </Text>
 
                             <View style={{ flexDirection: "row", gap: 8, marginTop: 8 }}>
-                                <Chip>
+                                <Chip
+                                    style={{
+                                        backgroundColor:
+                                            categoriesMap[item.category.id]?.color ?? "#E0E0E0",
+                                    }}
+                                    textStyle={{ color: "white" }}
+                                >
                                     {categoriesMap[item.category.id]?.name}
                                 </Chip>
 
-                                <Chip>
+                                <Chip
+                                    style={{
+                                        backgroundColor:
+                                            paymentMethodsMap[item.paymentMethod.id]?.color ?? "#E0E0E0",
+                                    }}
+                                    textStyle={{ color: "white" }}
+                                >
                                     {paymentMethodsMap[item.paymentMethod.id]?.name}
                                 </Chip>
                             </View>

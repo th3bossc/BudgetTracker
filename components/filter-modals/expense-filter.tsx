@@ -37,19 +37,22 @@ export default function ExpenseFiltersModal({
     const selectCategoryHandler = useCallback((val?: string) => {
         if (!val)
             return;
-        updateFilter('categoryId', val);
+        updateFilter('categoryId', val == '__all__' ? undefined : val);
     }, [updateFilter]);
 
     const selectPaymentMethodHandler = useCallback((val?: string) => {
         if (!val)
             return;
-        updateFilter('paymentMethodId', val);
+        updateFilter('paymentMethodId', val == '__all__' ? undefined : val);
     }, [updateFilter]);
 
-    const categoriesOptions = useMemo(() => categories.map(c => ({
-        label: c.name,
-        value: c.id,
-    })), [categories]);
+    const categoriesOptions = useMemo(() => [
+        { label: 'All Categories', value: '__all__' },
+        ...(categories.map(c => ({
+            label: c.name,
+            value: c.id,
+        })))
+    ], [categories]);
     
     const sortByOptions = useMemo(() => [
         { label: 'Amount', value: 'amount' },
@@ -61,10 +64,13 @@ export default function ExpenseFiltersModal({
         { label: 'Ascending', value: 'asc' },
     ], []);
 
-    const paymentMethodOptions = useMemo(() => paymentMethods.map(p => ({
-        label: p.name,
-        value: p.id,
-    })), [paymentMethods]);
+    const paymentMethodOptions = useMemo(() => [
+        { label: 'All Payment Methods', value: '__all__' },
+        ...(paymentMethods.map(p => ({
+            label: p.name,
+            value: p.id,
+        })))
+    ], [paymentMethods]);
 
     const updateMinAmountHandler = useCallback((text: string) => {
         updateFilter('minAmount', Number(text));

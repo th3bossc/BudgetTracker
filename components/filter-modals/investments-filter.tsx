@@ -9,6 +9,7 @@ import {
 import { Dropdown } from "react-native-paper-dropdown";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
 import type { InvestmentFilters } from "@/types/common";
+import { useCallback, useMemo } from "react";
 
 interface Props {
     visible: boolean;
@@ -25,12 +26,59 @@ export default function InvestmentFiltersModal({
 }: Props) {
     const { investmentTypes } = useFinanceConfig();
 
-    const updateFilter = (key: keyof InvestmentFilters, value: any) => {
+    const updateFilter = useCallback((key: keyof InvestmentFilters, value: any) => {
         setFilters(prev => ({
             ...prev,
             [key]: value,
         }));
-    };
+    }, [setFilters]);
+
+    const investmentTypesOptions = useMemo(() => [
+        { label: 'All Investment Types', value: '__all__' },
+        ...(investmentTypes.map(t => ({
+            label: t.name,
+            value: t.id,
+        })))
+    ], []);
+
+    const selectInvestmentTypeHandler = useCallback((val?: string) => {
+        if (!val)
+            return;
+
+        updateFilter('typeId', val == '__all__' ? undefined : val);
+    }, [updateFilter])
+
+    const updateFilterMinAmount = useCallback((text: string) => {
+        updateFilter('minAmount', Number(text));
+    }, [updateFilter]);
+
+    const updateFilterMaxAmount = useCallback((text: string) => {
+        updateFilter('maxAmount', Number(text));
+    }, [updateFilter])
+
+     const sortByOptions = useMemo(() => [
+        { label: 'Amount', value: 'amount' },
+        { label: 'Date', value: 'date' },
+    ], []);
+
+    const sortOrderOptions = useMemo(() => [
+        { label: 'Descending', value: 'desc' },
+        { label: 'Ascending', value: 'asc' },
+    ], []);
+
+    const updateSortByHandler = useCallback((val?: string) => {
+        if (!val)
+            return;
+
+        updateFilter('sortBy', val);
+    }, [updateFilter]);
+
+    const updateSortOrderHandler = useCallback((val?: string) => {
+        if (!val)
+            return;
+        
+        updateFilter('sortOrder', val);
+    }, [updateFilter])
 
     return (
         <Portal>
@@ -48,30 +96,21 @@ export default function InvestmentFiltersModal({
                     <Dropdown
                         label="Investment Type"
                         value={filters.typeId}
-                        options={investmentTypes.map(t => ({
-                            label: t.name,
-                            value: t.id,
-                        }))}
-                        onSelect={(val) =>
-                            updateFilter("typeId", val)
-                        }
+                        options={investmentTypesOptions}
+                        onSelect={selectInvestmentTypeHandler}
                     />
 
                     <TextInput
                         label="Min Amount"
                         value={filters.minAmount?.toString() ?? ""}
-                        onChangeText={(val) =>
-                            updateFilter("minAmount", val ? Number(val) : undefined)
-                        }
+                        onChangeText={updateFilterMinAmount }
                         keyboardType="numeric"
                     />
 
                     <TextInput
                         label="Max Amount"
                         value={filters.maxAmount?.toString() ?? ""}
-                        onChangeText={(val) =>
-                            updateFilter("maxAmount", val ? Number(val) : undefined)
-                        }
+                        onChangeText={updateFilterMaxAmount}
                         keyboardType="numeric"
                     />
 
@@ -80,25 +119,15 @@ export default function InvestmentFiltersModal({
                     <Dropdown
                         label="Sort By"
                         value={filters.sortBy}
-                        options={[
-                            { label: "Amount", value: "amount" },
-                            { label: "Date", value: "date" },
-                        ]}
-                        onSelect={(val) =>
-                            updateFilter("sortBy", val)
-                        }
+                        options={sortByOptions}
+                        onSelect={updateSortByHandler}
                     />
 
                     <Dropdown
                         label="Sort Order"
                         value={filters.sortOrder}
-                        options={[
-                            { label: "Descending", value: "desc" },
-                            { label: "Ascending", value: "asc" },
-                        ]}
-                        onSelect={(val) =>
-                            updateFilter("sortOrder", val)
-                        }
+                        options={sortOrderOptions}
+                        onSelect={updateSortOrderHandler}
                     />
 
                     <Divider />

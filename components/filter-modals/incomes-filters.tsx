@@ -33,10 +33,13 @@ export default function IncomeFiltersModal({
         }));
     };
 
-    const incomeSourcesOptions = useMemo(() => incomeSources.map(s => ({
-        label: s.name,
-        value: s.id,
-    })), [updateFilter]);
+    const incomeSourcesOptions = useMemo(() => [
+        { label: 'All Sources', value: '__all__' },
+        ...(incomeSources.map(s => ({
+            label: s.name,
+            value: s.id,
+        })))
+    ], [updateFilter]);
 
     const minAmount = useMemo(() => filters.minAmount?.toString() ?? "", [filters.minAmount]);
     const maxAmount = useMemo(() => filters.maxAmount?.toString() ?? "", [filters.maxAmount]);
@@ -55,7 +58,7 @@ export default function IncomeFiltersModal({
         if (!val)
             return;
 
-        updateFilter('sourceId', val);
+        updateFilter('sourceId', val == '__all__' ? undefined : val);
     }, [updateFilter])
     
     const updateMinAmountHandler = useCallback((text: string) => {

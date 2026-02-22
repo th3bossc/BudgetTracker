@@ -2,8 +2,7 @@ import CategoryBudgetSection from "@/components/dashboard/category-budget-sectio
 import MonthlySummaryCard from "@/components/dashboard/monthly-summary-card";
 import Header from "@/components/header";
 import Loading from "@/components/loading";
-import { useBulkCategoryBudgets } from "@/hooks/use-bulk-category-budgets";
-import { BudgetUsed, useMonthlyBudgetData } from "@/hooks/use-monthly-budget-data";
+import { useMonthlyBudgetData } from "@/hooks/use-monthly-budget-data";
 import { getMonthKey } from "@/utils/date";
 import { generateMonthOptions } from "@/utils/month-utils";
 import { router } from "expo-router";
@@ -63,7 +62,7 @@ export default function FinancesPage() {
             </ScrollView>
 
             <FAB
-                icon="plus"
+                icon="pencil"
                 style={{
                     position: "absolute",
                     right: 16,

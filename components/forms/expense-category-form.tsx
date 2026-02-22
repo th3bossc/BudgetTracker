@@ -10,6 +10,7 @@ import {
 } from "react-native-paper";
 import type { ExpenseCategory } from "@/types/schema";
 import type { ExpenseCategoryCreateInput, ExpenseCategoryUpdateInput } from "@/types/create";
+import ColorPicker from 'react-native-wheel-color-picker';
 
 interface Props {
     initialData?: ExpenseCategory;
@@ -23,6 +24,7 @@ export default function CategoryForm({
     loading,
 }: Props) {
     const [name, setName] = useState(initialData?.name ?? "");
+    const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
     const [color, setColor] = useState(initialData?.color ?? "#4CAF50");
     const [icon, setIcon] = useState(initialData?.icon ?? "");
     const [isArchived, setIsArchived] = useState(
@@ -57,12 +59,6 @@ export default function CategoryForm({
                 mode="outlined"
             />
 
-            <TextInput
-                label="Color (hex)"
-                value={color}
-                onChangeText={setColor}
-                mode="outlined"
-            />
 
             <TextInput
                 label="Icon (MaterialCommunityIcons name)"
@@ -70,6 +66,25 @@ export default function CategoryForm({
                 onChangeText={setIcon}
                 mode="outlined"
             />
+            <Button
+                mode="outlined"
+                onPress={() => setShowColorPicker(prev => !prev)}
+            >
+                Pick color
+            </Button>
+
+            {
+                showColorPicker && (
+                    <ColorPicker
+                        color={color}
+                        onColorChange={setColor}
+                        thumbSize={30}
+                        sliderSize={30}
+                        noSnap
+                        row={false}
+                    />
+                )
+            }
 
             <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
                 <Switch
