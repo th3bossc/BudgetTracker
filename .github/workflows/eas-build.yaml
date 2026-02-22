@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      EAS_TOKEN: ${{ secrets.EAS_TOKEN }}
+      EXPO_TOKEN: ${{ secrets.EAS_TOKEN }}
 
     steps:
       - name: Checkout repository
@@ -40,11 +40,11 @@ jobs:
 
       - name: Verify token exists
         run: |
-          if [ -z "$EAS_TOKEN" ]; then
-            echo "EAS_TOKEN is NOT set"
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "EXPO_TOKEN is NOT set"
             exit 1
           else
-            echo "EAS_TOKEN is set"
+            echo "EXPO_TOKEN is set"
           fi
 
       - name: Build APK
