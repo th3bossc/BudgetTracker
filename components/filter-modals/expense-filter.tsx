@@ -100,8 +100,9 @@ export default function ExpenseFiltersModal({
             <Modal visible={visible} onDismiss={onDismiss}>
                 <View
                     style={{
-                        padding: 20,
-                        margin: 20,
+                        elevation: 5,
+                        padding: 30,
+                        margin: 10,
                         borderRadius: 12,
                         gap: 20,
                     }}
