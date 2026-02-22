@@ -31,12 +31,12 @@ export default function FinancesPage() {
     }
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
-            <ScrollView style={{ flex: 1 }} contentContainerStyle={{
-                padding: 16,
-                backgroundColor: theme.colors.background,
-                flexGrow: 1,
-            }}>
+        <SafeAreaView style={{
+            padding: 16,
+            backgroundColor: theme.colors.background,
+            flexGrow: 1,
+        }}>
+            <ScrollView style={{ flex: 1 }}>
                 <Header
                     title="Finances"
                 />

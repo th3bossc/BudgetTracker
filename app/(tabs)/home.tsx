@@ -9,85 +9,89 @@ import Loading from "@/components/loading";
 import { useCallback } from "react";
 import { useRouter } from "expo-router";
 import Header from "@/components/header";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
-  const theme = useTheme();
-  const router = useRouter();
-  const {
-    loading,
-    summary,
-    monthlyData: { incomes, expenses, investments },
-  } = useDashboardData();
+    const theme = useTheme();
+    const router = useRouter();
+    const {
+        loading,
+        summary,
+        monthlyData: { incomes, expenses, investments },
+    } = useDashboardData();
 
-  if (loading) {
+    if (loading) {
+        return (
+            <Loading />
+        )
+    }
+
+    const createExpenseItem = useCallback(() => {
+        router.push('/expense/create')
+    }, [router]);
+
+    const createIncomeItem = useCallback(() => {
+        router.push('/income/create');
+    }, [router]);
+
+    const createInvestmentItem = useCallback(() => {
+        router.push('/investment/create');
+    }, [router]);
+
+    const viewAllExpenses = useCallback(() => {
+        router.push('/(tabs)/expenses');
+    }, [router]);
+
+    const viewAllIncomes = useCallback(() => {
+        router.push('/(tabs)/incomes');
+    }, [router]);
+
+    const viewAllInvestments = useCallback(() => {
+        router.push('/(tabs)/investments');
+    }, [router]);
+
+    const openProfile = useCallback(() => {
+        router.push('/profile');
+    }, [router]);
+
     return (
-      <Loading />
-    )
-  }
+        <SafeAreaView style={{
+            flex: 1,
+            padding: 16,
+            backgroundColor: theme.colors.background,
+        }}
+        >
+            <ScrollView style={{ flex: 1 }}>
+                <Header
+                    title="Dashboard"
+                    icon="face-man-profile"
+                    onPress={openProfile}
+                />
 
-  const createExpenseItem = useCallback(() => {
-    router.push('/expense/create')
-  }, [router]);
 
-  const createIncomeItem = useCallback(() => {
-    router.push('/income/create');
-  }, [router]);
+                <MonthlySummaryCard summary={summary} />
 
-  const createInvestmentItem = useCallback(() => {
-    router.push('/investment/create');
-  }, [router]);
+                <SectionHeader
+                    title="Expenses"
+                    onCreate={createExpenseItem}
+                    onViewAll={viewAllExpenses}
+                />
+                <MonthlyAggregateTable data={expenses} />
 
-  const viewAllExpenses = useCallback(() => {
-    router.push('/(tabs)/expenses');
-  }, [router]);
+                <SectionHeader
+                    title="Investments"
+                    onCreate={createInvestmentItem}
+                    onViewAll={viewAllInvestments}
+                />
+                <MonthlyAggregateTable data={investments} />
 
-  const viewAllIncomes = useCallback(() => {
-    router.push('/(tabs)/incomes');
-  }, [router]);
-
-  const viewAllInvestments = useCallback(() => {
-    router.push('/(tabs)/investments');
-  }, [router]);
-
-  const openProfile = useCallback(() => {
-    router.push('/profile');
-  }, [router]);
-
-  return (
-    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ 
-      padding: 16,
-      backgroundColor: theme.colors.background,
-      flexGrow: 1,
-    }}>
-      <Header
-        title="Dashboard"
-        icon="face-man-profile"
-        onPress={openProfile}
-      />
-
-      
-      <MonthlySummaryCard summary={summary} />
-
-      <SectionHeader
-        title="Expenses"
-        onCreate={createExpenseItem}
-        onViewAll={viewAllExpenses}
-      />
-      <MonthlyAggregateTable data={expenses} />
-
-      <SectionHeader
-        title="Investments"
-        onCreate={createInvestmentItem}
-        onViewAll={viewAllInvestments}
-      />
-      <MonthlyAggregateTable data={investments} />
-
-      <SectionHeader
-        title="Income"
-        onCreate={createIncomeItem}
-        onViewAll={viewAllIncomes}
-      />
-      <MonthlyAggregateTable data={incomes} />
-    </ScrollView>
-  );
+                <SectionHeader
+                    title="Income"
+                    onCreate={createIncomeItem}
+                    onViewAll={viewAllIncomes}
+                />
+                <MonthlyAggregateTable data={incomes} />
+            </ScrollView>
+        </SafeAreaView>
+    );
 }
