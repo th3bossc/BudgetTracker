@@ -10,22 +10,22 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      EXPO_TOKEN: ${{ secrets.EAS_TOKEN }}
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      EAS_BUILD_NO_EXPO_GO_WARNING: true
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
+      - run: npm install
 
-      - name: Install EAS CLI
-        run: npm install -g eas-cli
+      - run: npm install -g eas-cli
+
+      - name: Install jq
+        run: sudo apt-get install jq
 
       - name: Create .env file
         run: |
@@ -38,17 +38,24 @@ jobs:
           EXPO_PUBLIC_FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID }}
           EOF
 
-      - name: Verify token exists
-        run: |
-          if [ -z "$EXPO_TOKEN" ]; then
-            echo "EXPO_TOKEN is NOT set"
-            exit 1
-          else
-            echo "EXPO_TOKEN is set"
-          fi
-
       - name: Build APK
-        run: eas build --platform android --profile production --non-interactive --wait --output=app.apk
+        id: build
+        run: |
+          BUILD_OUTPUT=$(eas build \
+            --platform android \
+            --profile production \
+            --non-interactive \
+            --wait \
+            --json)
+
+          echo "$BUILD_OUTPUT"
+
+          APK_URL=$(echo "$BUILD_OUTPUT" | jq -r '.[0].artifacts.buildUrl')
+
+          echo "APK_URL=$APK_URL" >> $GITHUB_ENV
+
+      - name: Download APK
+        run: curl -L "$APK_URL" -o app.apk
 
       - name: Upload APK to Release
         uses: softprops/action-gh-release@v2
