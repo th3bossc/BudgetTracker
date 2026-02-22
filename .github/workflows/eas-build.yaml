@@ -22,7 +22,7 @@ jobs:
       - uses: expo/expo-github-action@v8
         with:
           token: ${{ secrets.EXPO_TOKEN }}
-          
+
       - name: Create .env file
         run: |
           cat <<EOF > .env
@@ -36,3 +36,5 @@ jobs:
 
       - name: Build APK
         run: eas build --platform android --profile production --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
