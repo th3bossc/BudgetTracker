@@ -10,17 +10,17 @@ export interface EditableBudgetRow {
 }
 
 export const useBulkCategoryBudgets = (monthKey: string) => {
-  const { categories } = useFinanceConfig();
+  const { loading: fetchCategoriesLoadingStatus, categories } = useFinanceConfig();
 
   const [rows, setRows] = useState<EditableBudgetRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [computationLoadingStatus, setComputationLoadingStatus] = useState(true);
+  const [noCategories, setNoCategories] = useState<boolean>(true);
 
   useEffect(() => {
     const load = async () => {
-      setLoading(true);
-
+      setComputationLoadingStatus(true);
       const budgets = await getBudgetsByMonth(monthKey);
-
+      console.log(categories, budgets);
       const mapped = categories.map(cat => {
         const existing = budgets.find(
           b => b.category.id === cat.id
@@ -34,11 +34,22 @@ export const useBulkCategoryBudgets = (monthKey: string) => {
         };
       });
       setRows(mapped);
-      setLoading(false);
+      setComputationLoadingStatus(false);
     };
 
-    if (categories.length > 0) load();
-  }, [categories, monthKey]);
+    const handleNoCategories = () => {
+      setNoCategories(true);
+      setComputationLoadingStatus(false);
+    }
+
+    if (fetchCategoriesLoadingStatus)
+      return;
+
+    if (categories.length > 0) 
+      load();
+    else
+      handleNoCategories()
+  }, [fetchCategoriesLoadingStatus, monthKey]);
 
   const updateAmount = useCallback((categoryId: string, value: string) => {
     setRows(prev =>
@@ -53,6 +64,7 @@ export const useBulkCategoryBudgets = (monthKey: string) => {
   return {
     rows,
     updateAmount,
-    loading,
+    loading: computationLoadingStatus || fetchCategoriesLoadingStatus,
+    noCategories,
   };
 };

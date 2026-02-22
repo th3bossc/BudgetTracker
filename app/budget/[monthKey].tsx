@@ -24,6 +24,7 @@ export default function BulkBudgetEditPage() {
         rows,
         updateAmount,
         loading,
+        noCategories,
     } = useBulkCategoryBudgets(monthKey);
 
     const handleSave = useCallback(async () => {
@@ -70,17 +71,29 @@ export default function BulkBudgetEditPage() {
                         />
                     </View>
                 )}
+                ListEmptyComponent={
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 60 }}>
+                        <Text variant="titleMedium">
+                            No categories found
+                        </Text>
+                        <Text variant="bodyMedium" style={{ opacity: 0.6, textAlign: 'center', marginTop: 8 }}>
+                            Add categories first before setting budgets.
+                        </Text>
+                    </View>
+                }
                 ListFooterComponent={
-                    <>
-                        <Divider style={{ marginVertical: 20 }} />
+                    noCategories
+                        ? null
+                        : <>
+                            <Divider style={{ marginVertical: 20 }} />
 
-                        <Button
-                            mode="contained"
-                            onPress={handleSave}
-                        >
-                            Save Budgets for {monthKey}
-                        </Button>
-                    </>
+                            <Button
+                                mode="contained"
+                                onPress={handleSave}
+                            >
+                                Save Budgets for {monthKey}
+                            </Button>
+                        </>
                 }
             />
         </SafeAreaView>
