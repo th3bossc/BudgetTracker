@@ -1,12 +1,11 @@
-import { CategoryBudget, ExpenseCategory } from "@/types/schema";
+import { CategoryBudget, Expense, ExpenseCategory, Income, Investment } from "@/types/schema";
 import { DashboardSummary } from "./use-dashboard-data";
 import { useEffect, useMemo, useState } from "react";
 import { useFinanceConfig } from "./use-finance-config";
 import { getBudgetsByMonth } from "@/services/category-budget-service";
-import { getExpenses } from "@/services/expense-service";
-import { getInvestments } from "@/services/investment-service";
-import { getIncomes } from "@/services/income-service";
-import { createLookupMap } from "@/utils/create-lookup-map";
+import { subscribeToExpenses } from "@/services/expense-service";
+import { subscribeToInvestments } from "@/services/investment-service";
+import { subscribeToIncomes } from "@/services/income-service";
 
 export interface BudgetUsed {
     category: ExpenseCategory;
@@ -41,6 +40,22 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
 
     const loading = useMemo(() => computationLoadingStatus || financeConfigLoadingStatus, [computationLoadingStatus, financeConfigLoadingStatus]);
 
+    const [incomes, setIncomes] = useState<Income[]>([]);
+        const [expenses, setExpenses] = useState<Expense[]>([]);
+        const [investments, setInvestments] = useState<Investment[]>([]);
+    
+        useEffect(() => {
+            const incomesUnsub = subscribeToIncomes(setIncomes);
+            const expensesUnsub = subscribeToExpenses(setExpenses);
+            const investmentsUnsub = subscribeToInvestments(setInvestments);
+    
+            return () => {
+                incomesUnsub();
+                expensesUnsub();
+                investmentsUnsub();
+            }
+        }, []);
+
     useEffect(() => {
         if (financeConfigLoadingStatus)
             return;
@@ -50,13 +65,6 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
 
             try {
                 const budgets = await getBudgetsByMonth(monthKey);
-
-                const [incomes, expenses, investments] = await Promise.all([
-                    getIncomes(),
-                    getExpenses(),
-                    getInvestments(),
-                ])
-
 
                 const currentIncome = incomes
                     .filter(i => i.monthKey == monthKey)
@@ -107,7 +115,7 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
         }
 
         void fetchData();
-    }, [financeConfigLoadingStatus, monthKey]);
+    }, [financeConfigLoadingStatus, monthKey, incomes, expenses, investments]);
 
     return {
         loading,

@@ -1,6 +1,6 @@
-import { getExpenseCategories } from "@/services/expense-category-service";
-import { getExpenses } from "@/services/expense-service";
-import { getPaymentMethods } from "@/services/payment-method-service";
+import { subscribeToExpenseCategories } from "@/services/expense-category-service";
+import { subscribeToExpenses } from "@/services/expense-service";
+import { subscribeToPaymentMethods } from "@/services/payment-method-service";
 import { ExpenseFilters } from "@/types/common";
 import { Expense, ExpenseCategory, PaymentMethod } from "@/types/schema";
 import { createLookupMap } from "@/utils/create-lookup-map";
@@ -13,24 +13,16 @@ export const useExpensesData = (filters: ExpenseFilters) => {
     const [initialLoading, setInitialLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const expenses = await getExpenses();
-                const categories = await getExpenseCategories();
-                const paymentMethods = await getPaymentMethods();
-                setRawExpenses(expenses);
-                setCategories(categories);
-                setPaymentMethods(paymentMethods);
-            }
-            catch (error) {
-                console.error('Error fetching expenses data: ', error);
-            }
-            finally {
-                setInitialLoading(false);
-            }
-        }
+        const expensesUnsub = subscribeToExpenses(setRawExpenses);
+        const categoriesUnsub = subscribeToExpenseCategories(setCategories);
+        const paymentMethodsUnsub = subscribeToPaymentMethods(setPaymentMethods);
+        setInitialLoading(false);
 
-        void fetchData();
+        return () => {
+            expensesUnsub();
+            categoriesUnsub();
+            paymentMethodsUnsub();
+        }
     }, []);
 
     const categoriesMap = useMemo(() => createLookupMap(categories), [categories]);

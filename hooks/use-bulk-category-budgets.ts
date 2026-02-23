@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useFinanceConfig } from "./use-finance-config";
-import { getBudgetsByMonth } from "@/services/category-budget-service";
+import { subscribeToMonthlyBudgets } from "@/services/category-budget-service";
+import { CategoryBudget } from "@/types/schema";
 
 export interface EditableBudgetRow {
   categoryId: string;
@@ -15,12 +16,17 @@ export const useBulkCategoryBudgets = (monthKey: string) => {
   const [rows, setRows] = useState<EditableBudgetRow[]>([]);
   const [computationLoadingStatus, setComputationLoadingStatus] = useState(true);
   const [noCategories, setNoCategories] = useState<boolean>(true);
+  const [budgets, setBudgets] = useState<CategoryBudget[]>([]);
+
+  useEffect(() => {
+    const unsub = subscribeToMonthlyBudgets(monthKey, setBudgets);
+
+    return unsub;
+  }, [monthKey]);
 
   useEffect(() => {
     const load = async () => {
       setComputationLoadingStatus(true);
-      const budgets = await getBudgetsByMonth(monthKey);
-      console.log(categories, budgets);
       const mapped = categories.map(cat => {
         const existing = budgets.find(
           b => b.category.id === cat.id
@@ -49,7 +55,7 @@ export const useBulkCategoryBudgets = (monthKey: string) => {
       load();
     else
       handleNoCategories()
-  }, [fetchCategoriesLoadingStatus, monthKey]);
+  }, [fetchCategoriesLoadingStatus, budgets]);
 
   const updateAmount = useCallback((categoryId: string, value: string) => {
     setRows(prev =>

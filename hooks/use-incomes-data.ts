@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import type { IncomeFilters } from "@/types/common";
 import { Income, IncomeSource } from "@/types/schema";
-import { getIncomes } from "@/services/income-service";
-import { getIncomeSources } from "@/services/income-source-service";
+import { subscribeToIncomes } from "@/services/income-service";
+import { subscribeToIncomeSources } from "@/services/income-source-service";
 import { createLookupMap } from "@/utils/create-lookup-map";
 
 export const useIncomesData = (filters: IncomeFilters) => {
@@ -11,22 +11,14 @@ export const useIncomesData = (filters: IncomeFilters) => {
     const [initialLoading, setInitialLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const incomes = await getIncomes();
-                const sources = await getIncomeSources();
-                setRawIncomes(incomes);
-                setSources(sources);
-            }
-            catch (error) {
-                console.error('Error fetching incomes data: ', error);
-            }
-            finally {
-                setInitialLoading(false);
-            }
-        }
+        const incomesUnsub = subscribeToIncomes(setRawIncomes);
+        const sourcesUnsub = subscribeToIncomeSources(setSources);
+        setInitialLoading(false);
 
-        void fetchData();
+        return () => {
+            incomesUnsub();
+            sourcesUnsub();
+        }
     }, []);
 
     const sourcesMap = useMemo(() => createLookupMap(sources), [sources]);

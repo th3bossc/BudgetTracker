@@ -13,6 +13,9 @@ import {
     updateDoc,
     doc,
     deleteDoc,
+    query,
+    orderBy,
+    onSnapshot,
 } from 'firebase/firestore';
 import { db } from "./firebase";
 import { getCurrentUserId } from "./firestore-helpers";
@@ -98,3 +101,22 @@ export const deleteExpense = async (
         doc(db, 'users', uid, TABLE_NAME, expenseId),
     );
 }
+
+export const subscribeToExpenses = (
+    callback: (expenses: Expense[]) => void
+) => {
+    const uid = getCurrentUserId();
+
+    const q = query(
+        collection(db, "users", uid, TABLE_NAME)
+            .withConverter(expenseConverter),
+        orderBy("date", "desc")
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+        const expenses = snapshot.docs.map(doc => doc.data());
+        callback(expenses);
+    });
+
+    return unsubscribe;
+};
