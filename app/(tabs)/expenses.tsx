@@ -16,6 +16,7 @@ import ExpenseFiltersModal from "@/components/filter-modals/expense-filter";
 import { ExpenseFilters } from "@/types/common";
 import Loading from "@/components/loading";
 import Header from "@/components/header";
+import { deleteExpense } from "@/services/expense-service";
 
 export default function ExpenseListPage() {
     const theme = useTheme();
