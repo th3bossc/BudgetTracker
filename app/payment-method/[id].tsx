@@ -1,18 +1,17 @@
-import { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import {
-    Appbar,
-    Surface,
-    ActivityIndicator,
-    useTheme,
-} from "react-native-paper";
-import {
-} from "@/services/investment-type-service";
-import { PaymentMethod } from "@/types/schema";
+import PaymentMethodForm from "@/components/forms/payment-method-form";
+import { } from "@/services/investment-type-service";
 import { getPaymentMethods, updatePaymentMethod } from "@/services/payment-method-service";
 import { PaymentMethodUpdateInput } from "@/types/create";
-import PaymentMethodForm from "@/components/forms/payment-method-form";
+import { PaymentMethod } from "@/types/schema";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import {
+    ActivityIndicator,
+    Appbar,
+    Surface,
+    useTheme,
+} from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function EditPaymentMethodPage() {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -45,8 +44,8 @@ export default function EditPaymentMethodPage() {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
-            <Appbar.Header>
+        <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
+            <Appbar.Header statusBarHeight={0}>
                 <Appbar.BackAction onPress={() => router.back()} />
                 <Appbar.Content title="Edit Payment Method" />
             </Appbar.Header>

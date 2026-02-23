@@ -1,14 +1,14 @@
-import { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import IncomeForm from "@/components/forms/income-form";
+import { addIncome } from "@/services/income-service";
+import type { IncomeCreateInput } from "@/types/create";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import {
   Appbar,
   Surface,
   useTheme,
 } from "react-native-paper";
-import IncomeForm from "@/components/forms/income-form";
-import { addIncome } from "@/services/income-service";
-import type { IncomeCreateInput } from "@/types/create";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CreateIncomePage() {
   const router = useRouter();
@@ -26,8 +26,8 @@ export default function CreateIncomePage() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Appbar.Header>
+    <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
+      <Appbar.Header statusBarHeight={0}>
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content title="Create Income" />
       </Appbar.Header>

@@ -1,18 +1,18 @@
+import Loading from "@/components/loading";
+import { useBulkCategoryBudgets } from "@/hooks/use-bulk-category-budgets";
+import { upsertBudget } from "@/services/category-budget-service";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, View } from "react-native";
 import {
     Appbar,
-    TextInput,
-    Text,
-    Divider,
     Button,
+    Divider,
+    Text,
+    TextInput,
     useTheme,
 } from "react-native-paper";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useBulkCategoryBudgets } from "@/hooks/use-bulk-category-budgets";
-import { upsertBudget } from "@/services/category-budget-service";
-import Loading from "@/components/loading";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function BulkBudgetEditPage() {
     const theme = useTheme();
@@ -46,8 +46,8 @@ export default function BulkBudgetEditPage() {
     }
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
-            <Appbar.Header>
+        <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
+            <Appbar.Header statusBarHeight={0}>
                 <Appbar.BackAction onPress={() => router.back()} />
                 <Appbar.Content title="Edit Category Budgets" />
             </Appbar.Header>

@@ -1,19 +1,19 @@
-import { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import {
-  Appbar,
-  Surface,
-  ActivityIndicator,
-  useTheme,
-} from "react-native-paper";
 import ExpenseForm from "@/components/forms/expense-form";
 import {
   getExpenses,
   updateExpense,
 } from "@/services/expense-service";
-import type { Expense } from "@/types/schema";
 import { ExpenseUpdateInput } from "@/types/create";
+import type { Expense } from "@/types/schema";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Appbar,
+  Surface,
+  useTheme,
+} from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function EditExpensePage() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -47,8 +47,8 @@ export default function EditExpensePage() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Appbar.Header>
+    <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
+      <Appbar.Header statusBarHeight={0}>
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content title="Edit Expense" />
       </Appbar.Header>

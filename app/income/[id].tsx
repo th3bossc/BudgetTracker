@@ -1,19 +1,19 @@
-import { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import {
-  Appbar,
-  Surface,
-  ActivityIndicator,
-  useTheme,
-} from "react-native-paper";
 import IncomeForm from "@/components/forms/income-form";
 import {
   getIncomes,
   updateIncome,
 } from "@/services/income-service";
-import type { Income } from "@/types/schema";
 import type { IncomeUpdateInput } from "@/types/create";
+import type { Income } from "@/types/schema";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Appbar,
+  Surface,
+  useTheme,
+} from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function EditIncomePage() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -48,8 +48,8 @@ export default function EditIncomePage() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Appbar.Header>
+    <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
+      <Appbar.Header statusBarHeight={0}>
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content title="Edit Income" />
       </Appbar.Header>

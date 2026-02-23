@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { Appbar, Surface, useTheme } from "react-native-paper";
 import InvestmentTypeForm from "@/components/forms/investment-type-form";
 import { addInvestmentType } from "@/services/investment-type-service";
 import { InvestmentTypeCreateInput } from "@/types/create";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { Appbar, Surface, useTheme } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CreateInvestmentTypePage() {
     const router = useRouter();
@@ -24,8 +24,8 @@ export default function CreateInvestmentTypePage() {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
-            <Appbar.Header>
+        <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
+            <Appbar.Header statusBarHeight={0}>
                 <Appbar.BackAction onPress={() => router.back()} />
                 <Appbar.Content title="Create Investment Type" />
             </Appbar.Header>

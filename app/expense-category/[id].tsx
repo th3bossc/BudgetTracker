@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react";
-import { ActivityIndicator } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams, useRouter } from "expo-router";
 import CategoryForm from "@/components/forms/expense-category-form";
 import {
     getExpenseCategories,
     updateExpenseCategory,
 } from "@/services/expense-category-service";
-import { ExpenseCategory } from "@/types/schema";
 import { ExpenseCategoryUpdateInput } from "@/types/create";
+import { ExpenseCategory } from "@/types/schema";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import { ActivityIndicator } from "react-native";
 import { Appbar, Surface, useTheme } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function EditCategoryPage() {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -41,8 +41,8 @@ export default function EditCategoryPage() {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
-            <Appbar.Header>
+        <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
+            <Appbar.Header statusBarHeight={0}>
                 <Appbar.BackAction onPress={() => router.back()} />
                 <Appbar.Content title="Edit Investment Type" />
             </Appbar.Header>

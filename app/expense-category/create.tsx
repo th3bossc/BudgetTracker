@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { Appbar, Surface, useTheme } from "react-native-paper";
 import CategoryForm from "@/components/forms/expense-category-form";
 import { addExpenseCategory } from "@/services/expense-category-service";
 import { ExpenseCategoryCreateInput } from "@/types/create";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { Appbar, Surface, useTheme } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CreateCategoryPage() {
   const router = useRouter();
@@ -22,8 +22,8 @@ export default function CreateCategoryPage() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Appbar.Header>
+    <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
+      <Appbar.Header statusBarHeight={0}>
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content title="Create Category" />
       </Appbar.Header>

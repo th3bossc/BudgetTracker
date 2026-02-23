@@ -1,11 +1,10 @@
-import { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { Appbar, Surface, useTheme } from "react-native-paper";
-import { addInvestmentType } from "@/services/investment-type-service";
-import { PaymentMethodCreateInput } from "@/types/create";
 import PaymentMethodForm from "@/components/forms/payment-method-form";
 import { addPaymentMethod } from "@/services/payment-method-service";
+import { PaymentMethodCreateInput } from "@/types/create";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { Appbar, Surface, useTheme } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CreatePaymentMethodPage() {
     const router = useRouter();
@@ -25,8 +24,8 @@ export default function CreatePaymentMethodPage() {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
-            <Appbar.Header>
+        <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
+            <Appbar.Header statusBarHeight={0}>
                 <Appbar.BackAction onPress={() => router.back()} />
                 <Appbar.Content title="Create Payment Method" />
             </Appbar.Header>

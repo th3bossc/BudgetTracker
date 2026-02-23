@@ -1,12 +1,3 @@
-import { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import {
-    Appbar,
-    Surface,
-    ActivityIndicator,
-    useTheme,
-} from "react-native-paper";
 import InvestmentTypeForm from "@/components/forms/investment-type-form";
 import {
     getInvestmentTypes,
@@ -14,6 +5,15 @@ import {
 } from "@/services/investment-type-service";
 import { InvestmentTypeUpdateInput } from "@/types/create";
 import { InvestmentType } from "@/types/schema";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import {
+    ActivityIndicator,
+    Appbar,
+    Surface,
+    useTheme,
+} from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function EditInvestmentTypePage() {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -46,8 +46,8 @@ export default function EditInvestmentTypePage() {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
-            <Appbar.Header>
+        <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
+            <Appbar.Header statusBarHeight={0}>
                 <Appbar.BackAction onPress={() => router.back()} />
                 <Appbar.Content title="Edit Investment Type" />
             </Appbar.Header>
