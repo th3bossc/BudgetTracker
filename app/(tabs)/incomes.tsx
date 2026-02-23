@@ -54,6 +54,7 @@ export default function IncomeListPage() {
             console.error('something went wrong while deleting income', error)
         }
         finally {
+            setDeleteId(null);
             setDeleting(false);
         }
     }, [deleteId]);

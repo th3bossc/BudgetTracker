@@ -58,6 +58,7 @@ export default function ExpenseListPage() {
             console.error('something went wrong while deleting expense', error)
         }
         finally {
+            setDeleteId(null)
             setDeleting(false);
         }
     }, [deleteId]);

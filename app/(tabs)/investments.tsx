@@ -53,13 +53,14 @@ export default function InvestmentListPage() {
             console.error('something went wrong while deleting income', error)
         }
         finally {
+            setDeleteId(null);
             setDeleting(false);
         }
     }, [deleteId]);
 
     const handleCancelDelete = useCallback(() => setDeleteId(null), []);
 
-    if (loading) {
+    if (loading || deleting) {
         return <Loading />
     }
 
