@@ -16,7 +16,7 @@ import { updatePaymentMethod } from "@/services/payment-method-service";
 export default function PaymentMethodListPage() {
     const router = useRouter();
     const theme = useTheme();
-    const { incomeSources } = useFinanceConfig();
+    const { paymentMethods } = useFinanceConfig();
 
     const toggleArchive = useCallback(async (id: string, current: boolean) => {
         await updatePaymentMethod(id, {
@@ -35,7 +35,7 @@ export default function PaymentMethodListPage() {
 
             <FlatList
                 contentContainerStyle={{ padding: 16, gap: 12 }}
-                data={incomeSources}
+                data={paymentMethods}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <Card

@@ -26,7 +26,7 @@ export default function CategoryBudgetCard({
     Animated.timing(animatedValue, {
       toValue: Math.min(percentage, 1),
       duration: 600,
-      useNativeDriver: false,
+      useNativeDriver: true,
     }).start();
   }, [percentage]);
 
