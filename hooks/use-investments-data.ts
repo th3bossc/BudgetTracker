@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import type { InvestmentFilters } from "@/types/common";
 import { Investment, InvestmentType } from "@/types/schema";
 import { createLookupMap } from "@/utils/create-lookup-map";
-import { getInvestments } from "@/services/investment-service";
-import { getInvestmentTypes } from "@/services/investment-type-service";
+import { subscribeToInvestments } from "@/services/investment-service";
+import { subscribeToInvestmentTypes } from "@/services/investment-type-service";
 
 export const useInvestmentsData = (filters: InvestmentFilters) => {
     const [initialLoding, setInitialLoading] = useState<boolean>(true);
@@ -11,21 +11,14 @@ export const useInvestmentsData = (filters: InvestmentFilters) => {
     const [types, setTypes] = useState<InvestmentType[]>([]);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const investments = await getInvestments();
-                const types = await getInvestmentTypes();
-                setRawInvestments(investments);
-                setTypes(types);
-            }
-            catch (error) {
-                console.error('Error fetching investments data: ', error);
-            }
-            finally {
-                setInitialLoading(false);
-            }
+        const investmentsUnsub = subscribeToInvestments(setRawInvestments);
+        const typesUnsub = subscribeToInvestmentTypes(setTypes);
+        setInitialLoading(false);
+
+        return () => {
+            investmentsUnsub();
+            typesUnsub();
         }
-        void fetchData();
     }, []);
 
     const typeMap = useMemo(() => createLookupMap(types), [types]);

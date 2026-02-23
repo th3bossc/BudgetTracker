@@ -8,6 +8,9 @@ import {
     doc,
     FirestoreDataConverter,
     getDocs,
+    onSnapshot,
+    orderBy,
+    query,
     QueryDocumentSnapshot,
     serverTimestamp,
     SnapshotOptions,
@@ -95,4 +98,23 @@ export const deleteIncome = async (
     await deleteDoc(
         doc(db, 'users', uid, TABLE_NAME, incomeId),
     );
+}
+
+export const subscribeToIncomes = (
+    callback: (incomes: Income[]) => void
+) => {
+    const uid = getCurrentUserId();
+
+    const q = query(
+        collection(db, 'users', uid, TABLE_NAME)
+            .withConverter(incomeConverter),
+        orderBy("date", "desc")
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+        const incomes = snapshot.docs.map(doc => doc.data())
+        callback(incomes);
+    });
+
+    return unsubscribe;
 }

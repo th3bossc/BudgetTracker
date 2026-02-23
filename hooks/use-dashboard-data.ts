@@ -1,13 +1,11 @@
-import { getExpenses } from "@/services/expense-service";
-import { getIncomes } from "@/services/income-service";
-import { getInvestments } from "@/services/investment-service";
+import { subscribeToExpenses } from "@/services/expense-service";
+import { subscribeToIncomes } from "@/services/income-service";
+import { subscribeToInvestments } from "@/services/investment-service";
 import type { MonthlyAggregate } from "@/types/common";
-import { ExpenseCategory } from "@/types/schema";
+import { Expense, Income, Investment } from "@/types/schema";
 import { getMonthKey } from "@/utils/date";
 import { groupByMonth } from "@/utils/group-by-month";
-import { useEffect, useMemo, useState } from "react";
-import { useFinanceConfig } from "./use-finance-config";
-import { createLookupMap } from "@/utils/create-lookup-map";
+import { useEffect, useState } from "react";
 
 export interface DashboardSummary {
     income: number;
@@ -47,16 +45,26 @@ export const useDashboardData = (): DashboardData => {
         investments: [],
     });
 
+    const [incomes, setIncomes] = useState<Income[]>([]);
+    const [expenses, setExpenses] = useState<Expense[]>([]);
+    const [investments, setInvestments] = useState<Investment[]>([]);
+
+    useEffect(() => {
+        const incomesUnsub = subscribeToIncomes(setIncomes);
+        const expensesUnsub = subscribeToExpenses(setExpenses);
+        const investmentsUnsub = subscribeToInvestments(setInvestments);
+
+        return () => {
+            incomesUnsub();
+            expensesUnsub();
+            investmentsUnsub();
+        }
+    }, []);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setComputationLoadingStatus(true);
-
-                const [incomes, expenses, investments] = await Promise.all([
-                    getIncomes(),
-                    getExpenses(),
-                    getInvestments(),
-                ]);
 
                 const currentMonth = getMonthKey(new Date());
 
@@ -100,7 +108,7 @@ export const useDashboardData = (): DashboardData => {
         }
 
         void fetchData();
-    }, []);
+    }, [incomes, expenses, investments]);
 
     return {
         loading: computationLoadingStatus,
