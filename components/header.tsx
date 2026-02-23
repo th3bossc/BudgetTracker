@@ -11,7 +11,7 @@ interface Props {
 const Header = ({ title, icon, onPress, flushed = false }: Props) => {
     return (
         <>
-            <Appbar.Header elevated={!flushed} style={{ borderRadius: 16 }}>
+            <Appbar.Header elevated={!flushed} style={{ borderRadius: 16 }} statusBarHeight={0}>
                 <Appbar.Content title={title} />
                 {
                     icon && (

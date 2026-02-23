@@ -1,19 +1,19 @@
-import { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import {
-  Appbar,
-  Surface,
-  ActivityIndicator,
-  useTheme,
-} from "react-native-paper";
 import InvestmentForm from "@/components/forms/investment-form";
 import {
   getInvestments,
   updateInvestment,
 } from "@/services/investment-service";
-import { Investment } from "@/types/schema";
 import { InvestmentUpdateInput } from "@/types/create";
+import { Investment } from "@/types/schema";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Appbar,
+  Surface,
+  useTheme,
+} from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function EditInvestmentPage() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -46,8 +46,8 @@ export default function EditInvestmentPage() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Appbar.Header>
+    <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
+      <Appbar.Header statusBarHeight={0}>
         <Appbar.BackAction onPress={() => router.back()} />
         <Appbar.Content title="Edit Investment" />
       </Appbar.Header>

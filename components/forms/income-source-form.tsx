@@ -7,10 +7,11 @@ import {
     Divider,
     Switch,
     Text,
+    useTheme,
 } from "react-native-paper";
 import type { IncomeSource } from "@/types/schema";
 import { IncomeSourceCreateInput, IncomeSourceUpdateInput } from "@/types/create";
-import ColorPicker from "react-native-wheel-color-picker";
+import ColorPicker from "../color-picker";
 interface Props {
     initialData?: IncomeSource;
     onSubmit: ((data: IncomeSourceCreateInput) => Promise<void>) | ((data: IncomeSourceUpdateInput) => Promise<void>);
@@ -23,7 +24,6 @@ export default function IncomeSourceForm({
     loading,
 }: Props) {
     const [name, setName] = useState(initialData?.name ?? "");
-    const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
     const [color, setColor] = useState(initialData?.color ?? "#2196F3");
     const [isArchived, setIsArchived] = useState(
         initialData?.isArchived ?? false
@@ -56,25 +56,11 @@ export default function IncomeSourceForm({
                 mode="outlined"
             />
 
-            <Button
-                mode="outlined"
-                onPress={() => setShowColorPicker(prev => !prev)}
-            >
-                Pick color
-            </Button>
 
-            {
-                showColorPicker && (
-                    <ColorPicker
-                        color={color}
-                        onColorChange={setColor}
-                        thumbSize={30}
-                        sliderSize={30}
-                        noSnap
-                        row={false}
-                    />
-                )
-            }
+            <ColorPicker
+                color={color}
+                onSelect={setColor}
+            />
 
             <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
                 <Switch

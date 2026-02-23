@@ -30,13 +30,12 @@ export default function CategoryBudgetCard({
     }).start();
   }, [percentage]);
 
-  // Color logic
   let barColor = theme.colors.primary;
 
   if (percentage >= 1) {
     barColor = theme.colors.error;
   } else if (percentage >= 0.9) {
-    barColor = theme.colors.secondary; // 90% warning
+    barColor = theme.colors.secondary;
   }
 
   return (

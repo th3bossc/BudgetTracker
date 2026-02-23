@@ -7,12 +7,14 @@ import {
     Button,
     HelperText,
     Surface,
-    TextInput
+    TextInput,
+    useTheme
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function RegisterPage() {
     const router = useRouter();
+    const theme = useTheme();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -28,7 +30,7 @@ export default function RegisterPage() {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
             <Surface style={{ flex: 1, padding: 20, gap: 20, justifyContent: 'center' }}>
                 <Header
                     title="Register"

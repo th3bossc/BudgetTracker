@@ -2,12 +2,12 @@ import { useCallback, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, View } from "react-native";
 import {
-    Appbar,
     Card,
     Chip,
     Text,
     FAB,
     useTheme,
+    IconButton,
 } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { useIncomesData } from "@/hooks/use-incomes-data";
@@ -15,6 +15,8 @@ import type { IncomeFilters } from "@/types/common";
 import IncomeFiltersModal from "@/components/filter-modals/incomes-filters";
 import Loading from "@/components/loading";
 import Header from "@/components/header";
+import { deleteIncome } from "@/services/income-service";
+import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
 
 export default function IncomeListPage() {
     const theme = useTheme();
@@ -24,6 +26,9 @@ export default function IncomeListPage() {
         sortBy: "date",
         sortOrder: "desc",
     });
+
+    const [deleting, setDeleting] = useState<boolean>(false);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
 
     const [filtersVisible, setFiltersVisible] = useState(false);
 
@@ -37,7 +42,26 @@ export default function IncomeListPage() {
         setFiltersVisible(true);
     }, []);
 
-    if (loading) {
+    const handleDelete = useCallback(async () => {
+        if (!deleteId)
+            return;
+
+        try {
+            setDeleting(true);
+            await deleteIncome(deleteId);
+        }
+        catch (error) {
+            console.error('something went wrong while deleting income', error)
+        }
+        finally {
+            setDeleteId(null);
+            setDeleting(false);
+        }
+    }, [deleteId]);
+
+    const handleCancelDelete = useCallback(() => setDeleteId(null), []);
+
+    if (loading || deleting) {
         return <Loading />
     }
 
@@ -77,8 +101,7 @@ export default function IncomeListPage() {
                                     {item.description}
                                 </Text>
                             )}
-
-                            <View style={{ marginTop: 8 }}>
+                            <View style={{ marginTop: 8, justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
                                 <Chip
                                     style={{
                                         backgroundColor:
@@ -88,7 +111,16 @@ export default function IncomeListPage() {
                                 >
                                     {sourcesMap[item.source.id]?.name}
                                 </Chip>
+                                <IconButton
+                                    icon="delete"
+                                    iconColor={theme.colors.error}
+                                    onPress={(e) => {
+                                        e.stopPropagation();
+                                        setDeleteId(item.id)
+                                    }}
+                                />
                             </View>
+
 
                         </Card.Content>
                     </Card>
@@ -110,6 +142,12 @@ export default function IncomeListPage() {
                 onDismiss={() => setFiltersVisible(false)}
                 filters={filters}
                 setFilters={setFilters}
+            />
+
+            <DeleteConfirmationDialog
+                visible={!!deleteId}
+                onConfirm={handleDelete}
+                onDismiss={handleCancelDelete}
             />
         </SafeAreaView>
     );

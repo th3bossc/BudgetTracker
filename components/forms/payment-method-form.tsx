@@ -9,8 +9,9 @@ import {
     Divider,
     Switch,
     Text,
+    useTheme,
 } from "react-native-paper";
-import ColorPicker from "react-native-wheel-color-picker";
+import ColorPicker from "../color-picker";
 
 interface Props {
     initialData?: PaymentMethod;
@@ -24,7 +25,6 @@ export default function PaymentMethodForm({
     loading,
 }: Props) {
     const [name, setName] = useState(initialData?.name ?? "");
-    const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
     const [color, setColor] = useState(initialData?.color ?? "#9C27B0");
     const [isArchived, setIsArchived] = useState(
         initialData?.isArchived ?? false
@@ -50,26 +50,10 @@ export default function PaymentMethodForm({
                 mode="outlined"
             />
 
-
-            <Button
-                mode="outlined"
-                onPress={() => setShowColorPicker(prev => !prev)}
-            >
-                Pick color
-            </Button>
-
-            {
-                showColorPicker && (
-                    <ColorPicker
-                        color={color}
-                        onColorChange={setColor}
-                        thumbSize={30}
-                        sliderSize={30}
-                        noSnap
-                        row={false}
-                    />
-                )
-            }
+            <ColorPicker
+                color={color}
+                onSelect={setColor}
+            />
 
             <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
                 <Switch value={isArchived} onValueChange={setIsArchived} />

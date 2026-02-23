@@ -1,18 +1,18 @@
+import Loading from "@/components/loading";
+import { useBulkCategoryBudgets } from "@/hooks/use-bulk-category-budgets";
+import { upsertBudget } from "@/services/category-budget-service";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, View } from "react-native";
 import {
     Appbar,
-    TextInput,
-    Text,
-    Divider,
     Button,
+    Divider,
+    Text,
+    TextInput,
     useTheme,
 } from "react-native-paper";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useBulkCategoryBudgets } from "@/hooks/use-bulk-category-budgets";
-import { upsertBudget } from "@/services/category-budget-service";
-import Loading from "@/components/loading";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function BulkBudgetEditPage() {
     const theme = useTheme();
@@ -24,6 +24,7 @@ export default function BulkBudgetEditPage() {
         rows,
         updateAmount,
         loading,
+        noCategories,
     } = useBulkCategoryBudgets(monthKey);
 
     const handleSave = useCallback(async () => {
@@ -45,8 +46,8 @@ export default function BulkBudgetEditPage() {
     }
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
-            <Appbar.Header>
+        <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
+            <Appbar.Header statusBarHeight={0}>
                 <Appbar.BackAction onPress={() => router.back()} />
                 <Appbar.Content title="Edit Category Budgets" />
             </Appbar.Header>
@@ -70,17 +71,29 @@ export default function BulkBudgetEditPage() {
                         />
                     </View>
                 )}
+                ListEmptyComponent={
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 60 }}>
+                        <Text variant="titleMedium">
+                            No categories found
+                        </Text>
+                        <Text variant="bodyMedium" style={{ opacity: 0.6, textAlign: 'center', marginTop: 8 }}>
+                            Add categories first before setting budgets.
+                        </Text>
+                    </View>
+                }
                 ListFooterComponent={
-                    <>
-                        <Divider style={{ marginVertical: 20 }} />
+                    noCategories
+                        ? null
+                        : <>
+                            <Divider style={{ marginVertical: 20 }} />
 
-                        <Button
-                            mode="contained"
-                            onPress={handleSave}
-                        >
-                            Save Budgets for {monthKey}
-                        </Button>
-                    </>
+                            <Button
+                                mode="contained"
+                                onPress={handleSave}
+                            >
+                                Save Budgets for {monthKey}
+                            </Button>
+                        </>
                 }
             />
         </SafeAreaView>
