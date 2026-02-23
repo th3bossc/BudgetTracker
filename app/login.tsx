@@ -1,4 +1,5 @@
 import Header from "@/components/header";
+import { useGoogleAuth } from "@/services/auth-service";
 import { auth } from "@/services/firebase";
 import { useRouter } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -6,15 +7,19 @@ import { useState } from "react";
 import {
     Button,
     HelperText,
+    Icon,
     Surface,
     TextInput,
-    useTheme
+    useTheme,
+    Text,
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LoginPage() {
     const router = useRouter();
     const theme = useTheme();
+    const { promptAsync } = useGoogleAuth();
+
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -62,6 +67,12 @@ export default function LoginPage() {
 
                 <Button onPress={() => router.push("/register")}>
                     Create Account
+                </Button>
+
+                
+                <Button onPress={() => promptAsync()} style={{ gap: 8 }}>
+                    <Icon source="google" size={14} />
+                    <Text> Continue with Google </Text>
                 </Button>
             </Surface>
         </SafeAreaView>

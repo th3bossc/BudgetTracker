@@ -1,0 +1,32 @@
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
+import { useEffect } from "react";
+import { signInWithCredential, GoogleAuthProvider } from "firebase/auth";
+import { auth } from "./firebase";
+
+WebBrowser.maybeCompleteAuthSession();
+
+export const useGoogleAuth = () => {
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+  });
+
+  useEffect(() => {
+    if (response?.type === "success") {
+      const { idToken } = response.authentication!;
+
+      const credential = GoogleAuthProvider.credential(idToken);
+
+      signInWithCredential(auth, credential)
+        .then(() => {
+          console.log("Google sign in success");
+        })
+        .catch((err) => {
+          console.error("Google sign in error:", err);
+        });
+    }
+  }, [response]);
+
+  return { promptAsync, request };
+};
