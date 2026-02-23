@@ -4,7 +4,6 @@ interface Props {
     visible: boolean;
     onDismiss: () => void;
     onConfirm: () => void | Promise<void>;
-    text: string;
 }
 
 const DeleteConfirmationDialog = ({

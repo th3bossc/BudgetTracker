@@ -4,7 +4,6 @@ import { Investment, InvestmentType } from "@/types/schema";
 import { createLookupMap } from "@/utils/create-lookup-map";
 import { getInvestments } from "@/services/investment-service";
 import { getInvestmentTypes } from "@/services/investment-type-service";
-// assume this fetches raw firestore data
 
 export const useInvestmentsData = (filters: InvestmentFilters) => {
     const [initialLoding, setInitialLoading] = useState<boolean>(true);

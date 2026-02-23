@@ -1,18 +1,18 @@
-import type { Income } from "@/types/schema";
 import type { IncomeCreateInput, IncomeUpdateInput } from "@/types/create";
 import type { IncomeDB } from "@/types/firebase";
+import type { Income } from "@/types/schema";
 import {
-    collection,
-    getDocs,
     addDoc,
-    serverTimestamp,
-    FirestoreDataConverter,
-    Timestamp,
-    QueryDocumentSnapshot,
-    SnapshotOptions,
-    updateDoc,
-    doc,
+    collection,
     deleteDoc,
+    doc,
+    FirestoreDataConverter,
+    getDocs,
+    QueryDocumentSnapshot,
+    serverTimestamp,
+    SnapshotOptions,
+    Timestamp,
+    updateDoc,
 } from 'firebase/firestore';
 import { db } from "./firebase";
 import { getCurrentUserId } from "./firestore-helpers";
@@ -87,7 +87,7 @@ export const updateIncome = async (
     )
 }
 
-export const deleteInvestment = async (
+export const deleteIncome = async (
     incomeId: string,
 ) => {
     const uid = getCurrentUserId();

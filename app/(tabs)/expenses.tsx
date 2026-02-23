@@ -1,8 +1,7 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, View } from "react-native";
 import {
-    Appbar,
     Card,
     Chip,
     Text,
@@ -11,20 +10,23 @@ import {
     FAB,
 } from "react-native-paper";
 import { useRouter } from "expo-router";
-import { useExpensesData } from "@/hooks/use-expenses-data"; // assume you create this
+import { useExpensesData } from "@/hooks/use-expenses-data";
 import ExpenseFiltersModal from "@/components/filter-modals/expense-filter";
 import { ExpenseFilters } from "@/types/common";
 import Loading from "@/components/loading";
 import Header from "@/components/header";
 import { deleteExpense } from "@/services/expense-service";
+import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
 
 export default function ExpenseListPage() {
     const theme = useTheme();
     const router = useRouter();
 
-    
+
     const [filtersVisible, setFiltersVisible] = useState(false);
-    
+    const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [deleteing, setDeleting] = useState<boolean>(false);
+
     const [filters, setFilters] = useState<ExpenseFilters>({
         sortBy: "date",
         sortOrder: "desc",
@@ -41,12 +43,31 @@ export default function ExpenseListPage() {
         setFiltersVisible(true);
     }, []);
 
-    if (loading) {
+    const handleCancelDelete = useCallback(() => {
+        setDeleteId(null);
+    }, [])
+
+    const handleDelete = useCallback(async () => {
+        if (!deleteId)
+            return;
+        try {
+            setDeleting(true)
+            await deleteExpense(deleteId);
+        }
+        catch (error) {
+            console.error('something went wrong while deleting expense', error)
+        }
+        finally {
+            setDeleting(false);
+        }
+    }, [deleteId]);
+
+    if (loading || deleteing) {
         return <Loading />
     }
 
     return (
-        <SafeAreaView style={{ 
+        <SafeAreaView style={{
             flex: 1,
             padding: 16,
             backgroundColor: theme.colors.background,
@@ -79,27 +100,41 @@ export default function ExpenseListPage() {
                                 {item.description}
                             </Text>
 
-                            <View style={{ flexDirection: "row", gap: 8, marginTop: 8 }}>
-                                <Chip
-                                    style={{
-                                        backgroundColor:
-                                            categoriesMap[item.category.id]?.color ?? "#E0E0E0",
-                                    }}
-                                    textStyle={{ color: "white" }}
-                                >
-                                    {categoriesMap[item.category.id]?.name}
-                                </Chip>
+                            <View style={{ flexDirection: "row", justifyContent: 'space-between', marginTop: 8 }}>
+                                <View style={{ flexDirection: "row", gap: 8, alignItems: 'center' }}>
+                                    <Chip
+                                        style={{
+                                            backgroundColor:
+                                                categoriesMap[item.category.id]?.color ?? "#E0E0E0",
+                                        }}
+                                        textStyle={{ color: "white" }}
+                                        icon={categoriesMap[item.category.id]?.icon}
+                                    >
+                                        {categoriesMap[item.category.id]?.name}
+                                    </Chip>
 
-                                <Chip
-                                    style={{
-                                        backgroundColor:
-                                            paymentMethodsMap[item.paymentMethod.id]?.color ?? "#E0E0E0",
+                                    <Chip
+                                        style={{
+                                            backgroundColor:
+                                                paymentMethodsMap[item.paymentMethod.id]?.color ?? "#E0E0E0",
+                                        }}
+                                        textStyle={{ color: "white" }}
+                                    >
+                                        {paymentMethodsMap[item.paymentMethod.id]?.name}
+                                    </Chip>
+                                </View>
+
+                                <IconButton
+                                    icon="delete"
+                                    iconColor={theme.colors.error}
+                                    onPress={(e) => {
+                                        e.stopPropagation();
+                                        setDeleteId(item.id)
                                     }}
-                                    textStyle={{ color: "white" }}
-                                >
-                                    {paymentMethodsMap[item.paymentMethod.id]?.name}
-                                </Chip>
+                                />
                             </View>
+
+
 
                         </Card.Content>
                     </Card>
@@ -121,6 +156,12 @@ export default function ExpenseListPage() {
                 onDismiss={() => setFiltersVisible(false)}
                 filters={filters}
                 setFilters={setFilters}
+            />
+
+            <DeleteConfirmationDialog
+                visible={!!deleteId}
+                onDismiss={handleCancelDelete}
+                onConfirm={handleDelete}
             />
         </SafeAreaView>
     );

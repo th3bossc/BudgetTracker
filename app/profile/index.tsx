@@ -10,6 +10,11 @@ const ProfilePage = () => {
     const router = useRouter();
     const { user, logout } = useAuth();
 
+    const handleLogout = useCallback(() => {
+        logout();
+        router.replace('/login');
+    }, [logout]);
+
     const backAction = useCallback(() => {
         router.back();
     }, [router]);
@@ -90,7 +95,7 @@ const ProfilePage = () => {
                 <Button
                     mode="contained"
                     buttonColor={theme.colors.error}
-                    onPress={logout}
+                    onPress={handleLogout}
                 >
                     Logout
                 </Button>

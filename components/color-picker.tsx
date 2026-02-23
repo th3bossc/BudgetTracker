@@ -45,7 +45,7 @@ export default function ColorPicker({
                         <View style={{
                             alignItems: "center",
                             justifyContent: "center",
-                            height: 320, // 🔥 controls picker space
+                            height: 320,
                         }}>
                             <ReactNativeWheelColorPicker
                                 color={color}

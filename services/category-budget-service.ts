@@ -77,7 +77,6 @@ export const upsertBudget = async (
 ) => {
   const uid = getCurrentUserId();
 
-  // naive upsert for now (can optimize later)
   const budgets = await getBudgets();
   const existing = budgets.find(
     b => b.category.id === categoryId && b.monthKey === monthKey
