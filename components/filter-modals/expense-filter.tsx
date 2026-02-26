@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { View } from "react-native";
 import {
     Modal,
@@ -37,13 +37,13 @@ export default function ExpenseFiltersModal({
     const selectCategoryHandler = useCallback((val?: string) => {
         if (!val)
             return;
-        updateFilter('categoryId', val == '__all__' ? undefined : val);
+        updateFilter('categoryId', val === '__all__' ? undefined : val);
     }, [updateFilter]);
 
     const selectPaymentMethodHandler = useCallback((val?: string) => {
         if (!val)
             return;
-        updateFilter('paymentMethodId', val == '__all__' ? undefined : val);
+        updateFilter('paymentMethodId', val === '__all__' ? undefined : val);
     }, [updateFilter]);
 
     const categoriesOptions = useMemo(() => [

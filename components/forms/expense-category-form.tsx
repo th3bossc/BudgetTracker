@@ -7,7 +7,6 @@ import {
     Divider,
     Switch,
     Text,
-    useTheme,
 } from "react-native-paper";
 import type { ExpenseCategory } from "@/types/schema";
 import type { ExpenseCategoryCreateInput, ExpenseCategoryUpdateInput } from "@/types/create";

@@ -7,7 +7,6 @@ import {
     Divider,
     Switch,
     Text,
-    useTheme,
 } from "react-native-paper";
 import type { IncomeSource } from "@/types/schema";
 import { IncomeSourceCreateInput, IncomeSourceUpdateInput } from "@/types/create";

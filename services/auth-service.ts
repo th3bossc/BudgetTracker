@@ -7,14 +7,19 @@ import { auth } from "./firebase";
 WebBrowser.maybeCompleteAuthSession();
 
 export const useGoogleAuth = () => {
-  const [request, response, promptAsync] = Google.useAuthRequest({
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
   });
 
   useEffect(() => {
     if (response?.type === "success") {
-      const { idToken } = response.authentication!;
+      const idToken =
+        response.params?.id_token ?? response.authentication?.idToken;
+      if (!idToken) {
+        console.error("Google sign in error: missing idToken in auth response");
+        return;
+      }
 
       const credential = GoogleAuthProvider.credential(idToken);
 

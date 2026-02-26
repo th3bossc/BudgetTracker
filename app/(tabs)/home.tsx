@@ -4,7 +4,6 @@ import MonthlyAggregateTable from "@/components/dashboard/monthly-aggregate-tabl
 import SectionHeader from "@/components/dashboard/section-header";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { useTheme } from "react-native-paper";
-import CategoryBudgetSection from "@/components/dashboard/category-budget-section";
 import Loading from "@/components/loading";
 import { useCallback } from "react";
 import { useRouter } from "expo-router";
@@ -19,12 +18,6 @@ export default function HomeScreen() {
         summary,
         monthlyData: { incomes, expenses, investments },
     } = useDashboardData();
-
-    if (loading) {
-        return (
-            <Loading />
-        )
-    }
 
     const createExpenseItem = useCallback(() => {
         router.push('/expense/create')
@@ -53,6 +46,12 @@ export default function HomeScreen() {
     const openProfile = useCallback(() => {
         router.push('/profile');
     }, [router]);
+
+    if (loading) {
+        return (
+            <Loading />
+        )
+    }
 
     return (
         <SafeAreaView style={{

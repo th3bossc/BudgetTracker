@@ -28,7 +28,7 @@ export default function CategoryBudgetCard({
       duration: 600,
       useNativeDriver: true,
     }).start();
-  }, [percentage]);
+  }, [percentage, animatedValue]);
 
   let barColor = theme.colors.primary;
 

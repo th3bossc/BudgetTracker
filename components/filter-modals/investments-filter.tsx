@@ -39,13 +39,13 @@ export default function InvestmentFiltersModal({
             label: t.name,
             value: t.id,
         })))
-    ], []);
+    ], [investmentTypes]);
 
     const selectInvestmentTypeHandler = useCallback((val?: string) => {
         if (!val)
             return;
 
-        updateFilter('typeId', val == '__all__' ? undefined : val);
+        updateFilter('typeId', val === '__all__' ? undefined : val);
     }, [updateFilter])
 
     const updateFilterMinAmount = useCallback((text: string) => {

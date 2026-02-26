@@ -9,7 +9,6 @@ import {
     Divider,
     Switch,
     Text,
-    useTheme,
 } from "react-native-paper";
 import ColorPicker from "../color-picker";
 
