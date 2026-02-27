@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { View, Animated } from "react-native";
 import { Card, Text, useTheme } from "react-native-paper";
 import type { ExpenseCategory } from "@/types/schema";
@@ -30,13 +30,24 @@ export default function CategoryBudgetCard({
     }).start();
   }, [percentage, animatedValue]);
 
-  let barColor = theme.colors.primary;
+  const barColor = useMemo(() => {
+    if (percentage >= 1)
+      return theme.colors.error;
+    else if (percentage >= 0.9)
+      return theme.colors.secondary;
 
-  if (percentage >= 1) {
-    barColor = theme.colors.error;
-  } else if (percentage >= 0.9) {
-    barColor = theme.colors.secondary;
-  }
+    return theme.colors.primary;
+  }, [theme, percentage]);
+
+  const barText = useMemo(() => {
+    if (percentage >= 1)
+      return 'Exceeded budget limit';
+    else if (percentage >= 0.9)
+      return 'Approaching budget limit';
+
+    return '';
+  }, [percentage])
+
 
   return (
     <Card style={{ marginBottom: 16 }}>
@@ -59,7 +70,7 @@ export default function CategoryBudgetCard({
               variant="bodySmall"
               style={{ color: theme.colors.error }}
             >
-              ⚠ Approaching budget limit
+              ⚠ {barText}
             </Text>
           )}
         </View>
