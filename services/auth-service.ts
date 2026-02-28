@@ -1,23 +1,15 @@
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { signInWithCredential, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "./firebase";
-import { makeRedirectUri } from 'expo-auth-session';
 
 WebBrowser.maybeCompleteAuthSession();
 
 export const useGoogleAuth = () => {
-
-  const redirectUri = useMemo(() => makeRedirectUri({
-    scheme: 'budgettracker',
-    path: 'oauthredirect',    
-  }), []);
-
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-    redirectUri,
   });
 
   useEffect(() => {
