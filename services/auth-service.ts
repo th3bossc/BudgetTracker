@@ -3,14 +3,24 @@ import * as Google from "expo-auth-session/providers/google";
 import { useEffect } from "react";
 import { signInWithCredential, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "./firebase";
+import { useRouter } from "expo-router";
+import { makeRedirectUri } from 'expo-auth-session';
 
 WebBrowser.maybeCompleteAuthSession();
 
 export const useGoogleAuth = () => {
+  const redirectUri = makeRedirectUri({
+    scheme: 'budgettracker',
+    path: 'oauthredirect',
+  });
+  
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+    redirectUri,
   });
+
+  const router = useRouter();
 
   useEffect(() => {
     if (response?.type === "success") {
@@ -26,6 +36,7 @@ export const useGoogleAuth = () => {
       signInWithCredential(auth, credential)
         .then(() => {
           console.log("Google sign in success");
+          router.replace('/(tabs)/home');
         })
         .catch((err) => {
           console.error("Google sign in error:", err);
