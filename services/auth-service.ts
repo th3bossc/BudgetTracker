@@ -10,10 +10,9 @@ WebBrowser.maybeCompleteAuthSession();
 
 export const useGoogleAuth = () => {
   const redirectUri = makeRedirectUri({
-    scheme: 'budgettracker',
     path: 'oauthredirect',
   });
-  
+
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
@@ -21,6 +20,8 @@ export const useGoogleAuth = () => {
   });
 
   const router = useRouter();
+
+  console.log("hello", request?.redirectUri)
 
   useEffect(() => {
     if (response?.type === "success") {
