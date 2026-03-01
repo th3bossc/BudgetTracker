@@ -6,7 +6,7 @@ export default function OAuthRedirect() {
 
   useEffect(() => {
     router.replace("/(tabs)/home");
-  }, []);
+  }, [router]);
 
   return null;
 }
