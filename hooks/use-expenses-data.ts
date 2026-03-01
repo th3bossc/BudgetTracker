@@ -43,16 +43,24 @@ export const useExpensesData = (filters: ExpenseFilters) => {
             );
         }
 
-        if (filters.minAmount !== undefined) {
+        if (filters.amount !== undefined) {
             result = result.filter(
-                e => e.amount >= filters.minAmount!
+                e => e.amount >= filters.amount!.min && e.amount <= filters.amount!.max 
             );
         }
 
-        if (filters.maxAmount !== undefined) {
+        if (filters.date !== undefined) {
+            const isInRange = (date: Date) => {
+                if (filters.date?.end && date > filters.date.end)
+                    return false;
+                if (filters.date?.start && date < filters.date.start)
+                    return false;
+
+                return true;
+            }
             result = result.filter(
-                e => e.amount <= filters.maxAmount!
-            );
+                e => isInRange(e.date)
+            )
         }
 
         if (filters.sortBy === "amount") {

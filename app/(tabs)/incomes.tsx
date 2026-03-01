@@ -142,6 +142,7 @@ export default function IncomeListPage() {
                 onDismiss={() => setFiltersVisible(false)}
                 filters={filters}
                 setFilters={setFilters}
+                style={{ backgroundColor: theme.colors.background }}
             />
 
             <DeleteConfirmationDialog

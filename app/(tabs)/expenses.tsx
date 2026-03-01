@@ -157,6 +157,7 @@ export default function ExpenseListPage() {
                 onDismiss={() => setFiltersVisible(false)}
                 filters={filters}
                 setFilters={setFilters}
+                style={{ backgroundColor: theme.colors.background }}
             />
 
             <DeleteConfirmationDialog
