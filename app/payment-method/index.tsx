@@ -1,5 +1,5 @@
 import { SafeAreaView } from "react-native-safe-area-context";
-import { FlatList } from "react-native";
+import { FlatList, View } from "react-native";
 import {
     Appbar,
     Card,

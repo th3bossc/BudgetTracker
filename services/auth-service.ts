@@ -1,16 +1,16 @@
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
+import * as AuthSession from 'expo-auth-session';
 import { useEffect } from "react";
 import { signInWithCredential, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "./firebase";
 import { useRouter } from "expo-router";
-import { makeRedirectUri } from 'expo-auth-session';
 
 WebBrowser.maybeCompleteAuthSession();
 
 export const useGoogleAuth = () => {
-  const redirectUri = makeRedirectUri({
-    path: 'oauthredirect',
+  const redirectUri = AuthSession.makeRedirectUri({
+    scheme: 'budgettracker',
   });
 
   const [request, response, promptAsync] = Google.useAuthRequest({
@@ -21,7 +21,7 @@ export const useGoogleAuth = () => {
 
   const router = useRouter();
 
-  console.log("hello", request?.redirectUri)
+  console.log("hello", request, response)
 
   useEffect(() => {
     if (response?.type === "success") {
