@@ -105,10 +105,12 @@ export default function IncomeListPage() {
                             <View style={{ marginTop: 8, justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
                                 <Chip
                                     style={{
-                                        backgroundColor:
-                                            sourcesMap[item.source.id]?.color ?? "#E0E0E0",
+                                        backgroundColor: "transparent",
+                                        borderWidth: 1,
+                                        borderColor: sourcesMap[item.source.id]?.color ?? theme.colors.outline,
                                     }}
-                                    textStyle={{ color: "white" }}
+                                    textStyle={{ color: sourcesMap[item.source.id]?.color ?? theme.colors.onSurface }}
+                                    icon={sourcesMap[item.source.id]?.icon}
                                 >
                                     {truncateText(sourcesMap[item.source.id]?.name)}
                                 </Chip>

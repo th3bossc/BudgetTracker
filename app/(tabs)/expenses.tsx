@@ -129,10 +129,11 @@ export default function ExpenseListPage() {
                                     <View style={{ flexDirection: "row", gap: 8, alignItems: 'center', justifyContent: 'space-between' }}>
                                         <Chip
                                             style={{
-                                                backgroundColor:
-                                                    categoriesMap[item.category.id]?.color ?? "#E0E0E0",
+                                                backgroundColor: "transparent",
+                                                borderWidth: 1,
+                                                borderColor: categoriesMap[item.category.id]?.color ?? theme.colors.outline,
                                             }}
-                                            textStyle={{ color: "white" }}
+                                            textStyle={{ color: categoriesMap[item.category.id]?.color ?? theme.colors.onSurface }}
                                             icon={categoriesMap[item.category.id]?.icon}
                                         >
                                             {truncateText(categoriesMap[item.category.id]?.name)}
@@ -143,7 +144,7 @@ export default function ExpenseListPage() {
                                             onPress={(e) => {
                                                 e.stopPropagation();
                                                 router.push({
-                                                    pathname: "/iou/create" as any,
+                                                    pathname: "/iou/create",
                                                     params: { expenseId: item.id },
                                                 });
                                             }}
@@ -153,10 +154,12 @@ export default function ExpenseListPage() {
                                     <View style={{ flexDirection: "row", alignItems: "center", justifyContent: 'space-between' }}>
                                         <Chip
                                             style={{
-                                                backgroundColor:
-                                                    paymentMethodsMap[item.paymentMethod.id]?.color ?? "#E0E0E0",
+                                                backgroundColor: "transparent",
+                                                borderWidth: 1,
+                                                borderColor: paymentMethodsMap[item.paymentMethod.id]?.color ?? theme.colors.outline,
                                             }}
-                                            textStyle={{ color: "white" }}
+                                            textStyle={{ color: paymentMethodsMap[item.paymentMethod.id]?.color ?? theme.colors.onSurface }}
+                                            icon={paymentMethodsMap[item.paymentMethod.id]?.icon}
                                         >
                                             {truncateText(paymentMethodsMap[item.paymentMethod.id]?.name)}
                                         </Chip>

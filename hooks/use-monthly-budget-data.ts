@@ -2,7 +2,7 @@ import { CategoryBudget, Expense, ExpenseCategory, Income, Iou, Investment } fro
 import { DashboardSummary } from "./use-dashboard-data";
 import { useEffect, useMemo, useState } from "react";
 import { useFinanceConfig } from "./use-finance-config";
-import { getBudgetsByMonth, subscribeToMonthlyBudgets } from "@/services/category-budget-service";
+import { subscribeToMonthlyBudgets } from "@/services/category-budget-service";
 import { subscribeToExpenses } from "@/services/expense-service";
 import { subscribeToInvestments } from "@/services/investment-service";
 import { subscribeToIncomes } from "@/services/income-service";

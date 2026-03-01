@@ -24,6 +24,7 @@ export default function CategoryForm({
     onSubmit,
     loading,
 }: Props) {
+    console.log(initialData)
     const [name, setName] = useState(initialData?.name ?? "");
     const [color, setColor] = useState(initialData?.color ?? "#4CAF50");
     const [icon, setIcon] = useState(initialData?.icon ?? "");

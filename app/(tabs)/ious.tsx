@@ -104,7 +104,7 @@ export default function IousPage() {
                     const amountPaid = Math.max(item.initialAmount - item.amountLeft, 0);
 
                     return (
-                        <Card onPress={() => router.push(`/iou/${item.id}` as any)}>
+                        <Card onPress={() => router.push(`/iou/${item.id}`)}>
                             <Card.Content>
                                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                                     <Text variant="titleMedium">
@@ -138,9 +138,12 @@ export default function IousPage() {
                                 <View style={{ marginTop: 10, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                                     <Chip
                                         style={{
-                                            backgroundColor: paymentMethod?.color ?? "#E0E0E0",
+                                            backgroundColor: "transparent",
+                                            borderWidth: 1,
+                                            borderColor: paymentMethod?.color ?? theme.colors.outline,
                                         }}
-                                        textStyle={{ color: "white" }}
+                                        textStyle={{ color: paymentMethod?.color ?? theme.colors.onSurface }}
+                                        icon={paymentMethod?.icon}
                                     >
                                         {truncateText(paymentMethod?.name) ?? "Unknown Method"}
                                     </Chip>

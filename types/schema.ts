@@ -26,11 +26,13 @@ export interface ExpenseCategoryBase {
 export interface IncomeSourceBase {
     name: string;
     color: string;
+    icon?: string;
     isArchived?: boolean;
 }
 
 export interface InvestmentTypeBase {
     name: string;
+    icon?: string;
     riskLevel?: InvestmentRiskLevel;
     isArchived?: boolean;
 }
@@ -38,6 +40,7 @@ export interface InvestmentTypeBase {
 export interface PaymentMethodBase {
     name: string;
     color: string;
+    icon?: string;
     isArchived?: boolean;
 }
 

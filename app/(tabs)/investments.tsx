@@ -106,7 +106,15 @@ export default function InvestmentListPage() {
                             )}
 
                             <View style={{ marginTop: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Chip>
+                                <Chip
+                                    icon={typeMap[item.type.id]?.icon}
+                                    style={{
+                                        backgroundColor: "transparent",
+                                        borderWidth: 1,
+                                        borderColor: theme.colors.primary,
+                                    }}
+                                    textStyle={{ color: theme.colors.primary }}
+                                >
                                     {truncateText(typeMap[item.type.id]?.name)}
                                 </Chip>
 

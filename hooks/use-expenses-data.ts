@@ -84,8 +84,8 @@ export const useExpensesData = (filters: ExpenseFilters) => {
         else if (filters.sortBy == 'date') {
             result.sort((a, b) => 
                 filters.sortOrder == "desc"
-                    ? a.date.getTime() - b.date.getTime()
-                    : b.date.getTime() - a.date.getTime()
+                    ? b.date.getTime() - a.date.getTime()
+                    : a.date.getTime() - b.date.getTime()
             )
         }
 
