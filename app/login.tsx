@@ -15,11 +15,12 @@ import {
     Text,
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Loading from "@/components/common/loading";
 
 export default function LoginPage() {
     const router = useRouter();
     const theme = useTheme();
-    const { promptAsync } = useGoogleAuth();
+    const { promptAsync, loading } = useGoogleAuth();
 
 
     const [email, setEmail] = useState("");
@@ -34,6 +35,9 @@ export default function LoginPage() {
             setError(e.message);
         }
     };
+
+    if (loading)
+        return <Loading />
 
     return (
         <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>

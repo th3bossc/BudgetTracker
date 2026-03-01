@@ -1,7 +1,7 @@
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import * as AuthSession from 'expo-auth-session';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { signInWithCredential, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "./firebase";
 import { useRouter } from "expo-router";
@@ -9,21 +9,18 @@ import { useRouter } from "expo-router";
 WebBrowser.maybeCompleteAuthSession();
 
 export const useGoogleAuth = () => {
-  const redirectUri = AuthSession.makeRedirectUri({
-    scheme: 'budgettracker',
-  });
-
   const [request, response, promptAsync] = Google.useAuthRequest({
     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-    redirectUri,
+    responseType: 'id_token',
+    scopes: ["openid", "profile", "email"],
   });
 
   const router = useRouter();
-
-  console.log("hello", request, response)
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    setLoading(true);
     if (response?.type === "success") {
       const idToken =
         response.params?.id_token ?? response.authentication?.idToken;
@@ -41,9 +38,12 @@ export const useGoogleAuth = () => {
         })
         .catch((err) => {
           console.error("Google sign in error:", err);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     }
   }, [response]);
 
-  return { promptAsync, request };
+  return { loading, promptAsync, request };
 };
