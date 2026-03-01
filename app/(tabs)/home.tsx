@@ -85,7 +85,7 @@ export default function HomeScreen() {
                 <MonthlyAggregateTable data={investments} />
 
                 <SectionHeader
-                    title="Income"
+                    title="Incomes"
                     onCreate={createIncomeItem}
                     onViewAll={viewAllIncomes}
                 />
