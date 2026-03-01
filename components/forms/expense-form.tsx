@@ -5,7 +5,6 @@ import {
     Button,
     HelperText,
     Divider,
-    useTheme,
 } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Dropdown } from "react-native-paper-dropdown";
@@ -125,7 +124,7 @@ export default function ExpenseForm({
                 onSelect={(val?: string) => {
                     if (!val)
                         return;
-                    if (val == "__add_new__") {
+                    if (val === "__add_new__") {
                         router.push('/payment-method/create');
                         return;
                     }

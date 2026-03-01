@@ -4,7 +4,6 @@ import MonthlySummaryCard from "@/components/dashboard/monthly-summary-card";
 import CategoryBudgetSection from "@/components/finances/category-budget-section";
 import CategoryPieChart from "@/components/finances/category-pie-chart";
 import { useMonthlyBudgetData } from "@/hooks/use-monthly-budget-data";
-import { ExpenseCategory } from "@/types/schema";
 import { getMonthKey } from "@/utils/date";
 import { generateMonthOptions } from "@/utils/month-utils";
 import { router } from "expo-router";

@@ -52,13 +52,6 @@ export default function HomeScreen() {
         });
     }, [router]);
 
-    const viewAllIous = useCallback(() => {
-        router.push({
-            pathname: '/(tabs)/data-sources' as any,
-            params: { source: 'ious' },
-        });
-    }, [router]);
-
     const openProfile = useCallback(() => {
         router.push('/profile');
     }, [router]);

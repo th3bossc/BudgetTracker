@@ -29,7 +29,7 @@ export default function AmountRangeFilter({
         if (!data) {
             onChange(range);
         }
-    }, [range, data]);
+    }, [onChange, range, data]);
     const hideModal = useCallback(() => setVisible(false), []);
 
     const filterAmount = useMemo(() => {

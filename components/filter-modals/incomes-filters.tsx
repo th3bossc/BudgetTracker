@@ -31,12 +31,12 @@ export default function IncomeFiltersModal({
     const { incomeSources } = useFinanceConfig();
     const theme = useTheme();
 
-    const updateFilter = (key: keyof IncomeFilters, value: any) => {
+    const updateFilter = useCallback((key: keyof IncomeFilters, value: any) => {
         setFilters(prev => ({
             ...prev,
             [key]: value,
         }));
-    };
+    }, [setFilters]);
 
     const incomeSourcesOptions = useMemo(() => [
         { label: 'All Sources', value: '__all__' },
@@ -44,7 +44,7 @@ export default function IncomeFiltersModal({
             label: s.name,
             value: s.id,
         })))
-    ], [updateFilter]);
+    ], [incomeSources]);
 
     const sortByOptions = useMemo(() => [
         { label: 'Amount', value: 'amount' },
@@ -60,7 +60,7 @@ export default function IncomeFiltersModal({
         if (!val)
             return;
 
-        updateFilter('sourceId', val == '__all__' ? undefined : val);
+        updateFilter('sourceId', val === '__all__' ? undefined : val);
     }, [updateFilter])
 
     const updateAmountHandler = useCallback((data?: { min: number, max: number }) => {
@@ -97,7 +97,7 @@ export default function IncomeFiltersModal({
     const clearFilters = useCallback(() => {
         setFilters({});
         onDismiss();
-    }, [setFilters]);
+    }, [setFilters, onDismiss]);
 
     return (
         <Portal>

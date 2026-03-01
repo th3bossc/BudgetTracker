@@ -13,7 +13,7 @@ const ProfilePage = () => {
     const handleLogout = useCallback(() => {
         logout();
         router.replace('/login');
-    }, [logout]);
+    }, [logout, router]);
 
     const backAction = useCallback(() => {
         router.back();

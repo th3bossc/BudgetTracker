@@ -41,13 +41,13 @@ export default function ExpenseFiltersModal({
     const selectCategoryHandler = useCallback((val?: string) => {
         if (!val)
             return;
-        updateFilter('categoryId', val == '__all__' ? undefined : val);
+        updateFilter('categoryId', val === '__all__' ? undefined : val);
     }, [updateFilter]);
 
     const selectPaymentMethodHandler = useCallback((val?: string) => {
         if (!val)
             return;
-        updateFilter('paymentMethodId', val == '__all__' ? undefined : val);
+        updateFilter('paymentMethodId', val === '__all__' ? undefined : val);
     }, [updateFilter]);
 
     const categoriesOptions = useMemo(() => [
@@ -110,7 +110,7 @@ export default function ExpenseFiltersModal({
     const clearFilters = useCallback(() => {
         setFilters({});
         onDismiss();
-    }, [setFilters]);
+    }, [setFilters, onDismiss]);
 
 
     return (
