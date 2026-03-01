@@ -1,5 +1,6 @@
-import Header from "@/components/header";
 import { useGoogleAuth } from "@/services/auth-service";
+import Header from "@/components/common/header";
+import PasswordInput from "@/components/form-fields/password-input";
 import { auth } from "@/services/firebase";
 import { useRouter } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -49,11 +50,10 @@ export default function LoginPage() {
                     mode="outlined"
                 />
 
-                <TextInput
+                <PasswordInput
                     label="Password"
                     value={password}
                     onChangeText={setPassword}
-                    secureTextEntry
                     mode="outlined"
                 />
 

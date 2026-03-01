@@ -1,5 +1,5 @@
 import { useFinanceConfig } from "@/hooks/use-finance-config";
-import type { IncomeFilters } from "@/types/common";
+import type { IouFilters } from "@/types/common";
 import { useCallback, useMemo } from "react";
 import { View, ViewStyle } from "react-native";
 import {
@@ -16,81 +16,94 @@ import DateRangeFilter from "../form-fields/date-filter-range";
 interface Props {
     visible: boolean;
     onDismiss: () => void;
-    filters: IncomeFilters;
-    setFilters: React.Dispatch<React.SetStateAction<IncomeFilters>>;
+    filters: IouFilters;
+    setFilters: React.Dispatch<React.SetStateAction<IouFilters>>;
     style?: ViewStyle;
 }
 
-export default function IncomeFiltersModal({
+export default function IousFiltersModal({
     visible,
     onDismiss,
     filters,
     setFilters,
     style = {},
 }: Props) {
-    const { incomeSources } = useFinanceConfig();
+    const { paymentMethods } = useFinanceConfig();
     const theme = useTheme();
 
-    const updateFilter = useCallback((key: keyof IncomeFilters, value: any) => {
+    const updateFilter = useCallback((key: keyof IouFilters, value: any) => {
         setFilters(prev => ({
             ...prev,
             [key]: value,
         }));
     }, [setFilters]);
 
-    const incomeSourcesOptions = useMemo(() => [
-        { label: 'All Sources', value: '__all__' },
-        ...(incomeSources.map(s => ({
-            label: s.name,
-            value: s.id,
-        })))
-    ], [incomeSources]);
+    const paymentMethodOptions = useMemo(() => [
+        { label: "All Repayment Methods", value: "__all__" },
+        ...(paymentMethods.map(method => ({
+            label: method.name,
+            value: method.id,
+        }))),
+    ], [paymentMethods]);
+
+    const statusOptions = useMemo(() => [
+        { label: "All", value: "__all__" },
+        { label: "Open", value: "open" },
+        { label: "Paid", value: "paid" },
+    ], []);
 
     const sortByOptions = useMemo(() => [
-        { label: 'Amount', value: 'amount' },
-        { label: 'Date', value: 'date' },
+        { label: "Amount", value: "amount" },
+        { label: "Date", value: "date" },
     ], []);
 
     const sortOrderOptions = useMemo(() => [
-        { label: 'Descending', value: 'desc' },
-        { label: 'Ascending', value: 'asc' },
+        { label: "Descending", value: "desc" },
+        { label: "Ascending", value: "asc" },
     ], []);
 
-    const updateIncomeSourceId = useCallback((val?: string) => {
+    const onSelectPaymentMethod = useCallback((val?: string) => {
         if (!val)
             return;
 
-        updateFilter('sourceId', val === '__all__' ? undefined : val);
-    }, [updateFilter])
-
-    const updateAmountHandler = useCallback((data?: { min: number, max: number }) => {
-        updateFilter('amount', data);
+        updateFilter("paymentMethodId", val === "__all__" ? undefined : val);
     }, [updateFilter]);
 
-    const updateDateRangeHandler = useCallback((data?: { start?: Date, end?: Date }) => {
-        updateFilter('date', data);
-    }, [updateFilter]);
-
-    const updateSortByHandler = useCallback((val?: string) => {
+    const onSelectStatus = useCallback((val?: string) => {
         if (!val)
             return;
 
-        updateFilter('sortBy', val);
+        updateFilter("status", val === "__all__" ? undefined : val);
     }, [updateFilter]);
 
-    const updateSortOrderHandler = useCallback((val?: string) => {
+    const onUpdateAmount = useCallback((data?: { min: number, max: number }) => {
+        updateFilter("amount", data);
+    }, [updateFilter]);
+
+    const onUpdateDate = useCallback((data?: { start?: Date, end?: Date }) => {
+        updateFilter("date", data);
+    }, [updateFilter]);
+
+    const onSelectSortBy = useCallback((val?: string) => {
         if (!val)
             return;
 
-        updateFilter('sortOrder', val);
-    }, [updateFilter])
+        updateFilter("sortBy", val);
+    }, [updateFilter]);
+
+    const onSelectSortOrder = useCallback((val?: string) => {
+        if (!val)
+            return;
+
+        updateFilter("sortOrder", val);
+    }, [updateFilter]);
 
     const viewStyle: ViewStyle = useMemo(() => ({
         elevation: 5,
         padding: 30,
         margin: 10,
         borderRadius: 12,
-        gap: 20,
+        gap: 12,
         ...style,
     }), [style]);
 
@@ -103,58 +116,61 @@ export default function IncomeFiltersModal({
         <Portal>
             <Modal visible={visible} onDismiss={onDismiss}>
                 <View style={viewStyle}>
+                    <Dropdown
+                        mode="outlined"
+                        label="Repayment Method"
+                        value={filters.paymentMethodId}
+                        options={paymentMethodOptions}
+                        onSelect={onSelectPaymentMethod}
+                    />
 
                     <Dropdown
                         mode="outlined"
-                        label="Income Source"
-                        value={filters.sourceId}
-                        options={incomeSourcesOptions}
-                        onSelect={updateIncomeSourceId}
+                        label="Status"
+                        value={filters.status}
+                        options={statusOptions}
+                        onSelect={onSelectStatus}
                     />
 
                     <AmountRangeFilter
                         data={filters.amount}
-                        onChange={updateAmountHandler}
+                        onChange={onUpdateAmount}
                     />
 
                     <DateRangeFilter
                         data={filters.date}
-                        onChange={updateDateRangeHandler}
+                        onChange={onUpdateDate}
                     />
 
                     <Divider />
 
                     <Dropdown
                         mode="outlined"
-                        label="Sort By"
+                        label="Sort by"
                         value={filters.sortBy}
                         options={sortByOptions}
-                        onSelect={updateSortByHandler}
+                        onSelect={onSelectSortBy}
                     />
 
                     <Dropdown
                         mode="outlined"
-                        label="Sort Order"
+                        label="Sort order"
                         value={filters.sortOrder}
                         options={sortOrderOptions}
-                        onSelect={updateSortOrderHandler}
+                        onSelect={onSelectSortOrder}
                     />
 
                     <Divider />
 
-
-                    <View
-                        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' }}
-                    >
+                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-around" }}>
                         <Button mode="contained" onPress={onDismiss}>
                             Apply Filters
                         </Button>
+
                         <Button mode="contained" buttonColor={theme.colors.error} onPress={clearFilters}>
                             Clear Filters
                         </Button>
-
                     </View>
-
                 </View>
             </Modal>
         </Portal>

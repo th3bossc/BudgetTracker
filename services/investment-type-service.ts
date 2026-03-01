@@ -27,6 +27,7 @@ const investmentTypeConverter: FirestoreDataConverter<InvestmentType> = {
     toFirestore(type: InvestmentType): InvestmentTypeDB {
         return {
             name: type.name,
+            icon: type.icon,
             riskLevel: type.riskLevel,
             isArchived: type.isArchived ?? false,
             createdAt: serverTimestamp(),
@@ -42,6 +43,7 @@ const investmentTypeConverter: FirestoreDataConverter<InvestmentType> = {
         return {
             id: snapshot.id,
             name: data.name,
+            icon: data.icon,
             riskLevel: data.riskLevel,
             isArchived: data.isArchived ?? false,
             createdAt: (data.createdAt as Timestamp)?.toDate?.() ?? new Date(),

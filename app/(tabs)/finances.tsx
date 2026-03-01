@@ -1,7 +1,8 @@
-import CategoryBudgetSection from "@/components/dashboard/category-budget-section";
+import Header from "@/components/common/header";
+import Loading from "@/components/common/loading";
 import MonthlySummaryCard from "@/components/dashboard/monthly-summary-card";
-import Header from "@/components/header";
-import Loading from "@/components/loading";
+import CategoryBudgetSection from "@/components/finances/category-budget-section";
+import CategoryPieChart from "@/components/finances/category-pie-chart";
 import { useMonthlyBudgetData } from "@/hooks/use-monthly-budget-data";
 import { getMonthKey } from "@/utils/date";
 import { generateMonthOptions } from "@/utils/month-utils";
@@ -58,6 +59,12 @@ export default function FinancesPage() {
                 <Divider style={{ marginVertical: 16 }} />
 
                 <CategoryBudgetSection budgetUsed={budgetUsed} />
+
+                <Divider />
+
+                <CategoryPieChart
+                    budgetUsed={budgetUsed}
+                />
 
             </ScrollView>
 

@@ -26,11 +26,13 @@ export interface ExpenseCategoryBase {
 export interface IncomeSourceBase {
     name: string;
     color: string;
+    icon?: string;
     isArchived?: boolean;
 }
 
 export interface InvestmentTypeBase {
     name: string;
+    icon?: string;
     riskLevel?: InvestmentRiskLevel;
     isArchived?: boolean;
 }
@@ -38,6 +40,7 @@ export interface InvestmentTypeBase {
 export interface PaymentMethodBase {
     name: string;
     color: string;
+    icon?: string;
     isArchived?: boolean;
 }
 
@@ -70,6 +73,17 @@ export interface CategoryBudgetBase {
     amount: number;
 }
 
+export interface IouBase {
+    expense: { id: string };
+    paymentMethod: { id: string, name?: string };
+    initialAmount: number;
+    amountLeft: number;
+    expenseMonthKey: string;
+    createdMonthKey: string;
+    isPaid: boolean;
+    paidAt?: Date;
+}
+
 /* main tables */ 
 export interface ExpenseCategory extends BaseDoc, ExpenseCategoryBase {};
 
@@ -93,3 +107,4 @@ export interface Investment extends BaseDoc, InvestmentBase {
 
 export interface CategoryBudget extends BaseDoc, CategoryBudgetBase {};
 
+export interface Iou extends BaseDoc, IouBase {};

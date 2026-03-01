@@ -1,21 +1,24 @@
-import { View } from "react-native";
-import {
-    Modal,
-    Portal,
-    TextInput,
-    Button,
-    Divider,
-} from "react-native-paper";
-import { Dropdown } from "react-native-paper-dropdown";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
 import type { InvestmentFilters } from "@/types/common";
 import { useCallback, useMemo } from "react";
+import { View, ViewStyle } from "react-native";
+import {
+    Button,
+    Divider,
+    Modal,
+    Portal,
+    useTheme,
+} from "react-native-paper";
+import { Dropdown } from "react-native-paper-dropdown";
+import AmountRangeFilter from "../form-fields/amount-filter-slider";
+import DateRangeFilter from "../form-fields/date-filter-range";
 
 interface Props {
     visible: boolean;
     onDismiss: () => void;
     filters: InvestmentFilters;
     setFilters: React.Dispatch<React.SetStateAction<InvestmentFilters>>;
+    style?: ViewStyle;
 }
 
 export default function InvestmentFiltersModal({
@@ -23,8 +26,11 @@ export default function InvestmentFiltersModal({
     onDismiss,
     filters,
     setFilters,
+    style = {},
 }: Props) {
     const { investmentTypes } = useFinanceConfig();
+    const theme = useTheme();
+
 
     const updateFilter = useCallback((key: keyof InvestmentFilters, value: any) => {
         setFilters(prev => ({
@@ -48,15 +54,15 @@ export default function InvestmentFiltersModal({
         updateFilter('typeId', val === '__all__' ? undefined : val);
     }, [updateFilter])
 
-    const updateFilterMinAmount = useCallback((text: string) => {
-        updateFilter('minAmount', Number(text));
+    const updateAmountHandler = useCallback((data?: { min: number, max: number }) => {
+        updateFilter('amount', data);
     }, [updateFilter]);
 
-    const updateFilterMaxAmount = useCallback((text: string) => {
-        updateFilter('maxAmount', Number(text));
-    }, [updateFilter])
+    const updateDateRangeHandler = useCallback((data?: { start?: Date, end?: Date }) => {
+        updateFilter('date', data);
+    }, [updateFilter]);
 
-     const sortByOptions = useMemo(() => [
+    const sortByOptions = useMemo(() => [
         { label: 'Amount', value: 'amount' },
         { label: 'Date', value: 'date' },
     ], []);
@@ -76,47 +82,51 @@ export default function InvestmentFiltersModal({
     const updateSortOrderHandler = useCallback((val?: string) => {
         if (!val)
             return;
-        
+
         updateFilter('sortOrder', val);
-    }, [updateFilter])
+    }, [updateFilter]);
+
+    const viewStyle: ViewStyle = useMemo(() => ({
+        elevation: 5,
+        padding: 30,
+        margin: 10,
+        borderRadius: 12,
+        gap: 20,
+        ...style,
+    }), [style]);
+
+    const clearFilters = useCallback(() => {
+        setFilters({});
+        onDismiss();
+    }, [setFilters, onDismiss]);
 
     return (
         <Portal>
             <Modal visible={visible} onDismiss={onDismiss}>
-                <View
-                    style={{
-                        elevation: 5,
-                        padding: 30,
-                        margin: 10,
-                        borderRadius: 12,
-                        gap: 20,
-                    }}
-                >
+                <View style={viewStyle}>
 
                     <Dropdown
+                        mode="outlined"
                         label="Investment Type"
                         value={filters.typeId}
                         options={investmentTypesOptions}
                         onSelect={selectInvestmentTypeHandler}
                     />
 
-                    <TextInput
-                        label="Min Amount"
-                        value={filters.minAmount?.toString() ?? ""}
-                        onChangeText={updateFilterMinAmount }
-                        keyboardType="numeric"
+                    <AmountRangeFilter
+                        data={filters.amount}
+                        onChange={updateAmountHandler}
                     />
 
-                    <TextInput
-                        label="Max Amount"
-                        value={filters.maxAmount?.toString() ?? ""}
-                        onChangeText={updateFilterMaxAmount}
-                        keyboardType="numeric"
+                    <DateRangeFilter
+                        data={filters.date}
+                        onChange={updateDateRangeHandler}
                     />
 
                     <Divider />
 
                     <Dropdown
+                        mode="outlined"
                         label="Sort By"
                         value={filters.sortBy}
                         options={sortByOptions}
@@ -124,6 +134,7 @@ export default function InvestmentFiltersModal({
                     />
 
                     <Dropdown
+                        mode="outlined"
                         label="Sort Order"
                         value={filters.sortOrder}
                         options={sortOrderOptions}
@@ -132,9 +143,18 @@ export default function InvestmentFiltersModal({
 
                     <Divider />
 
-                    <Button mode="contained" onPress={onDismiss}>
-                        Apply Filters
-                    </Button>
+
+                    <View
+                        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' }}
+                    >
+                        <Button mode="contained" onPress={onDismiss}>
+                            Apply Filters
+                        </Button>
+                        <Button mode="contained" buttonColor={theme.colors.error} onPress={clearFilters}>
+                            Clear Filters
+                        </Button>
+
+                    </View>
 
                 </View>
             </Modal>

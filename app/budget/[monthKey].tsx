@@ -1,16 +1,16 @@
-import Loading from "@/components/loading";
+import Loading from "@/components/common/loading";
 import { useBulkCategoryBudgets } from "@/hooks/use-bulk-category-budgets";
 import { upsertBudget } from "@/services/category-budget-service";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback } from "react";
 import { FlatList, View } from "react-native";
 import {
-    Appbar,
-    Button,
-    Divider,
-    Text,
-    TextInput,
-    useTheme,
+  Appbar,
+  Button,
+  Divider,
+  Text,
+  TextInput,
+  useTheme,
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 

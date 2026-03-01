@@ -1,8 +1,9 @@
 import { subscribeToExpenses } from "@/services/expense-service";
 import { subscribeToIncomes } from "@/services/income-service";
+import { subscribeToIous } from "@/services/iou-service";
 import { subscribeToInvestments } from "@/services/investment-service";
 import type { MonthlyAggregate } from "@/types/common";
-import { Expense, Income, Investment } from "@/types/schema";
+import { Expense, Income, Iou, Investment } from "@/types/schema";
 import { getMonthKey } from "@/utils/date";
 import { groupByMonth } from "@/utils/group-by-month";
 import { useEffect, useState } from "react";
@@ -48,16 +49,19 @@ export const useDashboardData = (): DashboardData => {
     const [incomes, setIncomes] = useState<Income[]>([]);
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [investments, setInvestments] = useState<Investment[]>([]);
+    const [ious, setIous] = useState<Iou[]>([]);
 
     useEffect(() => {
         const incomesUnsub = subscribeToIncomes(setIncomes);
         const expensesUnsub = subscribeToExpenses(setExpenses);
         const investmentsUnsub = subscribeToInvestments(setInvestments);
+        const iousUnsub = subscribeToIous(setIous);
 
         return () => {
             incomesUnsub();
             expensesUnsub();
             investmentsUnsub();
+            iousUnsub();
         }
     }, []);
 
@@ -80,22 +84,39 @@ export const useDashboardData = (): DashboardData => {
                     .filter(i => i.monthKey == currentMonth)
                     .reduce((sum, i) => sum + i.amount, 0);
 
+                const currentIouRecovered = ious
+                    .filter(i => i.createdMonthKey == currentMonth)
+                    .reduce((sum, i) => sum + Math.max(i.initialAmount - i.amountLeft, 0), 0);
 
                 setSummary({
                     income: currentIncome,
-                    expense: currentExpense,
+                    expense: currentExpense - currentIouRecovered,
                     investment: currentInvestments,
-                    netSavings: currentIncome - currentExpense,
-                    cashflow: currentIncome - currentExpense - currentInvestments
+                    netSavings: currentIncome - currentExpense + currentIouRecovered,
+                    cashflow: currentIncome - currentExpense - currentInvestments + currentIouRecovered
                 })
 
                 const incomeAgg = groupByMonth(incomes).slice(0, 3);
                 const expenseAgg = groupByMonth(expenses).slice(0, 3);
                 const investmentAgg = groupByMonth(investments).slice(0, 3);
+                const iouAgg = groupByMonth(
+                    ious.map(iou => ({
+                        monthKey: iou.createdMonthKey,
+                        amount: Math.max(iou.initialAmount - iou.amountLeft, 0),
+                    }))
+                ).slice(0, 3);
+
+                const iouMonthKeyMap = new Map<string, number>();
+                iouAgg.forEach(item => iouMonthKeyMap.set(item.month, item.total));
+
+                const expenseWithRecoveredAgg = expenseAgg.map(({ month, total }) => ({
+                    month: month,
+                    total: total - (iouMonthKeyMap.get(month) ?? 0)
+                }));
 
                 setMonthlyData({
                     incomes: incomeAgg,
-                    expenses: expenseAgg,
+                    expenses: expenseWithRecoveredAgg,
                     investments: investmentAgg,
                 });
             }
@@ -108,7 +129,7 @@ export const useDashboardData = (): DashboardData => {
         }
 
         void fetchData();
-    }, [incomes, expenses, investments]);
+    }, [incomes, expenses, investments, ious]);
 
     return {
         loading: computationLoadingStatus,

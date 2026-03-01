@@ -1,21 +1,24 @@
-import { useCallback, useMemo } from "react";
-import { View } from "react-native";
-import {
-    Modal,
-    Portal,
-    TextInput,
-    Button,
-    Divider,
-} from "react-native-paper";
-import { Dropdown } from "react-native-paper-dropdown";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
 import { ExpenseFilters } from "@/types/common";
+import { useCallback, useMemo } from "react";
+import { View, ViewStyle } from "react-native";
+import {
+    Button,
+    Divider,
+    Modal,
+    Portal,
+    useTheme
+} from "react-native-paper";
+import { Dropdown } from "react-native-paper-dropdown";
+import AmountRangeFilter from "../form-fields/amount-filter-slider";
+import DateRangeFilter from "../form-fields/date-filter-range";
 
 interface Props {
     visible: boolean;
     onDismiss: () => void;
     filters: ExpenseFilters;
     setFilters: React.Dispatch<React.SetStateAction<ExpenseFilters>>;
+    style?: ViewStyle;
 }
 
 
@@ -24,9 +27,10 @@ export default function ExpenseFiltersModal({
     onDismiss,
     filters,
     setFilters,
+    style = {},
 }: Props) {
     const { categories, paymentMethods } = useFinanceConfig();
-
+    const theme = useTheme();
     const updateFilter = useCallback((key: keyof ExpenseFilters, value: any) => {
         setFilters(prev => ({
             ...prev,
@@ -53,7 +57,7 @@ export default function ExpenseFiltersModal({
             value: c.id,
         })))
     ], [categories]);
-    
+
     const sortByOptions = useMemo(() => [
         { label: 'Amount', value: 'amount' },
         { label: 'Date', value: 'date' },
@@ -72,12 +76,12 @@ export default function ExpenseFiltersModal({
         })))
     ], [paymentMethods]);
 
-    const updateMinAmountHandler = useCallback((text: string) => {
-        updateFilter('minAmount', Number(text));
+    const updateAmountHandler = useCallback((data?: { min: number, max: number }) => {
+        updateFilter('amount', data);
     }, [updateFilter]);
 
-    const updateMaxAmountHandler = useCallback((text: string) => {
-        updateFilter('maxAmount', Number(text));
+    const updateDateRangeHandler = useCallback((data?: { start?: Date, end?: Date }) => {
+        updateFilter('date', data);
     }, [updateFilter]);
 
     const updateSortByHandler = useCallback((val?: string) => {
@@ -90,24 +94,31 @@ export default function ExpenseFiltersModal({
     const updateSortOrderHandler = useCallback((val?: string) => {
         if (!val)
             return;
-        
+
         updateFilter('sortOrder', val);
-    }, [updateFilter])
+    }, [updateFilter]);
+
+    const viewStyle: ViewStyle = useMemo(() => ({
+        elevation: 5,
+        padding: 30,
+        margin: 10,
+        borderRadius: 12,
+        gap: 12,
+        ...style,
+    }), [style]);
+
+    const clearFilters = useCallback(() => {
+        setFilters({});
+        onDismiss();
+    }, [setFilters, onDismiss]);
 
 
     return (
         <Portal>
             <Modal visible={visible} onDismiss={onDismiss}>
-                <View
-                    style={{
-                        elevation: 5,
-                        padding: 30,
-                        margin: 10,
-                        borderRadius: 12,
-                        gap: 20,
-                    }}
-                >
+                <View style={viewStyle}>
                     <Dropdown
+                        mode="outlined"
                         label="Category"
                         value={filters.categoryId}
                         options={categoriesOptions}
@@ -115,29 +126,27 @@ export default function ExpenseFiltersModal({
                     />
 
                     <Dropdown
+                        mode="outlined"
                         label="Payment Method"
                         value={filters.paymentMethodId}
                         options={paymentMethodOptions}
                         onSelect={selectPaymentMethodHandler}
                     />
 
-                    <TextInput
-                        label="Min Amount"
-                        value={filters.minAmount?.toString() ?? ""}
-                        onChangeText={updateMinAmountHandler}
-                        keyboardType="numeric"
+                    <AmountRangeFilter
+                        data={filters.amount}
+                        onChange={updateAmountHandler}
                     />
 
-                    <TextInput
-                        label="Max Amount"
-                        value={filters.maxAmount?.toString() ?? ""}
-                        onChangeText={updateMaxAmountHandler}
-                        keyboardType="numeric"
+                    <DateRangeFilter
+                        data={filters.date}
+                        onChange={updateDateRangeHandler}
                     />
 
                     <Divider />
 
                     <Dropdown
+                        mode="outlined"
                         label="Sort by"
                         value={filters.sortBy}
                         options={sortByOptions}
@@ -145,6 +154,7 @@ export default function ExpenseFiltersModal({
                     />
 
                     <Dropdown
+                        mode="outlined"
                         label="Sort order"
                         value={filters.sortOrder}
                         options={sortOrderOptions}
@@ -153,9 +163,17 @@ export default function ExpenseFiltersModal({
 
                     <Divider />
 
-                    <Button mode="contained" onPress={onDismiss}>
-                        Apply Filters
-                    </Button>
+                    <View
+                        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' }}
+                    >
+                        <Button mode="contained" onPress={onDismiss}>
+                            Apply Filters
+                        </Button>
+                        <Button mode="contained" buttonColor={theme.colors.error} onPress={clearFilters}>
+                            Clear Filters
+                        </Button>
+
+                    </View>
                 </View>
             </Modal>
         </Portal>

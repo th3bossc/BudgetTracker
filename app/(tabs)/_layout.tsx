@@ -1,8 +1,8 @@
-import { Redirect, Tabs } from "expo-router";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useTheme } from "react-native-paper";
+import Loading from "@/components/common/loading";
 import { useAuth } from "@/hooks/use-auth";
-import Loading from "@/components/loading";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Redirect, Tabs } from "expo-router";
+import { useTheme } from "react-native-paper";
 
 export default function TabLayout() {
     const theme = useTheme();
@@ -53,12 +53,12 @@ export default function TabLayout() {
             />
 
             <Tabs.Screen
-                name="expenses"
+                name="data-sources"
                 options={{
-                    title: "Expenses",
+                    title: "Data Sources",
                     tabBarIcon: ({ color, size }) => (
                         <MaterialCommunityIcons
-                            name="cash-minus"
+                            name="database-outline"
                             size={size}
                             color={color}
                         />
@@ -67,30 +67,30 @@ export default function TabLayout() {
             />
 
             <Tabs.Screen
-                name="investments"
+                name="expenses"
                 options={{
-                    title: "Investments",
-                    tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons
-                            name="chart-line"
-                            size={size}
-                            color={color}
-                        />
-                    ),
+                    href: null,
                 }}
             />
 
             <Tabs.Screen
                 name="incomes"
                 options={{
-                    title: "Incomes",
-                    tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons
-                            name="cash-plus"
-                            size={size}
-                            color={color}
-                        />
-                    )
+                    href: null,
+                }}
+            />
+
+            <Tabs.Screen
+                name="investments"
+                options={{
+                    href: null,
+                }}
+            />
+
+            <Tabs.Screen
+                name="ious"
+                options={{
+                    href: null,
                 }}
             />
 
@@ -104,7 +104,7 @@ export default function TabLayout() {
                             size={size}
                             color={color}
                         />
-                    )
+                    ),
                 }}
             />
         </Tabs>

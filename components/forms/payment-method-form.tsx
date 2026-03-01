@@ -10,7 +10,8 @@ import {
     Switch,
     Text,
 } from "react-native-paper";
-import ColorPicker from "../color-picker";
+import ColorPicker from "../form-fields/color-picker";
+import IconPicker from "../form-fields/icon-picker";
 
 interface Props {
     initialData?: PaymentMethod;
@@ -25,6 +26,7 @@ export default function PaymentMethodForm({
 }: Props) {
     const [name, setName] = useState(initialData?.name ?? "");
     const [color, setColor] = useState(initialData?.color ?? "#9C27B0");
+    const [icon, setIcon] = useState(initialData?.icon ?? "");
     const [isArchived, setIsArchived] = useState(
         initialData?.isArchived ?? false
     );
@@ -36,7 +38,7 @@ export default function PaymentMethodForm({
             return;
         }
 
-        await onSubmit({ name, color, isArchived });
+        await onSubmit({ name, color, icon, isArchived });
         setError(null);
     };
 
@@ -52,6 +54,11 @@ export default function PaymentMethodForm({
             <ColorPicker
                 color={color}
                 onSelect={setColor}
+            />
+
+            <IconPicker
+                icon={icon}
+                onSelect={setIcon}
             />
 
             <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>

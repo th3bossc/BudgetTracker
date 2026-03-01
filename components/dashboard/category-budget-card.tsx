@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { View, Animated } from "react-native";
 import { Card, Text, useTheme } from "react-native-paper";
 import type { ExpenseCategory } from "@/types/schema";
-import AnimatedProgress from "../animated-progress";
+import AnimatedProgress from "../common/animated-progress";
 
 interface Props {
   category: ExpenseCategory;

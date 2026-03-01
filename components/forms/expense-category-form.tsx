@@ -1,3 +1,5 @@
+import type { ExpenseCategoryCreateInput, ExpenseCategoryUpdateInput } from "@/types/create";
+import type { ExpenseCategory } from "@/types/schema";
 import { useState } from "react";
 import { View } from "react-native";
 import {
@@ -8,10 +10,8 @@ import {
     Switch,
     Text,
 } from "react-native-paper";
-import type { ExpenseCategory } from "@/types/schema";
-import type { ExpenseCategoryCreateInput, ExpenseCategoryUpdateInput } from "@/types/create";
-import IconPicker from "../icon-picker";
-import ColorPicker from "../color-picker";
+import ColorPicker from "../form-fields/color-picker";
+import IconPicker from "../form-fields/icon-picker";
 
 interface Props {
     initialData?: ExpenseCategory;
@@ -24,6 +24,7 @@ export default function CategoryForm({
     onSubmit,
     loading,
 }: Props) {
+    console.log(initialData)
     const [name, setName] = useState(initialData?.name ?? "");
     const [color, setColor] = useState(initialData?.color ?? "#4CAF50");
     const [icon, setIcon] = useState(initialData?.icon ?? "");

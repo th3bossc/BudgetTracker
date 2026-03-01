@@ -1,50 +1,170 @@
-# Welcome to your Expo app 👋
+# Budget Tracker
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A personal finance app built with Expo + React Native + Firebase.
 
-## Get started
+The app lets each user track expenses, incomes, and investments, then review monthly summaries, cashflow, and category-wise budget usage.
 
-1. Install dependencies
+## Features
 
-   ```bash
-   npm install
-   ```
+- Email/password authentication with Firebase Auth
+- Expense tracking with category and payment method mapping
+- Income tracking with income source mapping
+- Investment tracking with investment type mapping
+- Config management for:
+  - Expense categories
+  - Payment methods
+  - Income sources
+  - Investment types
+- Monthly dashboard summary:
+  - Income
+  - Expense
+  - Investment
+  - Net savings
+  - Cashflow
+- Monthly aggregates table for recent months
+- Finance screen for monthly budget vs category usage
+- Filters on list screens:
+  - By type/source/category/payment method
+  - Amount range
+  - Date range
+  - Sort by date/amount
 
-2. Start the app
+## Tech Stack
 
-   ```bash
-   npx expo start
-   ```
+- Expo SDK 54 + React Native 0.81
+- Expo Router (file-based routing)
+- React Native Paper (UI)
+- Firebase Auth + Firestore
+- TypeScript (strict mode)
 
-In the output, you'll find options to open the app in a
+## Project Structure
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```text
+app/                    # Routes (tabs, detail pages, create/edit screens, auth)
+components/             # Reusable UI, forms, filters, dashboard widgets
+hooks/                  # Data composition + subscriptions + filtering logic
+services/               # Firestore CRUD + realtime subscriptions
+providers/              # App-wide providers (AuthProvider)
+types/                  # Domain, firestore, and input/update types
+utils/                  # Date, aggregation, lookup helpers
+translations/           # Date picker translations
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Prerequisites
 
-## Learn more
+- Node.js 18+
+- npm 9+
+- Expo CLI (via `npx expo ...`)
+- Firebase project with:
+  - Authentication (Email/Password enabled)
+  - Cloud Firestore
 
-To learn more about developing your project with Expo, look at the following resources:
+## Environment Variables
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Copy `.env.example` to `.env` and fill values:
 
-## Join the community
+```bash
+cp .env.example .env
+```
 
-Join our community of developers creating universal apps.
+Required variables:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```env
+EXPO_PUBLIC_FIREBASE_API_KEY=
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+EXPO_PUBLIC_FIREBASE_APP_ID=
+```
+
+These are loaded in [`services/firebase.ts`](./services/firebase.ts).
+
+## Getting Started
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run development server:
+
+```bash
+npm run start
+```
+
+Run specific platforms:
+
+```bash
+npm run android
+npm run ios
+npm run web
+```
+
+Run lint:
+
+```bash
+npm run lint
+```
+
+## Auth + Routing Flow
+
+- Root route redirects to `/(tabs)/home`
+- Tab layout checks auth state:
+  - Unauthenticated users are redirected to `/login`
+  - Authenticated users can access all tab screens
+- Registration and login use Firebase Auth email/password
+
+## Firestore Data Model
+
+All user data is stored under:
+
+```text
+users/{uid}/
+```
+
+Subcollections used:
+
+- `expenses`
+- `incomes`
+- `investments`
+- `expenseCategories`
+- `paymentMethods`
+- `incomeSources`
+- `investmentTypes`
+- `budgets`
+
+Notes:
+
+- Transaction documents include `monthKey` (`YYYY-MM`) for monthly aggregation.
+- Budgets are keyed by `(categoryId, monthKey)` semantics in app logic.
+- `createdAt` is set server-side with Firestore `serverTimestamp()`.
+
+## Key Screens
+
+- Dashboard: summary cards + recent monthly aggregates
+- Expenses / Incomes / Investments: list, filter, delete, create, edit
+- Finances: month selector + budget utilization by category
+- Budget editor (`/budget/[monthKey]`): bulk budget input for categories
+- Profile: logout + navigate to config masters
+
+## Build
+
+`eas.json` currently contains a production profile for Android APK builds.
+
+## Scripts
+
+From `package.json`:
+
+- `npm run start` - Start Expo dev server
+- `npm run android` - Run Android native project
+- `npm run ios` - Run iOS native project
+- `npm run web` - Start web build/dev server
+- `npm run lint` - Run Expo lint setup
+- `npm run reset-project` - Reset script from Expo template
+
+## Notes
+
+- Currency display currently uses `₹` in UI components.
+- This repo is structured for realtime updates via Firestore `onSnapshot` subscriptions.

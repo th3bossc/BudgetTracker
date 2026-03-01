@@ -40,9 +40,9 @@ export const useFinanceConfig = (): FinanceFilterData => {
 
     return {
         loading,
-        categories,
-        incomeSources,
-        investmentTypes,
-        paymentMethods,
+        categories: [...categories].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
+        incomeSources: [...incomeSources].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
+        investmentTypes: [...investmentTypes].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
+        paymentMethods: [...paymentMethods].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
     };
 };

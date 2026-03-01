@@ -1,22 +1,23 @@
+import Header from "@/components/common/header";
+import Loading from "@/components/common/loading";
+import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
+import IncomeFiltersModal from "@/components/filter-modals/incomes-filters";
+import { useIncomesData } from "@/hooks/use-incomes-data";
+import { deleteIncome } from "@/services/income-service";
+import type { IncomeFilters } from "@/types/common";
+import { truncateText } from "@/utils/text";
+import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, View } from "react-native";
 import {
     Card,
     Chip,
-    Text,
     FAB,
-    useTheme,
     IconButton,
+    Text,
+    useTheme,
 } from "react-native-paper";
-import { useRouter } from "expo-router";
-import { useIncomesData } from "@/hooks/use-incomes-data";
-import type { IncomeFilters } from "@/types/common";
-import IncomeFiltersModal from "@/components/filter-modals/incomes-filters";
-import Loading from "@/components/loading";
-import Header from "@/components/header";
-import { deleteIncome } from "@/services/income-service";
-import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function IncomeListPage() {
     const theme = useTheme();
@@ -69,7 +70,7 @@ export default function IncomeListPage() {
     return (
         <SafeAreaView style={{ 
             flex: 1,
-            padding: 16,
+            paddingHorizontal: 16,
             backgroundColor: theme.colors.background,
         }}>
             <Header
@@ -79,7 +80,7 @@ export default function IncomeListPage() {
             />
 
             <FlatList
-                contentContainerStyle={{ padding: 16, gap: 12 }}
+                contentContainerStyle={{ gap: 12 }}
                 data={incomes}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
@@ -104,12 +105,14 @@ export default function IncomeListPage() {
                             <View style={{ marginTop: 8, justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
                                 <Chip
                                     style={{
-                                        backgroundColor:
-                                            sourcesMap[item.source.id]?.color ?? "#E0E0E0",
+                                        backgroundColor: "transparent",
+                                        borderWidth: 1,
+                                        borderColor: sourcesMap[item.source.id]?.color ?? theme.colors.outline,
                                     }}
-                                    textStyle={{ color: "white" }}
+                                    textStyle={{ color: sourcesMap[item.source.id]?.color ?? theme.colors.onSurface }}
+                                    icon={sourcesMap[item.source.id]?.icon}
                                 >
-                                    {sourcesMap[item.source.id]?.name}
+                                    {truncateText(sourcesMap[item.source.id]?.name)}
                                 </Chip>
                                 <IconButton
                                     icon="delete"
@@ -142,6 +145,7 @@ export default function IncomeListPage() {
                 onDismiss={() => setFiltersVisible(false)}
                 filters={filters}
                 setFilters={setFilters}
+                style={{ backgroundColor: theme.colors.background }}
             />
 
             <DeleteConfirmationDialog

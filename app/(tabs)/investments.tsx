@@ -1,22 +1,23 @@
+import Header from "@/components/common/header";
+import Loading from "@/components/common/loading";
+import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
+import InvestmentFiltersModal from "@/components/filter-modals/investments-filter";
+import { useInvestmentsData } from "@/hooks/use-investments-data";
+import { deleteInvestment } from "@/services/investment-service";
+import type { InvestmentFilters } from "@/types/common";
+import { truncateText } from "@/utils/text";
+import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, View } from "react-native";
 import {
     Card,
     Chip,
-    Text,
     FAB,
-    useTheme,
     IconButton,
+    Text,
+    useTheme,
 } from "react-native-paper";
-import { useRouter } from "expo-router";
-import { useInvestmentsData } from "@/hooks/use-investments-data";
-import type { InvestmentFilters } from "@/types/common";
-import InvestmentFiltersModal from "@/components/filter-modals/investments-filter";
-import Loading from "@/components/loading";
-import Header from "@/components/header";
-import { deleteInvestment } from "@/services/investment-service";
-import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function InvestmentListPage() {
     const router = useRouter();
@@ -67,7 +68,7 @@ export default function InvestmentListPage() {
     return (
         <SafeAreaView style={{
             flex: 1,
-            padding: 16,
+            paddingHorizontal: 16,
             backgroundColor: theme.colors.background,
         }}>
             <Header
@@ -105,8 +106,16 @@ export default function InvestmentListPage() {
                             )}
 
                             <View style={{ marginTop: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Chip>
-                                    {typeMap[item.type.id]?.name}
+                                <Chip
+                                    icon={typeMap[item.type.id]?.icon}
+                                    style={{
+                                        backgroundColor: "transparent",
+                                        borderWidth: 1,
+                                        borderColor: theme.colors.primary,
+                                    }}
+                                    textStyle={{ color: theme.colors.primary }}
+                                >
+                                    {truncateText(typeMap[item.type.id]?.name)}
                                 </Chip>
 
                                 <IconButton
@@ -140,6 +149,7 @@ export default function InvestmentListPage() {
                 onDismiss={() => setFiltersVisible(false)}
                 filters={filters}
                 setFilters={setFilters}
+                style={{ backgroundColor: theme.colors.background }}
             />
 
             <DeleteConfirmationDialog

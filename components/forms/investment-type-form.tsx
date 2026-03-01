@@ -14,6 +14,7 @@ import {
     InvestmentRiskLevel,
 } from "@/types/schema";
 import { InvestmentTypeCreateInput, InvestmentTypeUpdateInput } from "@/types/create";
+import IconPicker from "../form-fields/icon-picker";
 
 interface Props {
     initialData?: InvestmentType;
@@ -27,6 +28,7 @@ export default function InvestmentTypeForm({
     loading,
 }: Props) {
     const [name, setName] = useState(initialData?.name ?? "");
+    const [icon, setIcon] = useState(initialData?.icon ?? "");
     const [riskLevel, setRiskLevel] = useState(
         initialData?.riskLevel ?? InvestmentRiskLevel.MEDIUM
     );
@@ -49,6 +51,7 @@ export default function InvestmentTypeForm({
 
         await onSubmit({
             name,
+            icon,
             riskLevel,
             isArchived,
         });
@@ -64,6 +67,11 @@ export default function InvestmentTypeForm({
                 value={name}
                 onChangeText={setName}
                 mode="outlined"
+            />
+
+            <IconPicker
+                icon={icon}
+                onSelect={setIcon}
             />
 
             <Dropdown

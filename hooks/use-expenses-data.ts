@@ -1,8 +1,9 @@
 import { subscribeToExpenseCategories } from "@/services/expense-category-service";
 import { subscribeToExpenses } from "@/services/expense-service";
+import { subscribeToIous } from "@/services/iou-service";
 import { subscribeToPaymentMethods } from "@/services/payment-method-service";
 import { ExpenseFilters } from "@/types/common";
-import { Expense, ExpenseCategory, PaymentMethod } from "@/types/schema";
+import { Expense, ExpenseCategory, Iou, PaymentMethod } from "@/types/schema";
 import { createLookupMap } from "@/utils/create-lookup-map";
 import { useEffect, useMemo, useState } from "react";
 
@@ -10,23 +11,33 @@ export const useExpensesData = (filters: ExpenseFilters) => {
     const [rawExpenses, setRawExpenses] = useState<Expense[]>([])
     const [categories, setCategories] = useState<ExpenseCategory[]>([]);
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+    const [ious, setIous] = useState<Iou[]>([]);
     const [initialLoading, setInitialLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const expensesUnsub = subscribeToExpenses(setRawExpenses);
         const categoriesUnsub = subscribeToExpenseCategories(setCategories);
         const paymentMethodsUnsub = subscribeToPaymentMethods(setPaymentMethods);
+        const iousUnsub = subscribeToIous(setIous);
         setInitialLoading(false);
 
         return () => {
             expensesUnsub();
             categoriesUnsub();
             paymentMethodsUnsub();
+            iousUnsub();
         }
     }, []);
 
     const categoriesMap = useMemo(() => createLookupMap(categories), [categories]);
     const paymentMethodsMap = useMemo(() => createLookupMap(paymentMethods), [paymentMethods]);
+    const expenseRecoveryMap = useMemo(() => {
+        return ious.reduce<Record<string, number>>((acc, iou) => {
+            const recovered = Math.max(iou.initialAmount - iou.amountLeft, 0);
+            acc[iou.expense.id] = recovered;
+            return acc;
+        }, {});
+    }, [ious]);
 
     const filteredExpenses = useMemo(() => {
         let result = [...rawExpenses];
@@ -43,16 +54,24 @@ export const useExpensesData = (filters: ExpenseFilters) => {
             );
         }
 
-        if (filters.minAmount !== undefined) {
+        if (filters.amount !== undefined) {
             result = result.filter(
-                e => e.amount >= filters.minAmount!
+                e => e.amount >= filters.amount!.min && e.amount <= filters.amount!.max 
             );
         }
 
-        if (filters.maxAmount !== undefined) {
+        if (filters.date !== undefined) {
+            const isInRange = (date: Date) => {
+                if (filters.date?.end && date > filters.date.end)
+                    return false;
+                if (filters.date?.start && date < filters.date.start)
+                    return false;
+
+                return true;
+            }
             result = result.filter(
-                e => e.amount <= filters.maxAmount!
-            );
+                e => isInRange(e.date)
+            )
         }
 
         if (filters.sortBy === "amount") {
@@ -65,8 +84,8 @@ export const useExpensesData = (filters: ExpenseFilters) => {
         else if (filters.sortBy == 'date') {
             result.sort((a, b) => 
                 filters.sortOrder == "desc"
-                    ? a.date.getTime() - b.date.getTime()
-                    : b.date.getTime() - a.date.getTime()
+                    ? b.date.getTime() - a.date.getTime()
+                    : a.date.getTime() - b.date.getTime()
             )
         }
 
@@ -78,5 +97,6 @@ export const useExpensesData = (filters: ExpenseFilters) => {
         expenses: filteredExpenses,
         categoriesMap,
         paymentMethodsMap,
+        expenseRecoveryMap,
     };
 };
