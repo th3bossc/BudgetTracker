@@ -1,6 +1,7 @@
 import type { IouCreateInput, IouUpdateInput } from "@/types/create";
 import type { IouDB } from "@/types/firebase";
 import type { Iou } from "@/types/schema";
+import { getMonthKey } from "@/utils/date";
 import {
     addDoc,
     collection,
@@ -32,7 +33,8 @@ const iouConverter: FirestoreDataConverter<Iou> = {
             paymentMethod: iou.paymentMethod,
             initialAmount: iou.initialAmount,
             amountLeft: iou.amountLeft,
-            monthKey: iou.monthKey,
+            expenseMonthKey: iou.expenseMonthKey,
+            createdMonthKey: iou.createdMonthKey,
             isPaid: iou.isPaid,
             paidAt: iou.paidAt ? Timestamp.fromDate(iou.paidAt) : null,
             createdAt: serverTimestamp(),
@@ -44,6 +46,8 @@ const iouConverter: FirestoreDataConverter<Iou> = {
         options: SnapshotOptions
     ): Iou {
         const data = snapshot.data(options) as IouDB;
+        const createdAt = (data.createdAt as Timestamp)?.toDate?.() ?? new Date();
+        const fallbackMonthKey = data.monthKey ?? getMonthKey(createdAt);
 
         return {
             id: snapshot.id,
@@ -51,10 +55,11 @@ const iouConverter: FirestoreDataConverter<Iou> = {
             paymentMethod: data.paymentMethod,
             initialAmount: data.initialAmount ?? data.amountLeft,
             amountLeft: data.amountLeft,
-            monthKey: data.monthKey,
+            expenseMonthKey: data.expenseMonthKey ?? fallbackMonthKey,
+            createdMonthKey: data.createdMonthKey ?? fallbackMonthKey,
             isPaid: data.isPaid ?? false,
             paidAt: data.paidAt?.toDate?.(),
-            createdAt: (data.createdAt as Timestamp)?.toDate?.() ?? new Date(),
+            createdAt,
         };
     },
 };
@@ -71,11 +76,17 @@ export const getIous = async (): Promise<Iou[]> => {
 
 export const addIou = async (input: IouCreateInput) => {
     const uid = getCurrentUserId();
+    const nowMonthKey = getMonthKey(new Date());
+    const normalizedInput = {
+        ...input,
+        expenseMonthKey: input.expenseMonthKey,
+        createdMonthKey: input.createdMonthKey ?? nowMonthKey,
+    };
 
     const duplicateSnapshot = await getDocs(
         query(
             collection(db, "users", uid, TABLE_NAME).withConverter(iouConverter),
-            where("expense.id", "==", input.expense.id),
+            where("expense.id", "==", normalizedInput.expense.id),
             limit(1),
         )
     );
@@ -87,9 +98,9 @@ export const addIou = async (input: IouCreateInput) => {
     await addDoc(
         collection(db, "users", uid, TABLE_NAME).withConverter(iouConverter),
         {
-            ...input,
+            ...normalizedInput,
             id: "",
-            paidAt: input.paidAt,
+            paidAt: normalizedInput.paidAt,
             createdAt: new Date(),
         }
     );

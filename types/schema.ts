@@ -78,7 +78,8 @@ export interface IouBase {
     paymentMethod: { id: string, name?: string };
     initialAmount: number;
     amountLeft: number;
-    monthKey: string;
+    expenseMonthKey: string;
+    createdMonthKey: string;
     isPaid: boolean;
     paidAt?: Date;
 }

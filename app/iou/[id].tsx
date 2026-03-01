@@ -98,7 +98,8 @@ export default function EditIouPage() {
             <IouForm
               initialData={iou}
               expenseId={iou.expense.id}
-              monthKey={iou.monthKey}
+              expenseMonthKey={iou.expenseMonthKey}
+              createdMonthKey={iou.createdMonthKey}
               onSubmit={handleSubmit}
               loading={loading}
             />

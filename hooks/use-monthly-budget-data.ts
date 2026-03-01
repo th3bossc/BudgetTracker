@@ -84,7 +84,7 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
                     .reduce((sum, i) => sum + i.amount, 0);
 
                 const currentIouRecovered = ious
-                    .filter(i => i.monthKey == monthKey)
+                    .filter(i => i.createdMonthKey == monthKey)
                     .reduce((sum, i) => sum + Math.max(i.initialAmount - i.amountLeft, 0), 0);
 
                 setSummary({

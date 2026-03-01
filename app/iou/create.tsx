@@ -3,6 +3,7 @@ import { getExpenses } from "@/services/expense-service";
 import { addIou } from "@/services/iou-service";
 import type { IouCreateInput } from "@/types/create";
 import type { Expense } from "@/types/schema";
+import { getMonthKey } from "@/utils/date";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -99,7 +100,8 @@ export default function CreateIouPage() {
 
             <IouForm
               expenseId={expense.id}
-              monthKey={expense.monthKey}
+              expenseMonthKey={expense.monthKey}
+              createdMonthKey={getMonthKey(new Date())}
               defaultInitialAmount={expense.amount}
               onSubmit={handleSubmit}
               loading={loading}

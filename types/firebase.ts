@@ -41,7 +41,9 @@ export interface IouDB {
     paymentMethod: IouBase["paymentMethod"];
     initialAmount: IouBase["initialAmount"];
     amountLeft: IouBase["amountLeft"];
-    monthKey: IouBase["monthKey"];
+    expenseMonthKey?: IouBase["expenseMonthKey"];
+    createdMonthKey?: IouBase["createdMonthKey"];
+    monthKey?: string;
     isPaid: IouBase["isPaid"];
     paidAt: Timestamp | null;
     createdAt: Timestamp | FieldValue;

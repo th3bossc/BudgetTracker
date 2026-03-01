@@ -14,7 +14,8 @@ import type { Iou } from "@/types/schema";
 
 interface Props {
     expenseId: string;
-    monthKey: string;
+    expenseMonthKey: string;
+    createdMonthKey: string;
     defaultInitialAmount?: number;
     initialData?: Iou;
     onSubmit: ((data: IouCreateInput) => Promise<void>) | ((data: IouUpdateInput) => Promise<void>);
@@ -23,7 +24,8 @@ interface Props {
 
 export default function IouForm({
     expenseId,
-    monthKey,
+    expenseMonthKey,
+    createdMonthKey,
     defaultInitialAmount,
     initialData,
     onSubmit,
@@ -90,7 +92,8 @@ export default function IouForm({
             paymentMethod: { id: paymentMethodId },
             initialAmount: initial,
             amountLeft,
-            monthKey,
+            expenseMonthKey,
+            createdMonthKey,
             isPaid: amountLeft === 0,
         };
 
