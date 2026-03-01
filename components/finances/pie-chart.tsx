@@ -5,6 +5,7 @@ import { Text, useTheme } from "react-native-paper";
 import SectionHeader from "../dashboard/section-header";
 
 type Props = {
+    title?: string;
     data: {
         name: string;
         amount: number;
@@ -22,7 +23,7 @@ function generateColors(count: number) {
     return colors;
 }
 
-export default function ExpensePieChart({ data }: Props) {
+export default function ExpensePieChart({ data, title = "Expense Distribution" }: Props) {
     const theme = useTheme();
     const { width } = useWindowDimensions();
 
@@ -37,7 +38,7 @@ export default function ExpensePieChart({ data }: Props) {
 
     return (
         <View style={{ alignItems: "center", width: "100%" }}>
-            <SectionHeader title="Expense Distribution" />
+            <SectionHeader title={title} />
 
             <PieChart
                 data={chartData}

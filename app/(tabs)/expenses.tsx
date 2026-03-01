@@ -5,6 +5,7 @@ import ExpenseFiltersModal from "@/components/filter-modals/expense-filter";
 import { useExpensesData } from "@/hooks/use-expenses-data";
 import { deleteExpense } from "@/services/expense-service";
 import { ExpenseFilters } from "@/types/common";
+import { truncateText } from "@/utils/text";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { FlatList, View } from "react-native";
@@ -101,8 +102,8 @@ export default function ExpenseListPage() {
                                 {item.description}
                             </Text>
 
-                            <View style={{ flexDirection: "row", justifyContent: 'space-between', marginTop: 8 }}>
-                                <View style={{ flexDirection: "row", gap: 8, alignItems: 'center' }}>
+                            <View style={{ flexDirection: "column", justifyContent: 'space-between', marginTop: 8 }}>
+                                <View style={{ flexDirection: "row", gap: 8, alignItems: 'center', justifyContent: 'space-between' }}>
                                     <Chip
                                         style={{
                                             backgroundColor:
@@ -111,9 +112,22 @@ export default function ExpenseListPage() {
                                         textStyle={{ color: "white" }}
                                         icon={categoriesMap[item.category.id]?.icon}
                                     >
-                                        {categoriesMap[item.category.id]?.name}
+                                        {truncateText(categoriesMap[item.category.id]?.name)}
                                     </Chip>
 
+                                    <IconButton
+                                        icon="cash-refund"
+                                        onPress={(e) => {
+                                            e.stopPropagation();
+                                            router.push({
+                                                pathname: "/iou/create" as any,
+                                                params: { expenseId: item.id },
+                                            });
+                                        }}
+                                    />
+                                </View>
+
+                                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: 'space-between' }}>
                                     <Chip
                                         style={{
                                             backgroundColor:
@@ -121,18 +135,18 @@ export default function ExpenseListPage() {
                                         }}
                                         textStyle={{ color: "white" }}
                                     >
-                                        {paymentMethodsMap[item.paymentMethod.id]?.name}
+                                        {truncateText(paymentMethodsMap[item.paymentMethod.id]?.name)}
                                     </Chip>
-                                </View>
 
-                                <IconButton
-                                    icon="delete"
-                                    iconColor={theme.colors.error}
-                                    onPress={(e) => {
-                                        e.stopPropagation();
-                                        setDeleteId(item.id)
-                                    }}
-                                />
+                                    <IconButton
+                                        icon="delete"
+                                        iconColor={theme.colors.error}
+                                        onPress={(e) => {
+                                            e.stopPropagation();
+                                            setDeleteId(item.id)
+                                        }}
+                                    />
+                                </View>
                             </View>
 
 

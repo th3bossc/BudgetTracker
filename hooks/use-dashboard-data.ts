@@ -1,8 +1,9 @@
 import { subscribeToExpenses } from "@/services/expense-service";
 import { subscribeToIncomes } from "@/services/income-service";
+import { subscribeToIous } from "@/services/iou-service";
 import { subscribeToInvestments } from "@/services/investment-service";
 import type { MonthlyAggregate } from "@/types/common";
-import { Expense, Income, Investment } from "@/types/schema";
+import { Expense, Income, Iou, Investment } from "@/types/schema";
 import { getMonthKey } from "@/utils/date";
 import { groupByMonth } from "@/utils/group-by-month";
 import { useEffect, useState } from "react";
@@ -19,6 +20,7 @@ export interface DashboardMonthlyData {
     incomes: MonthlyAggregate[],
     expenses: MonthlyAggregate[],
     investments: MonthlyAggregate[],
+    ious: MonthlyAggregate[],
 }
 
 
@@ -43,21 +45,25 @@ export const useDashboardData = (): DashboardData => {
         incomes: [],
         expenses: [],
         investments: [],
+        ious: [],
     });
 
     const [incomes, setIncomes] = useState<Income[]>([]);
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [investments, setInvestments] = useState<Investment[]>([]);
+    const [ious, setIous] = useState<Iou[]>([]);
 
     useEffect(() => {
         const incomesUnsub = subscribeToIncomes(setIncomes);
         const expensesUnsub = subscribeToExpenses(setExpenses);
         const investmentsUnsub = subscribeToInvestments(setInvestments);
+        const iousUnsub = subscribeToIous(setIous);
 
         return () => {
             incomesUnsub();
             expensesUnsub();
             investmentsUnsub();
+            iousUnsub();
         }
     }, []);
 
@@ -92,11 +98,18 @@ export const useDashboardData = (): DashboardData => {
                 const incomeAgg = groupByMonth(incomes).slice(0, 3);
                 const expenseAgg = groupByMonth(expenses).slice(0, 3);
                 const investmentAgg = groupByMonth(investments).slice(0, 3);
+                const iouAgg = groupByMonth(
+                    ious.map(iou => ({
+                        monthKey: iou.monthKey,
+                        amount: iou.amountLeft,
+                    }))
+                ).slice(0, 3);
 
                 setMonthlyData({
                     incomes: incomeAgg,
                     expenses: expenseAgg,
                     investments: investmentAgg,
+                    ious: iouAgg,
                 });
             }
             catch (error) {
@@ -108,7 +121,7 @@ export const useDashboardData = (): DashboardData => {
         }
 
         void fetchData();
-    }, [incomes, expenses, investments]);
+    }, [incomes, expenses, investments, ious]);
 
     return {
         loading: computationLoadingStatus,

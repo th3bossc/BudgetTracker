@@ -70,6 +70,15 @@ export interface CategoryBudgetBase {
     amount: number;
 }
 
+export interface IouBase {
+    expense: { id: string };
+    paymentMethod: { id: string, name?: string };
+    amountLeft: number;
+    monthKey: string;
+    isPaid: boolean;
+    paidAt?: Date;
+}
+
 /* main tables */ 
 export interface ExpenseCategory extends BaseDoc, ExpenseCategoryBase {};
 
@@ -93,3 +102,4 @@ export interface Investment extends BaseDoc, InvestmentBase {
 
 export interface CategoryBudget extends BaseDoc, CategoryBudgetBase {};
 
+export interface Iou extends BaseDoc, IouBase {};

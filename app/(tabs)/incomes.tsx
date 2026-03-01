@@ -5,6 +5,7 @@ import IncomeFiltersModal from "@/components/filter-modals/incomes-filters";
 import { useIncomesData } from "@/hooks/use-incomes-data";
 import { deleteIncome } from "@/services/income-service";
 import type { IncomeFilters } from "@/types/common";
+import { truncateText } from "@/utils/text";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { FlatList, View } from "react-native";
@@ -109,7 +110,7 @@ export default function IncomeListPage() {
                                     }}
                                     textStyle={{ color: "white" }}
                                 >
-                                    {sourcesMap[item.source.id]?.name}
+                                    {truncateText(sourcesMap[item.source.id]?.name)}
                                 </Chip>
                                 <IconButton
                                     icon="delete"

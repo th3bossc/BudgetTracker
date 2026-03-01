@@ -16,14 +16,8 @@ export default function HomeScreen() {
     const {
         loading,
         summary,
-        monthlyData: { incomes, expenses, investments },
+        monthlyData: { incomes, expenses, investments, ious },
     } = useDashboardData();
-
-    if (loading) {
-        return (
-            <Loading />
-        )
-    }
 
     const createExpenseItem = useCallback(() => {
         router.push('/expense/create')
@@ -38,20 +32,42 @@ export default function HomeScreen() {
     }, [router]);
 
     const viewAllExpenses = useCallback(() => {
-        router.push('/(tabs)/expenses');
+        router.push({
+            pathname: '/(tabs)/data-sources' as any,
+            params: { source: 'expenses' },
+        });
     }, [router]);
 
     const viewAllIncomes = useCallback(() => {
-        router.push('/(tabs)/incomes');
+        router.push({
+            pathname: '/(tabs)/data-sources' as any,
+            params: { source: 'incomes' },
+        });
     }, [router]);
 
     const viewAllInvestments = useCallback(() => {
-        router.push('/(tabs)/investments');
+        router.push({
+            pathname: '/(tabs)/data-sources' as any,
+            params: { source: 'investments' },
+        });
+    }, [router]);
+
+    const viewAllIous = useCallback(() => {
+        router.push({
+            pathname: '/(tabs)/data-sources' as any,
+            params: { source: 'ious' },
+        });
     }, [router]);
 
     const openProfile = useCallback(() => {
         router.push('/profile');
     }, [router]);
+
+    if (loading) {
+        return (
+            <Loading />
+        )
+    }
 
     return (
         <SafeAreaView style={{
@@ -90,6 +106,12 @@ export default function HomeScreen() {
                     onViewAll={viewAllIncomes}
                 />
                 <MonthlyAggregateTable data={incomes} />
+
+                <SectionHeader
+                    title="IOUs"
+                    onViewAll={viewAllIous}
+                />
+                <MonthlyAggregateTable data={ious} />
             </ScrollView>
         </SafeAreaView>
     );

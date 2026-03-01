@@ -53,12 +53,12 @@ export default function TabLayout() {
             />
 
             <Tabs.Screen
-                name="expenses"
+                name="data-sources"
                 options={{
-                    title: "Expenses",
+                    title: "Data Sources",
                     tabBarIcon: ({ color, size }) => (
                         <MaterialCommunityIcons
-                            name="cash-minus"
+                            name="database-outline"
                             size={size}
                             color={color}
                         />
@@ -67,44 +67,30 @@ export default function TabLayout() {
             />
 
             <Tabs.Screen
-                name="investments"
+                name="expenses"
                 options={{
-                    title: "Investments",
-                    tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons
-                            name="chart-line"
-                            size={size}
-                            color={color}
-                        />
-                    ),
+                    href: null,
                 }}
             />
 
             <Tabs.Screen
                 name="incomes"
                 options={{
-                    title: "Incomes",
-                    tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons
-                            name="cash-plus"
-                            size={size}
-                            color={color}
-                        />
-                    )
+                    href: null,
+                }}
+            />
+
+            <Tabs.Screen
+                name="investments"
+                options={{
+                    href: null,
                 }}
             />
 
             <Tabs.Screen
                 name="ious"
                 options={{
-                    title: "IOUs",
-                    tabBarIcon: ({ color, size }) => (
-                        <MaterialCommunityIcons
-                            name="cash-refund"
-                            size={size}
-                            color={color}
-                        />
-                    )
+                    href: null,
                 }}
             />
 
@@ -118,7 +104,7 @@ export default function TabLayout() {
                             size={size}
                             color={color}
                         />
-                    )
+                    ),
                 }}
             />
         </Tabs>

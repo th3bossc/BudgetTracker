@@ -5,6 +5,7 @@ import InvestmentFiltersModal from "@/components/filter-modals/investments-filte
 import { useInvestmentsData } from "@/hooks/use-investments-data";
 import { deleteInvestment } from "@/services/investment-service";
 import type { InvestmentFilters } from "@/types/common";
+import { truncateText } from "@/utils/text";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { FlatList, View } from "react-native";
@@ -106,7 +107,7 @@ export default function InvestmentListPage() {
 
                             <View style={{ marginTop: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <Chip>
-                                    {typeMap[item.type.id]?.name}
+                                    {truncateText(typeMap[item.type.id]?.name)}
                                 </Chip>
 
                                 <IconButton
