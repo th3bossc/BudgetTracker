@@ -17,8 +17,8 @@ export default function LoginPage() {
     const router = useRouter();
     const theme = useTheme();
 
-    const [email, setEmail] = useState("test@test.com");
-    const [password, setPassword] = useState("test1234");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
     const handleLogin = async () => {
