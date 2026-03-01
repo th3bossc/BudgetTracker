@@ -6,6 +6,7 @@ import {
     Button,
     Divider,
     TextInput,
+    useTheme,
 } from "react-native-paper";
 import { Dropdown } from "react-native-paper-dropdown";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
@@ -30,7 +31,7 @@ export default function ExpenseFiltersModal({
     style = {},
 }: Props) {
     const { categories, paymentMethods } = useFinanceConfig();
-
+    const theme = useTheme();
     const updateFilter = useCallback((key: keyof ExpenseFilters, value: any) => {
         setFilters(prev => ({
             ...prev,
@@ -57,7 +58,7 @@ export default function ExpenseFiltersModal({
             value: c.id,
         })))
     ], [categories]);
-    
+
     const sortByOptions = useMemo(() => [
         { label: 'Amount', value: 'amount' },
         { label: 'Date', value: 'date' },
@@ -94,7 +95,7 @@ export default function ExpenseFiltersModal({
     const updateSortOrderHandler = useCallback((val?: string) => {
         if (!val)
             return;
-        
+
         updateFilter('sortOrder', val);
     }, [updateFilter]);
 
@@ -106,6 +107,11 @@ export default function ExpenseFiltersModal({
         gap: 12,
         ...style,
     }), [style]);
+
+    const clearFilters = useCallback(() => {
+        setFilters({});
+        onDismiss();
+    }, [setFilters]);
 
 
     return (
@@ -158,9 +164,17 @@ export default function ExpenseFiltersModal({
 
                     <Divider />
 
-                    <Button mode="contained" onPress={onDismiss}>
-                        Apply Filters
-                    </Button>
+                    <View
+                        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' }}
+                    >
+                        <Button mode="contained" onPress={onDismiss}>
+                            Apply Filters
+                        </Button>
+                        <Button mode="contained" buttonColor={theme.colors.error} onPress={clearFilters}>
+                            Clear Filters
+                        </Button>
+
+                    </View>
                 </View>
             </Modal>
         </Portal>

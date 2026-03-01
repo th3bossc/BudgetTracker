@@ -48,11 +48,20 @@ export default function DateRangeFilter({ data, onChange }: Props) {
         return 'Filter by Date'
     }, [data]);
 
+
+    const removeFilters = useCallback(() => {
+        setVisible(false);
+        setOpen(false);
+
+        onChange(undefined);
+    }, [onChange]);
+
     return (
         <>
             <Button
                 mode="outlined"
                 onPress={showModal}
+                style={{ borderRadius: 4 }}
             >
                 {filteredDate}
             </Button>
@@ -90,6 +99,9 @@ export default function DateRangeFilter({ data, onChange }: Props) {
                             </Button>
                             <Button compact onPress={() => setOpen(true)}>
                                 Custom
+                            </Button>
+                            <Button compact textColor={theme.colors.error} onPress={removeFilters}>
+                                All
                             </Button>
                         </View>
 

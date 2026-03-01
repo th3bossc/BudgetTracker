@@ -4,6 +4,7 @@ import {
     Portal,
     Button,
     Divider,
+    useTheme,
 } from "react-native-paper";
 import { Dropdown } from "react-native-paper-dropdown";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
@@ -28,6 +29,7 @@ export default function IncomeFiltersModal({
     style = {},
 }: Props) {
     const { incomeSources } = useFinanceConfig();
+    const theme = useTheme();
 
     const updateFilter = (key: keyof IncomeFilters, value: any) => {
         setFilters(prev => ({
@@ -92,6 +94,11 @@ export default function IncomeFiltersModal({
         ...style,
     }), [style]);
 
+    const clearFilters = useCallback(() => {
+        setFilters({});
+        onDismiss();
+    }, [setFilters]);
+
     return (
         <Portal>
             <Modal visible={visible} onDismiss={onDismiss}>
@@ -135,9 +142,18 @@ export default function IncomeFiltersModal({
 
                     <Divider />
 
-                    <Button mode="contained" onPress={onDismiss}>
-                        Apply Filters
-                    </Button>
+
+                    <View
+                        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' }}
+                    >
+                        <Button mode="contained" onPress={onDismiss}>
+                            Apply Filters
+                        </Button>
+                        <Button mode="contained" buttonColor={theme.colors.error} onPress={clearFilters}>
+                            Clear Filters
+                        </Button>
+
+                    </View>
 
                 </View>
             </Modal>

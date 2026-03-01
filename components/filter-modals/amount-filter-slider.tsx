@@ -48,6 +48,7 @@ export default function AmountRangeFilter({
             <Button
                 mode="outlined"
                 onPress={showModal}
+                style={{ borderRadius: 4 }}
             >
                 Filter by amount ({filterAmount})
             </Button>

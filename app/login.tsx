@@ -1,3 +1,4 @@
+import PasswordInput from "@/components/forms/password-input";
 import Header from "@/components/header";
 import { auth } from "@/services/firebase";
 import { useRouter } from "expo-router";
@@ -44,11 +45,10 @@ export default function LoginPage() {
                     mode="outlined"
                 />
 
-                <TextInput
+                <PasswordInput
                     label="Password"
                     value={password}
                     onChangeText={setPassword}
-                    secureTextEntry
                     mode="outlined"
                 />
 
