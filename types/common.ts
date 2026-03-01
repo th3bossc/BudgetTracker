@@ -29,3 +29,13 @@ export interface InvestmentFilters {
     sortBy?: "amount" | "date";
     sortOrder?: "asc" | "desc";
 }
+
+export interface IouFilters {
+    paymentMethodId?: string;
+    status?: "open" | "paid";
+    amount?: { min: number, max: number };
+    date?: { start?: Date, end?: Date };
+
+    sortBy?: "amount" | "date";
+    sortOrder?: "asc" | "desc";
+}

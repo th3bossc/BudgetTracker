@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.th3bossc.budgettracker"
     },
     "android": {
       "package": "com.th3bossc.budgettracker",

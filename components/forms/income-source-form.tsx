@@ -1,17 +1,17 @@
+import { IncomeSourceCreateInput, IncomeSourceUpdateInput } from "@/types/create";
+import type { IncomeSource } from "@/types/schema";
 import { useState } from "react";
 import { View } from "react-native";
 import {
-    TextInput,
     Button,
-    HelperText,
     Divider,
+    HelperText,
     Switch,
     Text,
-    useTheme,
+    TextInput
 } from "react-native-paper";
-import type { IncomeSource } from "@/types/schema";
-import { IncomeSourceCreateInput, IncomeSourceUpdateInput } from "@/types/create";
-import ColorPicker from "../color-picker";
+import ColorPicker from "../form-fields/color-picker";
+import IconPicker from "../form-fields/icon-picker";
 interface Props {
     initialData?: IncomeSource;
     onSubmit: ((data: IncomeSourceCreateInput) => Promise<void>) | ((data: IncomeSourceUpdateInput) => Promise<void>);
@@ -25,6 +25,7 @@ export default function IncomeSourceForm({
 }: Props) {
     const [name, setName] = useState(initialData?.name ?? "");
     const [color, setColor] = useState(initialData?.color ?? "#2196F3");
+    const [icon, setIcon] = useState(initialData?.icon ?? "");
     const [isArchived, setIsArchived] = useState(
         initialData?.isArchived ?? false
     );
@@ -40,6 +41,7 @@ export default function IncomeSourceForm({
         await onSubmit({
             name,
             color,
+            icon,
             isArchived,
         });
 
@@ -54,6 +56,11 @@ export default function IncomeSourceForm({
                 value={name}
                 onChangeText={setName}
                 mode="outlined"
+            />
+
+            <IconPicker
+                icon={icon}
+                onSelect={setIcon}
             />
 
 

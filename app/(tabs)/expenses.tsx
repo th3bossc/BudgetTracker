@@ -1,22 +1,23 @@
+import Header from "@/components/common/header";
+import Loading from "@/components/common/loading";
+import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
+import ExpenseFiltersModal from "@/components/filter-modals/expense-filter";
+import { useExpensesData } from "@/hooks/use-expenses-data";
+import { deleteExpense } from "@/services/expense-service";
+import { ExpenseFilters } from "@/types/common";
+import { truncateText } from "@/utils/text";
+import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, View } from "react-native";
 import {
     Card,
     Chip,
+    FAB,
+    IconButton,
     Text,
     useTheme,
-    IconButton,
-    FAB,
 } from "react-native-paper";
-import { useRouter } from "expo-router";
-import { useExpensesData } from "@/hooks/use-expenses-data";
-import ExpenseFiltersModal from "@/components/filter-modals/expense-filter";
-import { ExpenseFilters } from "@/types/common";
-import Loading from "@/components/loading";
-import Header from "@/components/header";
-import { deleteExpense } from "@/services/expense-service";
-import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ExpenseListPage() {
     const theme = useTheme();
@@ -37,6 +38,7 @@ export default function ExpenseListPage() {
         expenses,
         categoriesMap,
         paymentMethodsMap,
+        expenseRecoveryMap,
     } = useExpensesData(filters);
 
     const showFiltersHandler = useCallback(() => {
@@ -70,7 +72,7 @@ export default function ExpenseListPage() {
     return (
         <SafeAreaView style={{
             flex: 1,
-            padding: 16,
+            paddingHorizontal: 16,
             backgroundColor: theme.colors.background,
         }}>
             <Header
@@ -80,66 +82,105 @@ export default function ExpenseListPage() {
             />
 
             <FlatList
-                contentContainerStyle={{ padding: 16, gap: 12 }}
+                contentContainerStyle={{ gap: 12 }}
                 data={expenses}
                 keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                    <Card onPress={() => router.push(`/expense/${item.id}`)}>
-                        <Card.Content>
+                renderItem={({ item }) => {
+                    const hasIouAttached = !!expenseRecoveryMap[item.id]
+                    const recoveredAmount = expenseRecoveryMap[item.id] ?? 0;
+                    const netCost = Math.max(item.amount - recoveredAmount, 0);
 
-                            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                                <Text variant="titleMedium">
-                                    ₹ {item.amount}
-                                </Text>
+                    return (
+                        <Card onPress={() => router.push(`/expense/${item.id}`)}>
+                            <Card.Content>
 
-                                <Text variant="bodySmall">
-                                    {item.date.toDateString()}
-                                </Text>
-                            </View>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                                    <Text variant="titleMedium">
+                                        ₹ {netCost}
+                                    </Text>
 
-                            <Text variant="bodyMedium">
-                                {item.description}
-                            </Text>
-
-                            <View style={{ flexDirection: "row", justifyContent: 'space-between', marginTop: 8 }}>
-                                <View style={{ flexDirection: "row", gap: 8, alignItems: 'center' }}>
-                                    <Chip
-                                        style={{
-                                            backgroundColor:
-                                                categoriesMap[item.category.id]?.color ?? "#E0E0E0",
-                                        }}
-                                        textStyle={{ color: "white" }}
-                                        icon={categoriesMap[item.category.id]?.icon}
-                                    >
-                                        {categoriesMap[item.category.id]?.name}
-                                    </Chip>
-
-                                    <Chip
-                                        style={{
-                                            backgroundColor:
-                                                paymentMethodsMap[item.paymentMethod.id]?.color ?? "#E0E0E0",
-                                        }}
-                                        textStyle={{ color: "white" }}
-                                    >
-                                        {paymentMethodsMap[item.paymentMethod.id]?.name}
-                                    </Chip>
+                                    <Text variant="bodySmall">
+                                        {item.date.toDateString()}
+                                    </Text>
                                 </View>
 
-                                <IconButton
-                                    icon="delete"
-                                    iconColor={theme.colors.error}
-                                    onPress={(e) => {
-                                        e.stopPropagation();
-                                        setDeleteId(item.id)
-                                    }}
-                                />
-                            </View>
+                                <Text variant="bodyMedium">
+                                    {item.description}
+                                </Text>
+
+                                {
+                                    hasIouAttached && (
+                                        <View style={{ marginTop: 6 }}>
+                                            <Text variant="bodySmall">
+                                                Paid by you: ₹ {item.amount}
+                                            </Text>
+                                            <Text variant="bodySmall">
+                                                Recovered: ₹ {recoveredAmount}
+                                            </Text>
+                                            <Text variant="bodySmall">
+                                                Net cost: ₹ {netCost}
+                                            </Text>
+                                        </View>
+
+                                    )
+                                }
+
+                                <View style={{ flexDirection: "column", justifyContent: 'space-between', marginTop: 8 }}>
+                                    <View style={{ flexDirection: "row", gap: 8, alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <Chip
+                                            style={{
+                                                backgroundColor: "transparent",
+                                                borderWidth: 1,
+                                                borderColor: categoriesMap[item.category.id]?.color ?? theme.colors.outline,
+                                            }}
+                                            textStyle={{ color: categoriesMap[item.category.id]?.color ?? theme.colors.onSurface }}
+                                            icon={categoriesMap[item.category.id]?.icon}
+                                        >
+                                            {truncateText(categoriesMap[item.category.id]?.name)}
+                                        </Chip>
+
+                                        <IconButton
+                                            icon="cash-refund"
+                                            onPress={(e) => {
+                                                e.stopPropagation();
+                                                router.push({
+                                                    pathname: "/iou/create",
+                                                    params: { expenseId: item.id },
+                                                });
+                                            }}
+                                        />
+                                    </View>
+
+                                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: 'space-between' }}>
+                                        <Chip
+                                            style={{
+                                                backgroundColor: "transparent",
+                                                borderWidth: 1,
+                                                borderColor: paymentMethodsMap[item.paymentMethod.id]?.color ?? theme.colors.outline,
+                                            }}
+                                            textStyle={{ color: paymentMethodsMap[item.paymentMethod.id]?.color ?? theme.colors.onSurface }}
+                                            icon={paymentMethodsMap[item.paymentMethod.id]?.icon}
+                                        >
+                                            {truncateText(paymentMethodsMap[item.paymentMethod.id]?.name)}
+                                        </Chip>
+
+                                        <IconButton
+                                            icon="delete"
+                                            iconColor={theme.colors.error}
+                                            onPress={(e) => {
+                                                e.stopPropagation();
+                                                setDeleteId(item.id)
+                                            }}
+                                        />
+                                    </View>
+                                </View>
 
 
 
-                        </Card.Content>
-                    </Card>
-                )}
+                            </Card.Content>
+                        </Card>
+                    )
+                }}
             />
 
             <FAB

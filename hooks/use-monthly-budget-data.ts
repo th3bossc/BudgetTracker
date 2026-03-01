@@ -1,11 +1,12 @@
-import { CategoryBudget, Expense, ExpenseCategory, Income, Investment } from "@/types/schema";
+import { CategoryBudget, Expense, ExpenseCategory, Income, Iou, Investment } from "@/types/schema";
 import { DashboardSummary } from "./use-dashboard-data";
 import { useEffect, useMemo, useState } from "react";
 import { useFinanceConfig } from "./use-finance-config";
-import { getBudgetsByMonth } from "@/services/category-budget-service";
+import { subscribeToMonthlyBudgets } from "@/services/category-budget-service";
 import { subscribeToExpenses } from "@/services/expense-service";
 import { subscribeToInvestments } from "@/services/investment-service";
 import { subscribeToIncomes } from "@/services/income-service";
+import { subscribeToIous } from "@/services/iou-service";
 
 export interface BudgetUsed {
     category: ExpenseCategory;
@@ -41,20 +42,26 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
     const loading = useMemo(() => computationLoadingStatus || financeConfigLoadingStatus, [computationLoadingStatus, financeConfigLoadingStatus]);
 
     const [incomes, setIncomes] = useState<Income[]>([]);
-        const [expenses, setExpenses] = useState<Expense[]>([]);
-        const [investments, setInvestments] = useState<Investment[]>([]);
-    
-        useEffect(() => {
-            const incomesUnsub = subscribeToIncomes(setIncomes);
-            const expensesUnsub = subscribeToExpenses(setExpenses);
-            const investmentsUnsub = subscribeToInvestments(setInvestments);
-    
-            return () => {
-                incomesUnsub();
-                expensesUnsub();
-                investmentsUnsub();
-            }
-        }, []);
+    const [expenses, setExpenses] = useState<Expense[]>([]);
+    const [investments, setInvestments] = useState<Investment[]>([]);
+    const [ious, setIous] = useState<Iou[]>([]);
+    const [budgets, setBudgets] = useState<CategoryBudget[]>([]);
+
+    useEffect(() => {
+        const incomesUnsub = subscribeToIncomes(setIncomes);
+        const expensesUnsub = subscribeToExpenses(setExpenses);
+        const investmentsUnsub = subscribeToInvestments(setInvestments);
+        const iousUnsub = subscribeToIous(setIous);
+        const budgetsUnsub = subscribeToMonthlyBudgets(monthKey, setBudgets);
+
+        return () => {
+            incomesUnsub();
+            expensesUnsub();
+            investmentsUnsub();
+            iousUnsub();
+            budgetsUnsub();
+        }
+    }, [monthKey]);
 
     useEffect(() => {
         if (financeConfigLoadingStatus)
@@ -64,8 +71,6 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
             setComputationLoadingStatus(true);
 
             try {
-                const budgets = await getBudgetsByMonth(monthKey);
-
                 const currentIncome = incomes
                     .filter(i => i.monthKey == monthKey)
                     .reduce((sum, i) => sum + i.amount, 0);
@@ -78,12 +83,16 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
                     .filter(i => i.monthKey == monthKey)
                     .reduce((sum, i) => sum + i.amount, 0);
 
+                const currentIouRecovered = ious
+                    .filter(i => i.createdMonthKey == monthKey)
+                    .reduce((sum, i) => sum + Math.max(i.initialAmount - i.amountLeft, 0), 0);
+
                 setSummary({
                     income: currentIncome,
-                    expense: currentExpense,
+                    expense: currentExpense - currentIouRecovered,
                     investment: currentInvestments,
-                    netSavings: currentIncome - currentExpense,
-                    cashflow: currentIncome - currentExpense - currentInvestments,
+                    netSavings: currentIncome - currentExpense + currentIouRecovered,
+                    cashflow: currentIncome - currentExpense - currentInvestments + currentIouRecovered,
                 })
 
                 const budgetsMap = budgets.reduce<Record<string, CategoryBudget>>((acc, item) => {
@@ -95,7 +104,7 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
                     const amountUsed = expenses
                         .filter(i => i.monthKey == monthKey && i.category.id == c.id)
                         .reduce((sum, i) => sum + i.amount, 0);
-                        
+
                     const budget = budgetsMap[c.id]?.amount ?? 0;
                     return {
                         category: c,
@@ -115,7 +124,7 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
         }
 
         void fetchData();
-    }, [financeConfigLoadingStatus, monthKey, incomes, expenses, investments]);
+    }, [financeConfigLoadingStatus, monthKey, incomes, expenses, investments, ious, budgets]);
 
     return {
         loading,

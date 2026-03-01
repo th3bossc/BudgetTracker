@@ -3,6 +3,7 @@ import { FlatList, View } from "react-native";
 import {
     Appbar,
     Card,
+    Icon,
     Text,
     FAB,
     Switch,
@@ -49,13 +50,16 @@ export default function IncomeSourceListPage() {
                                 justifyContent: "space-between",
                             }}
                         >
-                            <Text
-                                style={{
-                                    opacity: item.isArchived ? 0.5 : 1,
-                                }}
-                            >
-                                {item.name}
-                            </Text>
+                            <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
+                                <Icon source={item.icon || "bank"} size={20} />
+                                <Text
+                                    style={{
+                                        opacity: item.isArchived ? 0.5 : 1,
+                                    }}
+                                >
+                                    {item.name}
+                                </Text>
+                            </View>
 
                             <Switch
                                 value={!item.isArchived}

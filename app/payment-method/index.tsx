@@ -3,6 +3,7 @@ import { FlatList, View } from "react-native";
 import {
     Appbar,
     Card,
+    Icon,
     Text,
     FAB,
     Switch,
@@ -16,7 +17,7 @@ import { updatePaymentMethod } from "@/services/payment-method-service";
 export default function PaymentMethodListPage() {
     const router = useRouter();
     const theme = useTheme();
-    const { incomeSources } = useFinanceConfig();
+    const { paymentMethods } = useFinanceConfig();
 
     const toggleArchive = useCallback(async (id: string, current: boolean) => {
         await updatePaymentMethod(id, {
@@ -35,7 +36,7 @@ export default function PaymentMethodListPage() {
 
             <FlatList
                 contentContainerStyle={{ padding: 16, gap: 12 }}
-                data={incomeSources}
+                data={paymentMethods}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <Card
@@ -49,13 +50,16 @@ export default function PaymentMethodListPage() {
                                 justifyContent: "space-between",
                             }}
                         >
-                            <Text
-                                style={{
-                                    opacity: item.isArchived ? 0.5 : 1,
-                                }}
-                            >
-                                {item.name}
-                            </Text>
+                            <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
+                                <Icon source={item.icon || "credit-card"} size={20} />
+                                <Text
+                                    style={{
+                                        opacity: item.isArchived ? 0.5 : 1,
+                                    }}
+                                >
+                                    {item.name}
+                                </Text>
+                            </View>
 
                             <Switch
                                 value={!item.isArchived}

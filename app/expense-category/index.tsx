@@ -3,6 +3,7 @@ import { FlatList, View } from "react-native";
 import {
     Appbar,
     Card,
+    Icon,
     Text,
     FAB,
     Switch,
@@ -50,18 +51,19 @@ export default function CategoryListPage() {
                                 alignItems: "center",
                             }}
                         >
-                            <View style={{ flexDirection: "row", gap: 12 }}>
-                                <View
-                                    style={{
+                                <View style={{ flexDirection: "row", gap: 12 }}>
+                                    <View
+                                        style={{
                                         width: 20,
                                         height: 20,
                                         borderRadius: 4,
                                         backgroundColor: item.color,
-                                    }}
-                                />
+                                        }}
+                                    />
+                                    <Icon source={item.icon || "shape"} size={20} />
 
-                                <Text
-                                    variant="bodyLarge"
+                                    <Text
+                                        variant="bodyLarge"
                                     style={{
                                         opacity: item.isArchived ? 0.5 : 1,
                                     }}

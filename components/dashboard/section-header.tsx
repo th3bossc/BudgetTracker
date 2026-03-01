@@ -13,7 +13,7 @@ export default function SectionHeader({
   onCreate,
   onViewAll,
 }: Props) {
-  const showButtons = useMemo(() => onCreate || onViewAll, [onCreate || onViewAll]);
+  const showButtons = useMemo(() => onCreate || onViewAll, [onCreate, onViewAll]);
   return (
     <View
       style={{

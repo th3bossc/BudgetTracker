@@ -26,6 +26,7 @@ const categoryConverter: FirestoreDataConverter<ExpenseCategory> = {
         return {
             name: category.name,
             color: category.color,
+            icon: category.icon,
             isArchived: category.isArchived ?? false,
             createdAt: serverTimestamp(),
         };
@@ -41,6 +42,7 @@ const categoryConverter: FirestoreDataConverter<ExpenseCategory> = {
             id: snapshot.id,
             name: data.name,
             color: data.color ?? "#4CAF50",
+            icon: data.icon,
             isArchived: data.isArchived ?? false,
             createdAt: (data.createdAt as Timestamp)?.toDate?.() ?? new Date(),
         };

@@ -26,6 +26,7 @@ const incomeSourceConverter: FirestoreDataConverter<IncomeSource> = {
         return {
             name: source.name,
             color: source.color,
+            icon: source.icon,
             isArchived: source.isArchived ?? false,
             createdAt: serverTimestamp(),
         };
@@ -41,6 +42,7 @@ const incomeSourceConverter: FirestoreDataConverter<IncomeSource> = {
             id: snapshot.id,
             name: data.name,
             color: data.color ?? "#2E7D32",
+            icon: data.icon,
             isArchived: data.isArchived ?? false,
             createdAt: (data.createdAt as Timestamp)?.toDate?.() ?? new Date(),
         };

@@ -1,17 +1,17 @@
-import { View, ViewStyle } from "react-native";
-import {
-    Modal,
-    Portal,
-    Button,
-    Divider,
-    useTheme,
-} from "react-native-paper";
-import { Dropdown } from "react-native-paper-dropdown";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
 import type { InvestmentFilters } from "@/types/common";
 import { useCallback, useMemo } from "react";
-import AmountRangeFilter from "./amount-filter-slider";
-import DateRangeFilter from "./date-filter-range";
+import { View, ViewStyle } from "react-native";
+import {
+    Button,
+    Divider,
+    Modal,
+    Portal,
+    useTheme,
+} from "react-native-paper";
+import { Dropdown } from "react-native-paper-dropdown";
+import AmountRangeFilter from "../form-fields/amount-filter-slider";
+import DateRangeFilter from "../form-fields/date-filter-range";
 
 interface Props {
     visible: boolean;
@@ -45,13 +45,13 @@ export default function InvestmentFiltersModal({
             label: t.name,
             value: t.id,
         })))
-    ], []);
+    ], [investmentTypes]);
 
     const selectInvestmentTypeHandler = useCallback((val?: string) => {
         if (!val)
             return;
 
-        updateFilter('typeId', val == '__all__' ? undefined : val);
+        updateFilter('typeId', val === '__all__' ? undefined : val);
     }, [updateFilter])
 
     const updateAmountHandler = useCallback((data?: { min: number, max: number }) => {
@@ -98,7 +98,7 @@ export default function InvestmentFiltersModal({
     const clearFilters = useCallback(() => {
         setFilters({});
         onDismiss();
-    }, [setFilters]);
+    }, [setFilters, onDismiss]);
 
     return (
         <Portal>

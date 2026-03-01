@@ -1,18 +1,17 @@
+import { useFinanceConfig } from "@/hooks/use-finance-config";
+import { ExpenseFilters } from "@/types/common";
 import { useCallback, useMemo } from "react";
 import { View, ViewStyle } from "react-native";
 import {
-    Modal,
-    Portal,
     Button,
     Divider,
-    TextInput,
-    useTheme,
+    Modal,
+    Portal,
+    useTheme
 } from "react-native-paper";
 import { Dropdown } from "react-native-paper-dropdown";
-import { useFinanceConfig } from "@/hooks/use-finance-config";
-import { ExpenseFilters } from "@/types/common";
-import AmountRangeFilter from "./amount-filter-slider";
-import DateRangeFilter from "./date-filter-range";
+import AmountRangeFilter from "../form-fields/amount-filter-slider";
+import DateRangeFilter from "../form-fields/date-filter-range";
 
 interface Props {
     visible: boolean;
@@ -42,13 +41,13 @@ export default function ExpenseFiltersModal({
     const selectCategoryHandler = useCallback((val?: string) => {
         if (!val)
             return;
-        updateFilter('categoryId', val == '__all__' ? undefined : val);
+        updateFilter('categoryId', val === '__all__' ? undefined : val);
     }, [updateFilter]);
 
     const selectPaymentMethodHandler = useCallback((val?: string) => {
         if (!val)
             return;
-        updateFilter('paymentMethodId', val == '__all__' ? undefined : val);
+        updateFilter('paymentMethodId', val === '__all__' ? undefined : val);
     }, [updateFilter]);
 
     const categoriesOptions = useMemo(() => [
@@ -111,7 +110,7 @@ export default function ExpenseFiltersModal({
     const clearFilters = useCallback(() => {
         setFilters({});
         onDismiss();
-    }, [setFilters]);
+    }, [setFilters, onDismiss]);
 
 
     return (

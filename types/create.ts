@@ -1,4 +1,4 @@
-import type { ExpenseCategory, Expense, Income, IncomeSource, Investment, InvestmentType, PaymentMethod } from "./schema";
+import type { ExpenseCategory, Expense, Income, IncomeSource, Iou, Investment, InvestmentType, PaymentMethod } from "./schema";
 
 export type OmittedKeys = 'id' | 'createdAt';
 
@@ -14,6 +14,7 @@ export type PaymentMethodCreateInput = CreateInput<PaymentMethod>;
 export type ExpenseCreateInput = CreateInput<Expense>;
 export type IncomeCreateInput = CreateInput<Income>;
 export type InvestmentCreateInput = CreateInput<Investment>;
+export type IouCreateInput = CreateInput<Iou>;
 
 /* UPDATE types */
 export type ExpenseCategoryUpdateInput = UpdateInput<ExpenseCategory>;
@@ -24,3 +25,4 @@ export type PaymentMethodUpdateInput = UpdateInput<PaymentMethod>;
 export type ExpenseUpdateInput = UpdateInput<Expense>;
 export type IncomeUpdateInput = UpdateInput<Income>;
 export type InvestmentUpdateInput = UpdateInput<Investment>;
+export type IouUpdateInput = UpdateInput<Iou>;
