@@ -16,7 +16,7 @@ export default function HomeScreen() {
     const {
         loading,
         summary,
-        monthlyData: { incomes, expenses, investments, ious },
+        monthlyData: { incomes, expenses, investments },
     } = useDashboardData();
 
     const createExpenseItem = useCallback(() => {
@@ -106,12 +106,6 @@ export default function HomeScreen() {
                     onViewAll={viewAllIncomes}
                 />
                 <MonthlyAggregateTable data={incomes} />
-
-                <SectionHeader
-                    title="IOUs"
-                    onViewAll={viewAllIous}
-                />
-                <MonthlyAggregateTable data={ious} />
             </ScrollView>
         </SafeAreaView>
     );

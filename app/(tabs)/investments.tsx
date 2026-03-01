@@ -68,7 +68,7 @@ export default function InvestmentListPage() {
     return (
         <SafeAreaView style={{
             flex: 1,
-            padding: 16,
+            paddingHorizontal: 16,
             backgroundColor: theme.colors.background,
         }}>
             <Header

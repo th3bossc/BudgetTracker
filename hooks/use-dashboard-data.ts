@@ -20,7 +20,6 @@ export interface DashboardMonthlyData {
     incomes: MonthlyAggregate[],
     expenses: MonthlyAggregate[],
     investments: MonthlyAggregate[],
-    ious: MonthlyAggregate[],
 }
 
 
@@ -45,7 +44,6 @@ export const useDashboardData = (): DashboardData => {
         incomes: [],
         expenses: [],
         investments: [],
-        ious: [],
     });
 
     const [incomes, setIncomes] = useState<Income[]>([]);
@@ -92,7 +90,7 @@ export const useDashboardData = (): DashboardData => {
 
                 setSummary({
                     income: currentIncome,
-                    expense: currentExpense,
+                    expense: currentExpense - currentIouRecovered,
                     investment: currentInvestments,
                     netSavings: currentIncome - currentExpense + currentIouRecovered,
                     cashflow: currentIncome - currentExpense - currentInvestments + currentIouRecovered
@@ -101,18 +99,11 @@ export const useDashboardData = (): DashboardData => {
                 const incomeAgg = groupByMonth(incomes).slice(0, 3);
                 const expenseAgg = groupByMonth(expenses).slice(0, 3);
                 const investmentAgg = groupByMonth(investments).slice(0, 3);
-                const iouAgg = groupByMonth(
-                    ious.map(iou => ({
-                        monthKey: iou.monthKey,
-                        amount: Math.max(iou.initialAmount - iou.amountLeft, 0),
-                    }))
-                ).slice(0, 3);
 
                 setMonthlyData({
                     incomes: incomeAgg,
                     expenses: expenseAgg,
                     investments: investmentAgg,
-                    ious: iouAgg,
                 });
             }
             catch (error) {

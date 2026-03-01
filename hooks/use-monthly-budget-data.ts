@@ -89,7 +89,7 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
 
                 setSummary({
                     income: currentIncome,
-                    expense: currentExpense,
+                    expense: currentExpense - currentIouRecovered,
                     investment: currentInvestments,
                     netSavings: currentIncome - currentExpense + currentIouRecovered,
                     cashflow: currentIncome - currentExpense - currentInvestments + currentIouRecovered,

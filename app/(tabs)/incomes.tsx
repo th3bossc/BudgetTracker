@@ -70,7 +70,7 @@ export default function IncomeListPage() {
     return (
         <SafeAreaView style={{ 
             flex: 1,
-            padding: 16,
+            paddingHorizontal: 16,
             backgroundColor: theme.colors.background,
         }}>
             <Header
@@ -80,7 +80,7 @@ export default function IncomeListPage() {
             />
 
             <FlatList
-                contentContainerStyle={{ padding: 16, gap: 12 }}
+                contentContainerStyle={{ gap: 12 }}
                 data={incomes}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
