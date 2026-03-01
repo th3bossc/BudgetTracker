@@ -1,17 +1,17 @@
-import { View, ViewStyle } from "react-native";
-import {
-    Modal,
-    Portal,
-    Button,
-    Divider,
-    useTheme,
-} from "react-native-paper";
-import { Dropdown } from "react-native-paper-dropdown";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
 import type { InvestmentFilters } from "@/types/common";
 import { useCallback, useMemo } from "react";
-import AmountRangeFilter from "./amount-filter-slider";
-import DateRangeFilter from "./date-filter-range";
+import { View, ViewStyle } from "react-native";
+import {
+    Button,
+    Divider,
+    Modal,
+    Portal,
+    useTheme,
+} from "react-native-paper";
+import { Dropdown } from "react-native-paper-dropdown";
+import AmountRangeFilter from "../form-fields/amount-filter-slider";
+import DateRangeFilter from "../form-fields/date-filter-range";
 
 interface Props {
     visible: boolean;

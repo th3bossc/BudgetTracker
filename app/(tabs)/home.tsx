@@ -1,14 +1,13 @@
-import { ScrollView } from "react-native";
-import MonthlySummaryCard from "@/components/dashboard/monthly-summary-card";
+import Header from "@/components/common/header";
+import Loading from "@/components/common/loading";
 import MonthlyAggregateTable from "@/components/dashboard/monthly-aggregate-table";
+import MonthlySummaryCard from "@/components/dashboard/monthly-summary-card";
 import SectionHeader from "@/components/dashboard/section-header";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
-import { useTheme } from "react-native-paper";
-import CategoryBudgetSection from "@/components/dashboard/category-budget-section";
-import Loading from "@/components/loading";
-import { useCallback } from "react";
 import { useRouter } from "expo-router";
-import Header from "@/components/header";
+import { useCallback } from "react";
+import { ScrollView } from "react-native";
+import { useTheme } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {

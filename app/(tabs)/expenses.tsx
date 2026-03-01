@@ -1,22 +1,22 @@
+import Header from "@/components/common/header";
+import Loading from "@/components/common/loading";
+import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
+import ExpenseFiltersModal from "@/components/filter-modals/expense-filter";
+import { useExpensesData } from "@/hooks/use-expenses-data";
+import { deleteExpense } from "@/services/expense-service";
+import { ExpenseFilters } from "@/types/common";
+import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, View } from "react-native";
 import {
     Card,
     Chip,
+    FAB,
+    IconButton,
     Text,
     useTheme,
-    IconButton,
-    FAB,
 } from "react-native-paper";
-import { useRouter } from "expo-router";
-import { useExpensesData } from "@/hooks/use-expenses-data";
-import ExpenseFiltersModal from "@/components/filter-modals/expense-filter";
-import { ExpenseFilters } from "@/types/common";
-import Loading from "@/components/loading";
-import Header from "@/components/header";
-import { deleteExpense } from "@/services/expense-service";
-import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ExpenseListPage() {
     const theme = useTheme();

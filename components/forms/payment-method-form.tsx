@@ -3,15 +3,14 @@ import { PaymentMethod } from "@/types/schema";
 import { useState } from "react";
 import { View } from "react-native";
 import {
-    TextInput,
-    Button,
-    HelperText,
-    Divider,
-    Switch,
-    Text,
-    useTheme,
+  Button,
+  Divider,
+  HelperText,
+  Switch,
+  Text,
+  TextInput
 } from "react-native-paper";
-import ColorPicker from "../color-picker";
+import ColorPicker from "../form-fields/color-picker";
 
 interface Props {
     initialData?: PaymentMethod;

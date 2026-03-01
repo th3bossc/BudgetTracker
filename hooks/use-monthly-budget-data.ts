@@ -2,7 +2,7 @@ import { CategoryBudget, Expense, ExpenseCategory, Income, Investment } from "@/
 import { DashboardSummary } from "./use-dashboard-data";
 import { useEffect, useMemo, useState } from "react";
 import { useFinanceConfig } from "./use-finance-config";
-import { getBudgetsByMonth } from "@/services/category-budget-service";
+import { getBudgetsByMonth, subscribeToMonthlyBudgets } from "@/services/category-budget-service";
 import { subscribeToExpenses } from "@/services/expense-service";
 import { subscribeToInvestments } from "@/services/investment-service";
 import { subscribeToIncomes } from "@/services/income-service";
@@ -41,20 +41,23 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
     const loading = useMemo(() => computationLoadingStatus || financeConfigLoadingStatus, [computationLoadingStatus, financeConfigLoadingStatus]);
 
     const [incomes, setIncomes] = useState<Income[]>([]);
-        const [expenses, setExpenses] = useState<Expense[]>([]);
-        const [investments, setInvestments] = useState<Investment[]>([]);
-    
-        useEffect(() => {
-            const incomesUnsub = subscribeToIncomes(setIncomes);
-            const expensesUnsub = subscribeToExpenses(setExpenses);
-            const investmentsUnsub = subscribeToInvestments(setInvestments);
-    
-            return () => {
-                incomesUnsub();
-                expensesUnsub();
-                investmentsUnsub();
-            }
-        }, []);
+    const [expenses, setExpenses] = useState<Expense[]>([]);
+    const [investments, setInvestments] = useState<Investment[]>([]);
+    const [budgets, setBudgets] = useState<CategoryBudget[]>([]);
+
+    useEffect(() => {
+        const incomesUnsub = subscribeToIncomes(setIncomes);
+        const expensesUnsub = subscribeToExpenses(setExpenses);
+        const investmentsUnsub = subscribeToInvestments(setInvestments);
+        const budgetsUnsub = subscribeToMonthlyBudgets(monthKey, setBudgets);
+
+        return () => {
+            incomesUnsub();
+            expensesUnsub();
+            investmentsUnsub();
+            budgetsUnsub();
+        }
+    }, [monthKey]);
 
     useEffect(() => {
         if (financeConfigLoadingStatus)
@@ -64,8 +67,6 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
             setComputationLoadingStatus(true);
 
             try {
-                const budgets = await getBudgetsByMonth(monthKey);
-
                 const currentIncome = incomes
                     .filter(i => i.monthKey == monthKey)
                     .reduce((sum, i) => sum + i.amount, 0);
@@ -95,7 +96,7 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
                     const amountUsed = expenses
                         .filter(i => i.monthKey == monthKey && i.category.id == c.id)
                         .reduce((sum, i) => sum + i.amount, 0);
-                        
+
                     const budget = budgetsMap[c.id]?.amount ?? 0;
                     return {
                         category: c,
@@ -115,7 +116,7 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
         }
 
         void fetchData();
-    }, [financeConfigLoadingStatus, monthKey, incomes, expenses, investments]);
+    }, [financeConfigLoadingStatus, monthKey, incomes, expenses, investments, budgets]);
 
     return {
         loading,

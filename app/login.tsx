@@ -1,5 +1,5 @@
-import PasswordInput from "@/components/forms/password-input";
-import Header from "@/components/header";
+import Header from "@/components/common/header";
+import PasswordInput from "@/components/form-fields/password-input";
 import { auth } from "@/services/firebase";
 import { useRouter } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";

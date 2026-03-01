@@ -1,22 +1,22 @@
+import Header from "@/components/common/header";
+import Loading from "@/components/common/loading";
+import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
+import InvestmentFiltersModal from "@/components/filter-modals/investments-filter";
+import { useInvestmentsData } from "@/hooks/use-investments-data";
+import { deleteInvestment } from "@/services/investment-service";
+import type { InvestmentFilters } from "@/types/common";
+import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, View } from "react-native";
 import {
     Card,
     Chip,
-    Text,
     FAB,
-    useTheme,
     IconButton,
+    Text,
+    useTheme,
 } from "react-native-paper";
-import { useRouter } from "expo-router";
-import { useInvestmentsData } from "@/hooks/use-investments-data";
-import type { InvestmentFilters } from "@/types/common";
-import InvestmentFiltersModal from "@/components/filter-modals/investments-filter";
-import Loading from "@/components/loading";
-import Header from "@/components/header";
-import { deleteInvestment } from "@/services/investment-service";
-import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function InvestmentListPage() {
     const router = useRouter();

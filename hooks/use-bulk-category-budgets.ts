@@ -41,6 +41,7 @@ export const useBulkCategoryBudgets = (monthKey: string) => {
       });
       setRows(mapped);
       setComputationLoadingStatus(false);
+      setNoCategories(false);
     };
 
     const handleNoCategories = () => {

@@ -1,17 +1,16 @@
+import { IncomeSourceCreateInput, IncomeSourceUpdateInput } from "@/types/create";
+import type { IncomeSource } from "@/types/schema";
 import { useState } from "react";
 import { View } from "react-native";
 import {
-    TextInput,
     Button,
-    HelperText,
     Divider,
+    HelperText,
     Switch,
     Text,
-    useTheme,
+    TextInput
 } from "react-native-paper";
-import type { IncomeSource } from "@/types/schema";
-import { IncomeSourceCreateInput, IncomeSourceUpdateInput } from "@/types/create";
-import ColorPicker from "../color-picker";
+import ColorPicker from "../form-fields/color-picker";
 interface Props {
     initialData?: IncomeSource;
     onSubmit: ((data: IncomeSourceCreateInput) => Promise<void>) | ((data: IncomeSourceUpdateInput) => Promise<void>);

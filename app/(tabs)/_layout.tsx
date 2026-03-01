@@ -1,8 +1,8 @@
-import { Redirect, Tabs } from "expo-router";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useTheme } from "react-native-paper";
+import Loading from "@/components/common/loading";
 import { useAuth } from "@/hooks/use-auth";
-import Loading from "@/components/loading";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Redirect, Tabs } from "expo-router";
+import { useTheme } from "react-native-paper";
 
 export default function TabLayout() {
     const theme = useTheme();

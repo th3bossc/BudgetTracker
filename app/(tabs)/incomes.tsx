@@ -1,22 +1,22 @@
+import Header from "@/components/common/header";
+import Loading from "@/components/common/loading";
+import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
+import IncomeFiltersModal from "@/components/filter-modals/incomes-filters";
+import { useIncomesData } from "@/hooks/use-incomes-data";
+import { deleteIncome } from "@/services/income-service";
+import type { IncomeFilters } from "@/types/common";
+import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, View } from "react-native";
 import {
     Card,
     Chip,
-    Text,
     FAB,
-    useTheme,
     IconButton,
+    Text,
+    useTheme,
 } from "react-native-paper";
-import { useRouter } from "expo-router";
-import { useIncomesData } from "@/hooks/use-incomes-data";
-import type { IncomeFilters } from "@/types/common";
-import IncomeFiltersModal from "@/components/filter-modals/incomes-filters";
-import Loading from "@/components/loading";
-import Header from "@/components/header";
-import { deleteIncome } from "@/services/income-service";
-import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function IncomeListPage() {
     const theme = useTheme();

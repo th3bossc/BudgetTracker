@@ -1,18 +1,17 @@
+import type { ExpenseCategoryCreateInput, ExpenseCategoryUpdateInput } from "@/types/create";
+import type { ExpenseCategory } from "@/types/schema";
 import { useState } from "react";
 import { View } from "react-native";
 import {
-    TextInput,
-    Button,
-    HelperText,
-    Divider,
-    Switch,
-    Text,
-    useTheme,
+  Button,
+  Divider,
+  HelperText,
+  Switch,
+  Text,
+  TextInput
 } from "react-native-paper";
-import type { ExpenseCategory } from "@/types/schema";
-import type { ExpenseCategoryCreateInput, ExpenseCategoryUpdateInput } from "@/types/create";
-import IconPicker from "../icon-picker";
-import ColorPicker from "../color-picker";
+import ColorPicker from "../form-fields/color-picker";
+import IconPicker from "../form-fields/icon-picker";
 
 interface Props {
     initialData?: ExpenseCategory;
