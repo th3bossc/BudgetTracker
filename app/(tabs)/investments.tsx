@@ -140,6 +140,7 @@ export default function InvestmentListPage() {
                 onDismiss={() => setFiltersVisible(false)}
                 filters={filters}
                 setFilters={setFilters}
+                style={{ backgroundColor: theme.colors.background }}
             />
 
             <DeleteConfirmationDialog

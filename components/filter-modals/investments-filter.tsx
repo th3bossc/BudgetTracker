@@ -1,8 +1,7 @@
-import { View } from "react-native";
+import { View, ViewStyle } from "react-native";
 import {
     Modal,
     Portal,
-    TextInput,
     Button,
     Divider,
 } from "react-native-paper";
@@ -10,12 +9,14 @@ import { Dropdown } from "react-native-paper-dropdown";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
 import type { InvestmentFilters } from "@/types/common";
 import { useCallback, useMemo } from "react";
+import AmountRangeFilter from "./amount-filter-slider";
 
 interface Props {
     visible: boolean;
     onDismiss: () => void;
     filters: InvestmentFilters;
     setFilters: React.Dispatch<React.SetStateAction<InvestmentFilters>>;
+    style?: ViewStyle;
 }
 
 export default function InvestmentFiltersModal({
@@ -23,6 +24,7 @@ export default function InvestmentFiltersModal({
     onDismiss,
     filters,
     setFilters,
+    style = {},
 }: Props) {
     const { investmentTypes } = useFinanceConfig();
 
@@ -48,13 +50,9 @@ export default function InvestmentFiltersModal({
         updateFilter('typeId', val == '__all__' ? undefined : val);
     }, [updateFilter])
 
-    const updateFilterMinAmount = useCallback((text: string) => {
-        updateFilter('minAmount', Number(text));
+    const updateAmountHandler = useCallback((data?: { min: number, max: number }) => {
+        updateFilter('amount', data);
     }, [updateFilter]);
-
-    const updateFilterMaxAmount = useCallback((text: string) => {
-        updateFilter('maxAmount', Number(text));
-    }, [updateFilter])
 
      const sortByOptions = useMemo(() => [
         { label: 'Amount', value: 'amount' },
@@ -78,45 +76,39 @@ export default function InvestmentFiltersModal({
             return;
         
         updateFilter('sortOrder', val);
-    }, [updateFilter])
+    }, [updateFilter]);
+
+    const viewStyle: ViewStyle = useMemo(() => ({
+        elevation: 5,
+        padding: 30,
+        margin: 10,
+        borderRadius: 12,
+        gap: 20,
+        ...style,
+    }), [style]);
 
     return (
         <Portal>
             <Modal visible={visible} onDismiss={onDismiss}>
-                <View
-                    style={{
-                        elevation: 5,
-                        padding: 30,
-                        margin: 10,
-                        borderRadius: 12,
-                        gap: 20,
-                    }}
-                >
+                <View style={viewStyle}>
 
                     <Dropdown
+                        mode="outlined"
                         label="Investment Type"
                         value={filters.typeId}
                         options={investmentTypesOptions}
                         onSelect={selectInvestmentTypeHandler}
                     />
 
-                    <TextInput
-                        label="Min Amount"
-                        value={filters.minAmount?.toString() ?? ""}
-                        onChangeText={updateFilterMinAmount }
-                        keyboardType="numeric"
-                    />
-
-                    <TextInput
-                        label="Max Amount"
-                        value={filters.maxAmount?.toString() ?? ""}
-                        onChangeText={updateFilterMaxAmount}
-                        keyboardType="numeric"
+                    <AmountRangeFilter
+                        data={filters.amount}
+                        onChange={updateAmountHandler}
                     />
 
                     <Divider />
 
                     <Dropdown
+                        mode="outlined"
                         label="Sort By"
                         value={filters.sortBy}
                         options={sortByOptions}
@@ -124,6 +116,7 @@ export default function InvestmentFiltersModal({
                     />
 
                     <Dropdown
+                        mode="outlined"
                         label="Sort Order"
                         value={filters.sortOrder}
                         options={sortOrderOptions}

@@ -32,15 +32,9 @@ export const useInvestmentsData = (filters: InvestmentFilters) => {
             );
         }
 
-        if (filters.minAmount !== undefined) {
+        if (filters.amount !== undefined) {
             result = result.filter(
-                i => i.amount >= filters.minAmount!
-            );
-        }
-
-        if (filters.maxAmount !== undefined) {
-            result = result.filter(
-                i => i.amount <= filters.maxAmount!
+                e => e.amount >= filters.amount!.min && e.amount <= filters.amount!.max 
             );
         }
 

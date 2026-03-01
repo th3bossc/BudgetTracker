@@ -1,21 +1,23 @@
-import { useCallback, useMemo, useState } from "react";
-import { View } from "react-native";
+import { useCallback, useMemo } from "react";
+import { View, ViewStyle } from "react-native";
 import {
     Modal,
     Portal,
-    TextInput,
     Button,
     Divider,
+    TextInput,
 } from "react-native-paper";
 import { Dropdown } from "react-native-paper-dropdown";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
 import { ExpenseFilters } from "@/types/common";
+import AmountRangeFilter from "./amount-filter-slider";
 
 interface Props {
     visible: boolean;
     onDismiss: () => void;
     filters: ExpenseFilters;
     setFilters: React.Dispatch<React.SetStateAction<ExpenseFilters>>;
+    style?: ViewStyle;
 }
 
 
@@ -24,6 +26,7 @@ export default function ExpenseFiltersModal({
     onDismiss,
     filters,
     setFilters,
+    style = {},
 }: Props) {
     const { categories, paymentMethods } = useFinanceConfig();
 
@@ -72,12 +75,8 @@ export default function ExpenseFiltersModal({
         })))
     ], [paymentMethods]);
 
-    const updateMinAmountHandler = useCallback((text: string) => {
-        updateFilter('minAmount', Number(text));
-    }, [updateFilter]);
-
-    const updateMaxAmountHandler = useCallback((text: string) => {
-        updateFilter('maxAmount', Number(text));
+    const updateAmountHandler = useCallback((data?: { min: number, max: number }) => {
+        updateFilter('amount', data);
     }, [updateFilter]);
 
     const updateSortByHandler = useCallback((val?: string) => {
@@ -92,22 +91,24 @@ export default function ExpenseFiltersModal({
             return;
         
         updateFilter('sortOrder', val);
-    }, [updateFilter])
+    }, [updateFilter]);
+
+    const viewStyle: ViewStyle = useMemo(() => ({
+        elevation: 5,
+        padding: 30,
+        margin: 10,
+        borderRadius: 12,
+        gap: 12,
+        ...style,
+    }), [style]);
 
 
     return (
         <Portal>
             <Modal visible={visible} onDismiss={onDismiss}>
-                <View
-                    style={{
-                        elevation: 5,
-                        padding: 30,
-                        margin: 10,
-                        borderRadius: 12,
-                        gap: 20,
-                    }}
-                >
+                <View style={viewStyle}>
                     <Dropdown
+                        mode="outlined"
                         label="Category"
                         value={filters.categoryId}
                         options={categoriesOptions}
@@ -115,29 +116,22 @@ export default function ExpenseFiltersModal({
                     />
 
                     <Dropdown
+                        mode="outlined"
                         label="Payment Method"
                         value={filters.paymentMethodId}
                         options={paymentMethodOptions}
                         onSelect={selectPaymentMethodHandler}
                     />
 
-                    <TextInput
-                        label="Min Amount"
-                        value={filters.minAmount?.toString() ?? ""}
-                        onChangeText={updateMinAmountHandler}
-                        keyboardType="numeric"
-                    />
-
-                    <TextInput
-                        label="Max Amount"
-                        value={filters.maxAmount?.toString() ?? ""}
-                        onChangeText={updateMaxAmountHandler}
-                        keyboardType="numeric"
+                    <AmountRangeFilter
+                        data={filters.amount}
+                        onChange={updateAmountHandler}
                     />
 
                     <Divider />
 
                     <Dropdown
+                        mode="outlined"
                         label="Sort by"
                         value={filters.sortBy}
                         options={sortByOptions}
@@ -145,6 +139,7 @@ export default function ExpenseFiltersModal({
                     />
 
                     <Dropdown
+                        mode="outlined"
                         label="Sort order"
                         value={filters.sortOrder}
                         options={sortOrderOptions}

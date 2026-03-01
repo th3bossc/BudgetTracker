@@ -43,15 +43,9 @@ export const useExpensesData = (filters: ExpenseFilters) => {
             );
         }
 
-        if (filters.minAmount !== undefined) {
+        if (filters.amount !== undefined) {
             result = result.filter(
-                e => e.amount >= filters.minAmount!
-            );
-        }
-
-        if (filters.maxAmount !== undefined) {
-            result = result.filter(
-                e => e.amount <= filters.maxAmount!
+                e => e.amount >= filters.amount!.min && e.amount <= filters.amount!.max 
             );
         }
 
