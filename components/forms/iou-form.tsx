@@ -15,6 +15,7 @@ import type { Iou } from "@/types/schema";
 interface Props {
     expenseId: string;
     monthKey: string;
+    defaultInitialAmount?: number;
     initialData?: Iou;
     onSubmit: ((data: IouCreateInput) => Promise<void>) | ((data: IouUpdateInput) => Promise<void>);
     loading?: boolean;
@@ -23,6 +24,7 @@ interface Props {
 export default function IouForm({
     expenseId,
     monthKey,
+    defaultInitialAmount,
     initialData,
     onSubmit,
     loading,
@@ -30,8 +32,17 @@ export default function IouForm({
     const router = useRouter();
     const { paymentMethods } = useFinanceConfig();
 
-    const [amountLeft, setAmountLeft] = useState(
-        initialData ? String(initialData.amountLeft) : ""
+    const [initialAmount, setInitialAmount] = useState(
+        initialData
+            ? String(initialData.initialAmount)
+            : defaultInitialAmount !== undefined
+                ? String(defaultInitialAmount)
+                : ""
+    );
+    const [amountPaid, setAmountPaid] = useState(
+        initialData
+            ? String(Math.max(initialData.initialAmount - initialData.amountLeft, 0))
+            : "0"
     );
 
     const [paymentMethodId, setPaymentMethodId] = useState(
@@ -49,26 +60,41 @@ export default function IouForm({
     ];
 
     const handleSubmit = async () => {
-        if (!amountLeft || !paymentMethodId) {
-            setError("Amount left and payment method are required.");
+        if (!initialAmount || !paymentMethodId) {
+            setError("Initial amount and payment method are required.");
             return;
         }
 
-        const amount = Number(amountLeft);
-        if (Number.isNaN(amount) || amount < 0) {
-            setError("Amount left must be a valid non-negative number.");
+        const initial = Number(initialAmount);
+        const paid = Number(amountPaid || "0");
+
+        if (Number.isNaN(initial) || initial < 0) {
+            setError("Initial amount must be a valid non-negative number.");
             return;
         }
+
+        if (Number.isNaN(paid) || paid < 0) {
+            setError("Amount paid must be a valid non-negative number.");
+            return;
+        }
+
+        if (paid > initial) {
+            setError("Amount paid cannot be greater than initial amount.");
+            return;
+        }
+
+        const amountLeft = Math.max(initial - paid, 0);
 
         const payload: any = {
             expense: { id: expenseId },
             paymentMethod: { id: paymentMethodId },
-            amountLeft: amount,
+            initialAmount: initial,
+            amountLeft,
             monthKey,
-            isPaid: amount === 0,
+            isPaid: amountLeft === 0,
         };
 
-        if (amount === 0) {
+        if (amountLeft === 0) {
             payload.paidAt = new Date();
         }
 
@@ -80,11 +106,34 @@ export default function IouForm({
     return (
         <View style={{ gap: 24 }}>
             <TextInput
-                label="Amount Left"
-                value={amountLeft}
-                onChangeText={setAmountLeft}
+                label="Initial IOU Amount"
+                value={initialAmount}
+                onChangeText={setInitialAmount}
                 keyboardType="numeric"
                 mode="outlined"
+            />
+
+            <TextInput
+                label="Amount Paid"
+                value={amountPaid}
+                onChangeText={setAmountPaid}
+                keyboardType="numeric"
+                mode="outlined"
+            />
+
+            <TextInput
+                label="Amount Left"
+                value={(() => {
+                    const initial = Number(initialAmount || "0");
+                    const paid = Number(amountPaid || "0");
+                    if (Number.isNaN(initial) || Number.isNaN(paid)) {
+                        return "-";
+                    }
+
+                    return String(Math.max(initial - paid, 0));
+                })()}
+                mode="outlined"
+                disabled
             />
 
             <Dropdown

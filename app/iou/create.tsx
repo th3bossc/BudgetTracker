@@ -100,6 +100,7 @@ export default function CreateIouPage() {
             <IouForm
               expenseId={expense.id}
               monthKey={expense.monthKey}
+              defaultInitialAmount={expense.amount}
               onSubmit={handleSubmit}
               loading={loading}
             />

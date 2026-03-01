@@ -73,6 +73,7 @@ export interface CategoryBudgetBase {
 export interface IouBase {
     expense: { id: string };
     paymentMethod: { id: string, name?: string };
+    initialAmount: number;
     amountLeft: number;
     monthKey: string;
     isPaid: boolean;

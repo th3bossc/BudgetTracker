@@ -1,4 +1,6 @@
-export const truncateText = (text: string) => {
+export const truncateText = (text?: string) => {
+    if (!text)
+        return text;
     if (text.length < 25)
         return text;
     else

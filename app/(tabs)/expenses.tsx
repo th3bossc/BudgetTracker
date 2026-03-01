@@ -38,6 +38,7 @@ export default function ExpenseListPage() {
         expenses,
         categoriesMap,
         paymentMethodsMap,
+        expenseRecoveryMap,
     } = useExpensesData(filters);
 
     const showFiltersHandler = useCallback(() => {
@@ -84,76 +85,99 @@ export default function ExpenseListPage() {
                 contentContainerStyle={{ padding: 16, gap: 12 }}
                 data={expenses}
                 keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                    <Card onPress={() => router.push(`/expense/${item.id}`)}>
-                        <Card.Content>
+                renderItem={({ item }) => {
+                    const hasIouAttached = !!expenseRecoveryMap[item.id]
+                    const recoveredAmount = expenseRecoveryMap[item.id] ?? 0;
+                    const netCost = Math.max(item.amount - recoveredAmount, 0);
 
-                            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                                <Text variant="titleMedium">
-                                    ₹ {item.amount}
-                                </Text>
+                    return (
+                        <Card onPress={() => router.push(`/expense/${item.id}`)}>
+                            <Card.Content>
 
-                                <Text variant="bodySmall">
-                                    {item.date.toDateString()}
-                                </Text>
-                            </View>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                                    <Text variant="titleMedium">
+                                        ₹ {netCost}
+                                    </Text>
 
-                            <Text variant="bodyMedium">
-                                {item.description}
-                            </Text>
-
-                            <View style={{ flexDirection: "column", justifyContent: 'space-between', marginTop: 8 }}>
-                                <View style={{ flexDirection: "row", gap: 8, alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <Chip
-                                        style={{
-                                            backgroundColor:
-                                                categoriesMap[item.category.id]?.color ?? "#E0E0E0",
-                                        }}
-                                        textStyle={{ color: "white" }}
-                                        icon={categoriesMap[item.category.id]?.icon}
-                                    >
-                                        {truncateText(categoriesMap[item.category.id]?.name)}
-                                    </Chip>
-
-                                    <IconButton
-                                        icon="cash-refund"
-                                        onPress={(e) => {
-                                            e.stopPropagation();
-                                            router.push({
-                                                pathname: "/iou/create" as any,
-                                                params: { expenseId: item.id },
-                                            });
-                                        }}
-                                    />
+                                    <Text variant="bodySmall">
+                                        {item.date.toDateString()}
+                                    </Text>
                                 </View>
 
-                                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: 'space-between' }}>
-                                    <Chip
-                                        style={{
-                                            backgroundColor:
-                                                paymentMethodsMap[item.paymentMethod.id]?.color ?? "#E0E0E0",
-                                        }}
-                                        textStyle={{ color: "white" }}
-                                    >
-                                        {truncateText(paymentMethodsMap[item.paymentMethod.id]?.name)}
-                                    </Chip>
+                                <Text variant="bodyMedium">
+                                    {item.description}
+                                </Text>
 
-                                    <IconButton
-                                        icon="delete"
-                                        iconColor={theme.colors.error}
-                                        onPress={(e) => {
-                                            e.stopPropagation();
-                                            setDeleteId(item.id)
-                                        }}
-                                    />
+                                {
+                                    hasIouAttached && (
+                                        <View style={{ marginTop: 6 }}>
+                                            <Text variant="bodySmall">
+                                                Paid by you: ₹ {item.amount}
+                                            </Text>
+                                            <Text variant="bodySmall">
+                                                Recovered: ₹ {recoveredAmount}
+                                            </Text>
+                                            <Text variant="bodySmall">
+                                                Net cost: ₹ {netCost}
+                                            </Text>
+                                        </View>
+
+                                    )
+                                }
+
+                                <View style={{ flexDirection: "column", justifyContent: 'space-between', marginTop: 8 }}>
+                                    <View style={{ flexDirection: "row", gap: 8, alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <Chip
+                                            style={{
+                                                backgroundColor:
+                                                    categoriesMap[item.category.id]?.color ?? "#E0E0E0",
+                                            }}
+                                            textStyle={{ color: "white" }}
+                                            icon={categoriesMap[item.category.id]?.icon}
+                                        >
+                                            {truncateText(categoriesMap[item.category.id]?.name)}
+                                        </Chip>
+
+                                        <IconButton
+                                            icon="cash-refund"
+                                            onPress={(e) => {
+                                                e.stopPropagation();
+                                                router.push({
+                                                    pathname: "/iou/create" as any,
+                                                    params: { expenseId: item.id },
+                                                });
+                                            }}
+                                        />
+                                    </View>
+
+                                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: 'space-between' }}>
+                                        <Chip
+                                            style={{
+                                                backgroundColor:
+                                                    paymentMethodsMap[item.paymentMethod.id]?.color ?? "#E0E0E0",
+                                            }}
+                                            textStyle={{ color: "white" }}
+                                        >
+                                            {truncateText(paymentMethodsMap[item.paymentMethod.id]?.name)}
+                                        </Chip>
+
+                                        <IconButton
+                                            icon="delete"
+                                            iconColor={theme.colors.error}
+                                            onPress={(e) => {
+                                                e.stopPropagation();
+                                                setDeleteId(item.id)
+                                            }}
+                                        />
+                                    </View>
                                 </View>
-                            </View>
 
 
 
-                        </Card.Content>
-                    </Card>
-                )}
+                            </Card.Content>
+                        </Card>
+                    )
+                }}
             />
 
             <FAB

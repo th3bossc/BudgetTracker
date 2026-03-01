@@ -101,13 +101,14 @@ export default function IousPage() {
                 renderItem={({ item }) => {
                     const expense = expensesMap[item.expense.id];
                     const paymentMethod = paymentMethodsMap[item.paymentMethod.id];
+                    const amountPaid = Math.max(item.initialAmount - item.amountLeft, 0);
 
                     return (
                         <Card onPress={() => router.push(`/iou/${item.id}` as any)}>
                             <Card.Content>
                                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                                     <Text variant="titleMedium">
-                                        ₹ {item.amountLeft}
+                                        Left: ₹ {item.amountLeft}
                                     </Text>
 
                                     <Chip
@@ -128,6 +129,10 @@ export default function IousPage() {
 
                                 <Text variant="bodySmall" style={{ marginTop: 2 }}>
                                     Created: {item.createdAt.toDateString()}
+                                </Text>
+
+                                <Text variant="bodySmall" style={{ marginTop: 2 }}>
+                                    Paid: ₹ {amountPaid} / ₹ {item.initialAmount}
                                 </Text>
 
                                 <View style={{ marginTop: 10, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>

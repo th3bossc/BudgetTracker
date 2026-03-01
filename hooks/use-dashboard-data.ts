@@ -86,13 +86,16 @@ export const useDashboardData = (): DashboardData => {
                     .filter(i => i.monthKey == currentMonth)
                     .reduce((sum, i) => sum + i.amount, 0);
 
+                const currentIouRecovered = ious
+                    .filter(i => i.monthKey == currentMonth)
+                    .reduce((sum, i) => sum + Math.max(i.initialAmount - i.amountLeft, 0), 0);
 
                 setSummary({
                     income: currentIncome,
                     expense: currentExpense,
                     investment: currentInvestments,
-                    netSavings: currentIncome - currentExpense,
-                    cashflow: currentIncome - currentExpense - currentInvestments
+                    netSavings: currentIncome - currentExpense + currentIouRecovered,
+                    cashflow: currentIncome - currentExpense - currentInvestments + currentIouRecovered
                 })
 
                 const incomeAgg = groupByMonth(incomes).slice(0, 3);
@@ -101,7 +104,7 @@ export const useDashboardData = (): DashboardData => {
                 const iouAgg = groupByMonth(
                     ious.map(iou => ({
                         monthKey: iou.monthKey,
-                        amount: iou.amountLeft,
+                        amount: Math.max(iou.initialAmount - iou.amountLeft, 0),
                     }))
                 ).slice(0, 3);
 

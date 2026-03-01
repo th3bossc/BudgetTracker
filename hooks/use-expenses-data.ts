@@ -1,8 +1,9 @@
 import { subscribeToExpenseCategories } from "@/services/expense-category-service";
 import { subscribeToExpenses } from "@/services/expense-service";
+import { subscribeToIous } from "@/services/iou-service";
 import { subscribeToPaymentMethods } from "@/services/payment-method-service";
 import { ExpenseFilters } from "@/types/common";
-import { Expense, ExpenseCategory, PaymentMethod } from "@/types/schema";
+import { Expense, ExpenseCategory, Iou, PaymentMethod } from "@/types/schema";
 import { createLookupMap } from "@/utils/create-lookup-map";
 import { useEffect, useMemo, useState } from "react";
 
@@ -10,23 +11,33 @@ export const useExpensesData = (filters: ExpenseFilters) => {
     const [rawExpenses, setRawExpenses] = useState<Expense[]>([])
     const [categories, setCategories] = useState<ExpenseCategory[]>([]);
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+    const [ious, setIous] = useState<Iou[]>([]);
     const [initialLoading, setInitialLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const expensesUnsub = subscribeToExpenses(setRawExpenses);
         const categoriesUnsub = subscribeToExpenseCategories(setCategories);
         const paymentMethodsUnsub = subscribeToPaymentMethods(setPaymentMethods);
+        const iousUnsub = subscribeToIous(setIous);
         setInitialLoading(false);
 
         return () => {
             expensesUnsub();
             categoriesUnsub();
             paymentMethodsUnsub();
+            iousUnsub();
         }
     }, []);
 
     const categoriesMap = useMemo(() => createLookupMap(categories), [categories]);
     const paymentMethodsMap = useMemo(() => createLookupMap(paymentMethods), [paymentMethods]);
+    const expenseRecoveryMap = useMemo(() => {
+        return ious.reduce<Record<string, number>>((acc, iou) => {
+            const recovered = Math.max(iou.initialAmount - iou.amountLeft, 0);
+            acc[iou.expense.id] = recovered;
+            return acc;
+        }, {});
+    }, [ious]);
 
     const filteredExpenses = useMemo(() => {
         let result = [...rawExpenses];
@@ -86,5 +97,6 @@ export const useExpensesData = (filters: ExpenseFilters) => {
         expenses: filteredExpenses,
         categoriesMap,
         paymentMethodsMap,
+        expenseRecoveryMap,
     };
 };

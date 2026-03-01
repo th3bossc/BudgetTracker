@@ -39,6 +39,7 @@ export interface PaymentMethodDB extends PaymentMethodBase {
 export interface IouDB {
     expense: IouBase["expense"];
     paymentMethod: IouBase["paymentMethod"];
+    initialAmount: IouBase["initialAmount"];
     amountLeft: IouBase["amountLeft"];
     monthKey: IouBase["monthKey"];
     isPaid: IouBase["isPaid"];

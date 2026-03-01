@@ -18,6 +18,7 @@ import {
     updateDoc,
     where,
     limit,
+    getDoc,
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { getCurrentUserId } from "./firestore-helpers";
@@ -29,6 +30,7 @@ const iouConverter: FirestoreDataConverter<Iou> = {
         return {
             expense: iou.expense,
             paymentMethod: iou.paymentMethod,
+            initialAmount: iou.initialAmount,
             amountLeft: iou.amountLeft,
             monthKey: iou.monthKey,
             isPaid: iou.isPaid,
@@ -47,6 +49,7 @@ const iouConverter: FirestoreDataConverter<Iou> = {
             id: snapshot.id,
             expense: data.expense,
             paymentMethod: data.paymentMethod,
+            initialAmount: data.initialAmount ?? data.amountLeft,
             amountLeft: data.amountLeft,
             monthKey: data.monthKey,
             isPaid: data.isPaid ?? false,
@@ -104,6 +107,14 @@ export const updateIou = async (
         payload.paidAt = Timestamp.fromDate(updates.paidAt);
     }
 
+    if (typeof updates.amountLeft === "number") {
+        const isPaid = updates.amountLeft <= 0;
+        payload.isPaid = isPaid;
+        payload.paidAt = isPaid
+            ? serverTimestamp()
+            : null;
+    }
+
     await updateDoc(
         doc(db, "users", uid, TABLE_NAME, iouId),
         payload,
@@ -112,10 +123,22 @@ export const updateIou = async (
 
 export const markIouPaid = async (iouId: string) => {
     const uid = getCurrentUserId();
+    const ref = doc(db, "users", uid, TABLE_NAME, iouId).withConverter(iouConverter);
+    const snapshot = await getDoc(ref);
+
+    if (!snapshot.exists()) {
+        throw new Error("IOU not found");
+    }
+
+    const current = snapshot.data();
+    const safeInitialAmount = current.initialAmount > 0
+        ? current.initialAmount
+        : current.amountLeft;
 
     await updateDoc(
         doc(db, "users", uid, TABLE_NAME, iouId),
         {
+            initialAmount: safeInitialAmount,
             isPaid: true,
             amountLeft: 0,
             paidAt: serverTimestamp(),
