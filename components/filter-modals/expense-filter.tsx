@@ -11,6 +11,7 @@ import { Dropdown } from "react-native-paper-dropdown";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
 import { ExpenseFilters } from "@/types/common";
 import AmountRangeFilter from "./amount-filter-slider";
+import DateRangeFilter from "./date-filter-range";
 
 interface Props {
     visible: boolean;
@@ -79,6 +80,10 @@ export default function ExpenseFiltersModal({
         updateFilter('amount', data);
     }, [updateFilter]);
 
+    const updateDateRangeHandler = useCallback((data?: { start?: Date, end?: Date }) => {
+        updateFilter('date', data);
+    }, [updateFilter]);
+
     const updateSortByHandler = useCallback((val?: string) => {
         if (!val)
             return;
@@ -126,6 +131,11 @@ export default function ExpenseFiltersModal({
                     <AmountRangeFilter
                         data={filters.amount}
                         onChange={updateAmountHandler}
+                    />
+
+                    <DateRangeFilter
+                        data={filters.date}
+                        onChange={updateDateRangeHandler}
                     />
 
                     <Divider />

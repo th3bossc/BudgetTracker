@@ -10,6 +10,7 @@ import { useFinanceConfig } from "@/hooks/use-finance-config";
 import type { InvestmentFilters } from "@/types/common";
 import { useCallback, useMemo } from "react";
 import AmountRangeFilter from "./amount-filter-slider";
+import DateRangeFilter from "./date-filter-range";
 
 interface Props {
     visible: boolean;
@@ -54,7 +55,11 @@ export default function InvestmentFiltersModal({
         updateFilter('amount', data);
     }, [updateFilter]);
 
-     const sortByOptions = useMemo(() => [
+    const updateDateRangeHandler = useCallback((data?: { start?: Date, end?: Date }) => {
+        updateFilter('date', data);
+    }, [updateFilter]);
+
+    const sortByOptions = useMemo(() => [
         { label: 'Amount', value: 'amount' },
         { label: 'Date', value: 'date' },
     ], []);
@@ -74,7 +79,7 @@ export default function InvestmentFiltersModal({
     const updateSortOrderHandler = useCallback((val?: string) => {
         if (!val)
             return;
-        
+
         updateFilter('sortOrder', val);
     }, [updateFilter]);
 
@@ -103,6 +108,11 @@ export default function InvestmentFiltersModal({
                     <AmountRangeFilter
                         data={filters.amount}
                         onChange={updateAmountHandler}
+                    />
+
+                    <DateRangeFilter
+                        data={filters.date}
+                        onChange={updateDateRangeHandler}
                     />
 
                     <Divider />

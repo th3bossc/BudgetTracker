@@ -38,6 +38,20 @@ export const useIncomesData = (filters: IncomeFilters) => {
             );
         }
 
+        if (filters.date !== undefined) {
+            const isInRange = (date: Date) => {
+                if (filters.date?.end && date > filters.date.end)
+                    return false;
+                if (filters.date?.start && date < filters.date.start)
+                    return false;
+
+                return true;
+            }
+            result = result.filter(
+                e => isInRange(e.date)
+            )
+        }
+
         if (filters.sortBy === "amount") {
             result.sort((a, b) =>
                 filters.sortOrder === "asc"

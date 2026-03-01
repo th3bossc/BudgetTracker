@@ -7,6 +7,7 @@ export interface ExpenseFilters {
     categoryId?: string;
     paymentMethodId?: string;
     amount?: { min: number, max: number };
+    date?: { start?: Date, end?: Date };
     sortBy?: "amount" | "date";
     sortOrder?: "asc" | "desc";
 }
@@ -14,6 +15,7 @@ export interface ExpenseFilters {
 export interface IncomeFilters {
     sourceId?: string;
     amount?: { min: number, max: number };
+    date?: { start?: Date, end?: Date };
 
     sortBy?: "amount" | "date";
     sortOrder?: "asc" | "desc";
@@ -22,6 +24,7 @@ export interface IncomeFilters {
 export interface InvestmentFilters {
     typeId?: string;
     amount?: { min: number, max: number };
+    date?: { start?: Date, end?: Date };
 
     sortBy?: "amount" | "date";
     sortOrder?: "asc" | "desc";
