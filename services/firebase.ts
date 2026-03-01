@@ -1,6 +1,13 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import {
+  Auth,
+  getAuth,
+  initializeAuth,
+} from 'firebase/auth';
+import * as FirebaseAuth from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
 const firebaseConfig = {
     apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
@@ -14,4 +21,29 @@ const firebaseConfig = {
 
 const app =  initializeApp(firebaseConfig);
 export const db = getFirestore(app);
-export const auth = getAuth(app);
+
+let auth: Auth;
+const getReactNativePersistence = (
+    FirebaseAuth as unknown as {
+        getReactNativePersistence?: (storage: typeof AsyncStorage) => unknown;
+    }
+).getReactNativePersistence;
+
+if (Platform.OS === 'web') {
+    auth = getAuth(app);
+} else {
+    try {
+        if (getReactNativePersistence) {
+            auth = initializeAuth(app, {
+                persistence: getReactNativePersistence(AsyncStorage) as never,
+            });
+        } else {
+            auth = getAuth(app);
+        }
+    } catch {
+        // HMR or duplicate init path fallback.
+        auth = getAuth(app);
+    }
+}
+
+export { auth };

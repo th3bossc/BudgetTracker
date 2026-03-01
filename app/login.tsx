@@ -1,3 +1,4 @@
+import { useGoogleAuth } from "@/services/auth-service";
 import Header from "@/components/common/header";
 import PasswordInput from "@/components/form-fields/password-input";
 import { auth } from "@/services/firebase";
@@ -7,15 +8,20 @@ import { useState } from "react";
 import {
     Button,
     HelperText,
+    Icon,
     Surface,
     TextInput,
-    useTheme
+    useTheme,
+    Text,
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Loading from "@/components/common/loading";
 
 export default function LoginPage() {
     const router = useRouter();
     const theme = useTheme();
+    const { promptAsync, loading } = useGoogleAuth();
+
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -29,6 +35,9 @@ export default function LoginPage() {
             setError(e.message);
         }
     };
+
+    if (loading)
+        return <Loading />
 
     return (
         <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
@@ -62,6 +71,12 @@ export default function LoginPage() {
 
                 <Button onPress={() => router.push("/register")}>
                     Create Account
+                </Button>
+
+                
+                <Button onPress={() => promptAsync()} style={{ gap: 8 }}>
+                    <Icon source="google" size={14} />
+                    <Text> Continue with Google </Text>
                 </Button>
             </Surface>
         </SafeAreaView>

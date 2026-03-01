@@ -3,12 +3,12 @@ import { PaymentMethod } from "@/types/schema";
 import { useState } from "react";
 import { View } from "react-native";
 import {
-  Button,
-  Divider,
-  HelperText,
-  Switch,
-  Text,
-  TextInput
+    TextInput,
+    Button,
+    HelperText,
+    Divider,
+    Switch,
+    Text,
 } from "react-native-paper";
 import ColorPicker from "../form-fields/color-picker";
 import IconPicker from "../form-fields/icon-picker";
