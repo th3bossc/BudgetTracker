@@ -20,8 +20,8 @@ export const useGoogleAuth = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    setLoading(true);
     if (response?.type === "success") {
+      setLoading(true);
       const idToken =
         response.params?.id_token ?? response.authentication?.idToken;
       if (!idToken) {
