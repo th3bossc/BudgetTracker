@@ -5,6 +5,7 @@ import IousFiltersModal from "@/components/filter-modals/ious-filters";
 import { useIousData } from "@/hooks/use-ious-data";
 import { deleteIou, markIouPaid } from "@/services/iou-service";
 import type { IouFilters } from "@/types/common";
+import { formatCurrency } from "@/utils/number";
 import { truncateText } from "@/utils/text";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -108,7 +109,7 @@ export default function IousPage() {
                             <Card.Content>
                                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                                     <Text variant="titleMedium">
-                                        Left: ₹ {item.amountLeft}
+                                        Left: {formatCurrency(item.amountLeft)}
                                     </Text>
 
                                     <Chip
@@ -132,7 +133,7 @@ export default function IousPage() {
                                 </Text>
 
                                 <Text variant="bodySmall" style={{ marginTop: 2 }}>
-                                    Paid: ₹ {amountPaid} / ₹ {item.initialAmount}
+                                    Paid: {formatCurrency(amountPaid)} / {formatCurrency(item.initialAmount)}
                                 </Text>
 
                                 <View style={{ marginTop: 10, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>

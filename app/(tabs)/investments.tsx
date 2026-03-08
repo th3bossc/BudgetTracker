@@ -5,6 +5,7 @@ import InvestmentFiltersModal from "@/components/filter-modals/investments-filte
 import { useInvestmentsData } from "@/hooks/use-investments-data";
 import { deleteInvestment } from "@/services/investment-service";
 import type { InvestmentFilters } from "@/types/common";
+import { formatCurrency } from "@/utils/number";
 import { truncateText } from "@/utils/text";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -87,7 +88,7 @@ export default function InvestmentListPage() {
 
                             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                                 <Text variant="titleMedium">
-                                    ₹ {item.amount}
+                                    {formatCurrency(item.amount)}
                                 </Text>
 
                                 <Text variant="bodySmall">

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { View, Animated } from "react-native";
 import { Card, Text, useTheme } from "react-native-paper";
 import type { ExpenseCategory } from "@/types/schema";
+import { formatCurrency, formatNumber } from "@/utils/number";
 import AnimatedProgress from "../common/animated-progress";
 
 interface Props {
@@ -61,8 +62,8 @@ export default function CategoryBudgetCard({
 
                 <View style={{ marginTop: 6 }}>
                     <Text variant="bodySmall">
-                        ₹ {amountUsed} / ₹ {budgetAmount} (
-                        {Math.round(percentage * 100)}%)
+                        {formatCurrency(amountUsed)} / {formatCurrency(budgetAmount)} (
+                        {formatNumber(percentage * 100)}%)
                     </Text>
 
                     {percentage >= 0.9 && (

@@ -4,6 +4,7 @@ import { addIou } from "@/services/iou-service";
 import type { IouCreateInput } from "@/types/create";
 import type { Expense } from "@/types/schema";
 import { getMonthKey } from "@/utils/date";
+import { formatCurrency } from "@/utils/number";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -56,7 +57,7 @@ export default function CreateIouPage() {
   const initialAmount = useMemo(() => {
     if (!expense)
       return "-";
-    return String(expense.amount);
+    return formatCurrency(expense.amount);
   }, [expense]);
 
   const handleSubmit = async (data: IouCreateInput) => {
@@ -95,7 +96,7 @@ export default function CreateIouPage() {
         ) : expense ? (
           <>
             <Text variant="bodyMedium">
-              Expense Amount: ₹ {initialAmount}
+              Expense Amount: {initialAmount}
             </Text>
 
             <IouForm
