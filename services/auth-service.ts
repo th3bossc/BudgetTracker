@@ -12,7 +12,7 @@ export const useGoogleAuth = () => {
   const [request, response, promptAsync] = Google.useAuthRequest({
     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-    responseType: 'id_token',
+    responseType: 'token',
     scopes: ["openid", "profile", "email"],
   });
 
@@ -22,14 +22,15 @@ export const useGoogleAuth = () => {
   useEffect(() => {
     if (response?.type === "success") {
       setLoading(true);
-      const idToken =
-        response.params?.id_token ?? response.authentication?.idToken;
-      if (!idToken) {
-        console.error("Google sign in error: missing idToken in auth response");
+      const accessToken =
+        response.authentication?.accessToken ?? response.params?.access_token;
+
+      if (!accessToken) {
+        console.error("Google sign in error: missing accessToken in auth response");
         return;
       }
 
-      const credential = GoogleAuthProvider.credential(idToken);
+      const credential = GoogleAuthProvider.credential(null, accessToken);
 
       signInWithCredential(auth, credential)
         .then(() => {
