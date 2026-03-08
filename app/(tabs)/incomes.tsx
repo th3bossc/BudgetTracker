@@ -5,6 +5,7 @@ import IncomeFiltersModal from "@/components/filter-modals/incomes-filters";
 import { useIncomesData } from "@/hooks/use-incomes-data";
 import { deleteIncome } from "@/services/income-service";
 import type { IncomeFilters } from "@/types/common";
+import { formatCurrency } from "@/utils/number";
 import { truncateText } from "@/utils/text";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -89,7 +90,7 @@ export default function IncomeListPage() {
 
                             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                                 <Text variant="titleMedium">
-                                    ₹ {item.amount}
+                                    {formatCurrency(item.amount)}
                                 </Text>
 
                                 <Text variant="bodySmall">

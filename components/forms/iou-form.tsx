@@ -11,6 +11,7 @@ import { useFinanceConfig } from "@/hooks/use-finance-config";
 import { useRouter } from "expo-router";
 import type { IouCreateInput, IouUpdateInput } from "@/types/create";
 import type { Iou } from "@/types/schema";
+import { formatNumber } from "@/utils/number";
 
 interface Props {
     expenseId: string;
@@ -133,7 +134,7 @@ export default function IouForm({
                         return "-";
                     }
 
-                    return String(Math.max(initial - paid, 0));
+                    return formatNumber(Math.max(initial - paid, 0));
                 })()}
                 mode="outlined"
                 disabled

@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import { View } from "react-native";
 import { Text, useTheme, Button, Portal, Modal, IconButton } from "react-native-paper";
 import MultiSlider from "@ptomasroos/react-native-multi-slider";
+import { formatCurrency } from "@/utils/number";
 
 type Props = {
     data?: { min: number, max: number };
@@ -35,7 +36,7 @@ export default function AmountRangeFilter({
     const filterAmount = useMemo(() => {
         if (!data)
             return 'No filters applied'
-        return `₹${data.min} - ₹${data.max}`
+        return `${formatCurrency(data.min)} - ${formatCurrency(data.max)}`
     }, [data]);
 
     const resetFilters = useCallback(() => {
@@ -79,7 +80,7 @@ export default function AmountRangeFilter({
                             data &&
                             <>
                                 <Text style={{ marginVertical: 8 }}>
-                                    ₹{data.min} – ₹{data.max}
+                                    {formatCurrency(data.min)} - {formatCurrency(data.max)}
                                 </Text>
 
                                 <MultiSlider

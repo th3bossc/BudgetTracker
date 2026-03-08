@@ -5,6 +5,7 @@ import ExpenseFiltersModal from "@/components/filter-modals/expense-filter";
 import { useExpensesData } from "@/hooks/use-expenses-data";
 import { deleteExpense } from "@/services/expense-service";
 import { ExpenseFilters } from "@/types/common";
+import { formatCurrency } from "@/utils/number";
 import { truncateText } from "@/utils/text";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
@@ -96,7 +97,7 @@ export default function ExpenseListPage() {
 
                                 <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                                     <Text variant="titleMedium">
-                                        ₹ {netCost}
+                                        {formatCurrency(netCost)}
                                     </Text>
 
                                     <Text variant="bodySmall">
@@ -112,13 +113,13 @@ export default function ExpenseListPage() {
                                     hasIouAttached && (
                                         <View style={{ marginTop: 6 }}>
                                             <Text variant="bodySmall">
-                                                Paid by you: ₹ {item.amount}
+                                                Paid by you: {formatCurrency(item.amount)}
                                             </Text>
                                             <Text variant="bodySmall">
-                                                Recovered: ₹ {recoveredAmount}
+                                                Recovered: {formatCurrency(recoveredAmount)}
                                             </Text>
                                             <Text variant="bodySmall">
-                                                Net cost: ₹ {netCost}
+                                                Net cost: {formatCurrency(netCost)}
                                             </Text>
                                         </View>
 

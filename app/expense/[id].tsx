@@ -6,6 +6,7 @@ import {
 import { getIous } from "@/services/iou-service";
 import { ExpenseUpdateInput } from "@/types/create";
 import type { Expense } from "@/types/schema";
+import { formatCurrency } from "@/utils/number";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -81,13 +82,13 @@ export default function EditExpensePage() {
         ) : expense ? (
           <>
             <Text variant="bodyMedium">
-              Paid by you: ₹ {expense.amount}
+              Paid by you: {formatCurrency(expense.amount)}
             </Text>
             <Text variant="bodyMedium">
-              Recovered: ₹ {recoveredAmount}
+              Recovered: {formatCurrency(recoveredAmount)}
             </Text>
             <Text variant="bodyMedium">
-              Net cost: ₹ {Math.max(expense.amount - recoveredAmount, 0)}
+              Net cost: {formatCurrency(Math.max(expense.amount - recoveredAmount, 0))}
             </Text>
 
             <Divider style={{ marginVertical: 12 }} />
