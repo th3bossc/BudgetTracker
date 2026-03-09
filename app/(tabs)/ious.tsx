@@ -15,6 +15,7 @@ import {
     Card,
     Chip,
     IconButton,
+    Switch,
     Text,
     useTheme,
 } from "react-native-paper";
@@ -27,6 +28,7 @@ export default function IousPage() {
     const [filtersVisible, setFiltersVisible] = useState(false);
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [processing, setProcessing] = useState<boolean>(false);
+    const [showPaidItems, setShowPaidItems] = useState<boolean>(false);
 
     const [filters, setFilters] = useState<IouFilters>({
         sortBy: "date",
@@ -38,7 +40,7 @@ export default function IousPage() {
         ious,
         expensesMap,
         paymentMethodsMap,
-    } = useIousData(filters);
+    } = useIousData(filters, showPaidItems);
 
     const showFiltersHandler = useCallback(() => {
         setFiltersVisible(true);
@@ -89,6 +91,22 @@ export default function IousPage() {
                 icon="filter-variant"
                 onPress={showFiltersHandler}
             />
+
+            <View style={{ paddingHorizontal: 16, paddingTop: 8, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                <Text variant="bodyMedium">Show paid IOUs</Text>
+                <Switch
+                    value={showPaidItems}
+                    onValueChange={(enabled) => {
+                        setShowPaidItems(enabled);
+                        if (!enabled && filters.status === "paid") {
+                            setFilters(prev => ({
+                                ...prev,
+                                status: undefined,
+                            }));
+                        }
+                    }}
+                />
+            </View>
 
             <FlatList
                 contentContainerStyle={{ padding: 16, gap: 12 }}

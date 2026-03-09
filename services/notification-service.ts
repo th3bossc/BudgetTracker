@@ -1,4 +1,5 @@
 import * as Notifications from "expo-notifications";
+import Constants from "expo-constants";
 import { Platform } from "react-native";
 import { getIous, markIouPaid } from "./iou-service";
 import { getPaymentMethods } from "./payment-method-service";
@@ -17,14 +18,18 @@ type ManagedNotificationData = {
     paymentMethodId?: string;
 };
 
-Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-        shouldShowBanner: true,
-        shouldShowList: true,
-        shouldPlaySound: true,
-        shouldSetBadge: false,
-    }),
-});
+export const notificationsSupported = Platform.OS !== "web" && Constants.appOwnership !== "expo";
+
+if (notificationsSupported) {
+    Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+            shouldShowBanner: true,
+            shouldShowList: true,
+            shouldPlaySound: true,
+            shouldSetBadge: false,
+        }),
+    });
+}
 
 const getLastDayOfMonth = (year: number, monthIndex: number) => {
     return new Date(year, monthIndex + 1, 0).getDate();
@@ -49,7 +54,7 @@ const toManagedData = (value: unknown): ManagedNotificationData | null => {
 };
 
 export const initializeNotifications = async () => {
-    if (Platform.OS === "web") {
+    if (!notificationsSupported) {
         return;
     }
 
@@ -73,7 +78,7 @@ export const initializeNotifications = async () => {
 };
 
 export const requestNotificationPermissions = async () => {
-    if (Platform.OS === "web") {
+    if (!notificationsSupported) {
         return false;
     }
 
@@ -87,7 +92,7 @@ export const requestNotificationPermissions = async () => {
 };
 
 export const clearManagedScheduledNotifications = async () => {
-    if (Platform.OS === "web") {
+    if (!notificationsSupported) {
         return;
     }
 
@@ -100,7 +105,7 @@ export const clearManagedScheduledNotifications = async () => {
 };
 
 export const syncManagedNotifications = async () => {
-    if (Platform.OS === "web") {
+    if (!notificationsSupported) {
         return;
     }
 
