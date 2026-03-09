@@ -40,6 +40,7 @@ export default function ExpenseListPage() {
         categoriesMap,
         paymentMethodsMap,
         expenseRecoveryMap,
+        expenseOutstandingMap,
     } = useExpensesData(filters);
 
     const showFiltersHandler = useCallback(() => {
@@ -87,9 +88,10 @@ export default function ExpenseListPage() {
                 data={expenses}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => {
-                    const hasIouAttached = !!expenseRecoveryMap[item.id]
                     const recoveredAmount = expenseRecoveryMap[item.id] ?? 0;
-                    const netCost = Math.max(item.amount - recoveredAmount, 0);
+                    const amountYetToGetBack = expenseOutstandingMap[item.id] ?? 0;
+                    const hasIouAttached = recoveredAmount > 0 || amountYetToGetBack > 0;
+                    const netCost = Math.max(item.amount - amountYetToGetBack, 0);
 
                     return (
                         <Card onPress={() => router.push(`/expense/${item.id}`)}>
@@ -117,6 +119,9 @@ export default function ExpenseListPage() {
                                             </Text>
                                             <Text variant="bodySmall">
                                                 Recovered: {formatCurrency(recoveredAmount)}
+                                            </Text>
+                                            <Text variant="bodySmall">
+                                                Yet to get back: {formatCurrency(amountYetToGetBack)}
                                             </Text>
                                             <Text variant="bodySmall">
                                                 Net cost: {formatCurrency(netCost)}

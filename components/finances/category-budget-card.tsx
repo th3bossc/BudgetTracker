@@ -9,12 +9,14 @@ interface Props {
     category: ExpenseCategory;
     amountUsed: number;
     budgetAmount: number;
+    amountYetToGetBack: number;
 }
 
 export default function CategoryBudgetCard({
     category,
     amountUsed,
     budgetAmount,
+    amountYetToGetBack,
 }: Props) {
     const theme = useTheme();
 
@@ -65,6 +67,11 @@ export default function CategoryBudgetCard({
                         {formatCurrency(amountUsed)} / {formatCurrency(budgetAmount)} (
                         {formatNumber(percentage * 100)}%)
                     </Text>
+                    {amountYetToGetBack > 0 && (
+                        <Text variant="bodySmall">
+                            IOU pending: {formatCurrency(amountYetToGetBack)}
+                        </Text>
+                    )}
 
                     {percentage >= 0.9 && (
                         <Text

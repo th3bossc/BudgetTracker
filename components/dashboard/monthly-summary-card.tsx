@@ -16,7 +16,10 @@ export default function MonthlySummaryCard({ summary }: Props) {
         </Text>
 
         <Text style={{ color: theme.colors.primary }}>Income: {formatCurrency(summary.income)}</Text>
-        <Text style={{ color: theme.colors.error }}>Expense: {formatCurrency(summary.expense)}</Text>
+        <Text style={{ color: theme.colors.error }}>
+          Expense: {formatCurrency(summary.expense)}
+          {summary.expenseYetToGetBack > 0 ? ` (${formatCurrency(-summary.expenseYetToGetBack)})` : ""}
+        </Text>
         <Text style={{ color: theme.colors.inverseSurface }}>Invested: {formatCurrency(summary.investment)}</Text>
 
         <Divider style={{ marginVertical: 12 }} />

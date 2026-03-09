@@ -12,6 +12,7 @@ export interface BudgetUsed {
     category: ExpenseCategory;
     amountUsed: number;
     budget: number;
+    amountYetToGetBack: number;
 }
 
 interface MonthlyBudgetData {
@@ -27,6 +28,7 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
         income: 0,
         expense: 0,
         investment: 0,
+        expenseYetToGetBack: 0,
         netSavings: 0,
         cashflow: 0,
     });
@@ -83,16 +85,17 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
                     .filter(i => i.monthKey == monthKey)
                     .reduce((sum, i) => sum + i.amount, 0);
 
-                const currentIouRecovered = ious
-                    .filter(i => i.createdMonthKey == monthKey)
-                    .reduce((sum, i) => sum + Math.max(i.initialAmount - i.amountLeft, 0), 0);
+                const currentIouOutstanding = ious
+                    .filter(i => i.expenseMonthKey == monthKey)
+                    .reduce((sum, i) => sum + Math.max(i.amountLeft, 0), 0);
 
                 setSummary({
                     income: currentIncome,
-                    expense: currentExpense - currentIouRecovered,
+                    expense: Math.max(currentExpense - currentIouOutstanding, 0),
                     investment: currentInvestments,
-                    netSavings: currentIncome - currentExpense + currentIouRecovered,
-                    cashflow: currentIncome - currentExpense - currentInvestments + currentIouRecovered,
+                    expenseYetToGetBack: currentIouOutstanding,
+                    netSavings: currentIncome - currentExpense + currentIouOutstanding,
+                    cashflow: currentIncome - currentExpense - currentInvestments + currentIouOutstanding,
                 })
 
                 const budgetsMap = budgets.reduce<Record<string, CategoryBudget>>((acc, item) => {
@@ -100,16 +103,51 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
                     return acc;
                 }, {});
 
+                const expensesById = expenses.reduce<Record<string, Expense>>((acc, item) => {
+                    acc[item.id] = item;
+                    return acc;
+                }, {});
+
+                const iouOutstandingByCategory = ious.reduce<Record<string, number>>((acc, iou) => {
+                    if (iou.expenseMonthKey !== monthKey)
+                        return acc;
+
+                    const expense = expensesById[iou.expense.id];
+                    if (!expense || expense.monthKey !== monthKey)
+                        return acc;
+
+                    const outstanding = Math.max(iou.amountLeft, 0);
+                    acc[expense.category.id] = (acc[expense.category.id] ?? 0) + outstanding;
+                    return acc;
+                }, {});
+
+                const iouInitialByCategory = ious.reduce<Record<string, number>>((acc, iou) => {
+                    if (iou.expenseMonthKey !== monthKey)
+                        return acc;
+
+                    const expense = expensesById[iou.expense.id];
+                    if (!expense || expense.monthKey !== monthKey)
+                        return acc;
+
+                    const iouInitialAmount = Math.max(iou.initialAmount, 0);
+                    acc[expense.category.id] = (acc[expense.category.id] ?? 0) + iouInitialAmount;
+                    return acc;
+                }, {});
+
                 const budgetUsedInfo: BudgetUsed[] = categories.map(c => {
-                    const amountUsed = expenses
+                    const totalSpent = expenses
                         .filter(i => i.monthKey == monthKey && i.category.id == c.id)
                         .reduce((sum, i) => sum + i.amount, 0);
 
+                    const amountYetToGetBack = iouOutstandingByCategory[c.id] ?? 0;
+                    const totalIouEntitled = iouInitialByCategory[c.id] ?? 0;
+                    const amountUsed = Math.max(totalSpent - totalIouEntitled, 0);
                     const budget = budgetsMap[c.id]?.amount ?? 0;
                     return {
                         category: c,
                         amountUsed,
                         budget,
+                        amountYetToGetBack,
                     }
                 })
 

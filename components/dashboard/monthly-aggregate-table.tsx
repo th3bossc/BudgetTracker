@@ -1,13 +1,9 @@
 import { DataTable } from "react-native-paper";
 import { formatCurrency } from "@/utils/number";
-
-interface Row {
-  month: string;
-  total: number;
-}
+import type { MonthlyAggregate } from "@/types/common";
 
 interface Props {
-  data: Row[];
+  data: MonthlyAggregate[];
 }
 
 export default function MonthlyAggregateTable({ data }: Props) {
@@ -30,6 +26,9 @@ export default function MonthlyAggregateTable({ data }: Props) {
           <DataTable.Cell>{row.month}</DataTable.Cell>
           <DataTable.Cell numeric>
             {formatCurrency(row.total)}
+            {(row.auxiliaryTotal ?? 0) > 0
+              ? ` (${formatCurrency(-(row.auxiliaryTotal ?? 0))})`
+              : ""}
           </DataTable.Cell>
         </DataTable.Row>
       ))}
