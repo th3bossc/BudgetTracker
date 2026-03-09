@@ -21,7 +21,16 @@ export interface BankAccountComputed extends BankAccount {
     isBelowMinimum: boolean;
 }
 
-export const useBankAccountsData = () => {
+export interface AccountMonthlyFlow {
+    incomeIn: number;
+    expenseOut: number;
+    transferIn: number;
+    transferOut: number;
+    adjustmentNet: number;
+    netFlow: number;
+}
+
+export const useBankAccountsData = (monthKey?: string) => {
     const [accounts, setAccounts] = useState<BankAccount[]>([]);
     const [incomes, setIncomes] = useState<Income[]>([]);
     const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -116,8 +125,90 @@ export const useBankAccountsData = () => {
             .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     }, [accounts, incomes, expenses, ious, transfers, paymentMethodToAccountIdMap, adjustments]);
 
+    const monthlyFlowByAccountId = useMemo<Record<string, AccountMonthlyFlow>>(() => {
+        if (!monthKey) {
+            return {};
+        }
+
+        const init: Record<string, AccountMonthlyFlow> = {};
+        accounts.forEach((account) => {
+            init[account.id] = {
+                incomeIn: 0,
+                expenseOut: 0,
+                transferIn: 0,
+                transferOut: 0,
+                adjustmentNet: 0,
+                netFlow: 0,
+            };
+        });
+
+        incomes.forEach((income) => {
+            if (income.monthKey !== monthKey || !income.bankAccount?.id) {
+                return;
+            }
+
+            const flow = init[income.bankAccount.id];
+            if (!flow) {
+                return;
+            }
+
+            flow.incomeIn += income.amount;
+            flow.netFlow += income.amount;
+        });
+
+        expenses.forEach((expense) => {
+            if (expense.monthKey !== monthKey) {
+                return;
+            }
+
+            const accountId = paymentMethodToAccountIdMap[expense.paymentMethod.id];
+            const flow = accountId ? init[accountId] : undefined;
+            if (!flow) {
+                return;
+            }
+
+            flow.expenseOut += expense.amount;
+            flow.netFlow -= expense.amount;
+        });
+
+        transfers.forEach((transfer) => {
+            if (transfer.monthKey !== monthKey) {
+                return;
+            }
+
+            const fromFlow = init[transfer.fromBankAccount.id];
+            if (fromFlow) {
+                fromFlow.transferOut += transfer.amount;
+                fromFlow.netFlow -= transfer.amount;
+            }
+
+            const toFlow = init[transfer.toBankAccount.id];
+            if (toFlow) {
+                toFlow.transferIn += transfer.amount;
+                toFlow.netFlow += transfer.amount;
+            }
+        });
+
+        adjustments.forEach((adjustment) => {
+            if (adjustment.monthKey !== monthKey) {
+                return;
+            }
+
+            const flow = init[adjustment.bankAccount.id];
+            if (!flow) {
+                return;
+            }
+
+            flow.adjustmentNet += adjustment.amount;
+            flow.netFlow += adjustment.amount;
+        });
+
+        return init;
+    }, [monthKey, accounts, incomes, expenses, transfers, adjustments, paymentMethodToAccountIdMap]);
+
     return {
         loading: initialLoading,
         accounts: accountsWithBalance,
+        monthlyFlowByAccountId,
     };
 };
