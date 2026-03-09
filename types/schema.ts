@@ -42,6 +42,11 @@ export interface PaymentMethodBase {
     color: string;
     icon?: string;
     isArchived?: boolean;
+    bankAccount?: { id: string, name?: string };
+    isCreditCard?: boolean;
+    creditLimit?: number;
+    statementClosingDay?: number;
+    billingDueDay?: number;
 }
 
 export interface ExpenseBase {
@@ -55,6 +60,7 @@ export interface ExpenseBase {
 export interface IncomeBase {
     amount: number;
     source: { id: string, name?: string };
+    bankAccount?: { id: string, name?: string };
     description?: string;
     monthKey: string;
 }
@@ -73,6 +79,12 @@ export interface CategoryBudgetBase {
     amount: number;
 }
 
+export interface PaymentChannelBudgetBase {
+    paymentMethod: { id: string, name?: string };
+    monthKey: string;
+    amount: number;
+}
+
 export interface IouBase {
     expense: { id: string };
     paymentMethod: { id: string, name?: string };
@@ -82,6 +94,28 @@ export interface IouBase {
     createdMonthKey: string;
     isPaid: boolean;
     paidAt?: Date;
+}
+
+export interface AccountTransferBase {
+    fromBankAccount: { id: string, name?: string };
+    toBankAccount: { id: string, name?: string };
+    amount: number;
+    description?: string;
+    monthKey: string;
+}
+
+export interface BankAccountBase {
+    name: string;
+    openingBalance: number;
+    minimumBalance?: number;
+    isArchived?: boolean;
+}
+
+export interface BankAccountBalanceAdjustmentBase {
+    bankAccount: { id: string, name?: string };
+    amount: number;
+    note?: string;
+    monthKey: string;
 }
 
 /* main tables */ 
@@ -107,4 +141,16 @@ export interface Investment extends BaseDoc, InvestmentBase {
 
 export interface CategoryBudget extends BaseDoc, CategoryBudgetBase {};
 
+export interface PaymentChannelBudget extends BaseDoc, PaymentChannelBudgetBase {};
+
 export interface Iou extends BaseDoc, IouBase {};
+
+export interface AccountTransfer extends BaseDoc, AccountTransferBase {
+    date: Date;
+};
+
+export interface BankAccount extends BaseDoc, BankAccountBase {};
+
+export interface BankAccountBalanceAdjustment extends BaseDoc, BankAccountBalanceAdjustmentBase {
+    date: Date;
+};

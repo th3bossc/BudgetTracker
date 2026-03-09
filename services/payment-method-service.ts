@@ -23,13 +23,35 @@ import { PaymentMethodCreateInput, PaymentMethodUpdateInput } from "@/types/crea
 
 const paymentMethodConverter: FirestoreDataConverter<PaymentMethod> = {
     toFirestore(source: PaymentMethod): PaymentMethodDB {
-        return {
+        const payload: PaymentMethodDB = {
             name: source.name,
             color: source.color,
-            icon: source.icon,
             isArchived: source.isArchived ?? false,
+            isCreditCard: source.isCreditCard ?? false,
             createdAt: serverTimestamp(),
         };
+
+        if (source.icon) {
+            payload.icon = source.icon;
+        }
+
+        if (source.bankAccount) {
+            payload.bankAccount = source.bankAccount;
+        }
+
+        if (typeof source.creditLimit === "number") {
+            payload.creditLimit = source.creditLimit;
+        }
+
+        if (typeof source.statementClosingDay === "number") {
+            payload.statementClosingDay = source.statementClosingDay;
+        }
+
+        if (typeof source.billingDueDay === "number") {
+            payload.billingDueDay = source.billingDueDay;
+        }
+
+        return payload;
     },
 
     fromFirestore(
@@ -44,6 +66,11 @@ const paymentMethodConverter: FirestoreDataConverter<PaymentMethod> = {
             color: data.color ?? "#2E7D32",
             icon: data.icon,
             isArchived: data.isArchived ?? false,
+            bankAccount: data.bankAccount,
+            isCreditCard: data.isCreditCard ?? false,
+            creditLimit: data.creditLimit,
+            statementClosingDay: data.statementClosingDay,
+            billingDueDay: data.billingDueDay,
             createdAt: (data.createdAt as Timestamp)?.toDate?.() ?? new Date(),
         };
     },
@@ -79,10 +106,13 @@ export const updatePaymentMethod = async (
     updates: PaymentMethodUpdateInput
 ) => {
     const uid = getCurrentUserId();
+    const payload = Object.fromEntries(
+        Object.entries(updates).filter(([, value]) => value !== undefined)
+    );
 
     await updateDoc(
         doc(db, "users", uid, TABLE_NAME, paymentMethodId),
-        updates
+        payload
     );
 };
 

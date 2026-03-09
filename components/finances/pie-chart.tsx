@@ -26,15 +26,19 @@ function generateColors(count: number) {
 export default function ExpensePieChart({ title, data }: Props) {
     const theme = useTheme();
     const { width } = useWindowDimensions();
+    const visibleData = useMemo(
+        () => data.filter(item => item.amount > 0),
+        [data]
+    );
 
-    const colors = useMemo(() => generateColors(data.length), [data]);
+    const colors = useMemo(() => generateColors(visibleData.length), [visibleData.length]);
     const chartSize = useMemo(() => Math.max(width - 48, 0), [width]);
 
-    const chartData = useMemo(() => data.map((item, index) => ({
+    const chartData = useMemo(() => visibleData.map((item, index) => ({
         name: item.name,
         population: item.amount,
         color: colors[index],
-    })), [colors, data]);
+    })), [colors, visibleData]);
 
     return (
         <View style={{ alignItems: "center", width: "100%" }}>
@@ -54,7 +58,7 @@ export default function ExpensePieChart({ title, data }: Props) {
             />
 
             <View style={{ marginTop: 16, width: chartSize }}>
-                {data.map((item, index) => (
+                {visibleData.map((item, index) => (
                     <View
                         key={item.name}
                         style={{

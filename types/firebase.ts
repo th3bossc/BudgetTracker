@@ -1,5 +1,5 @@
 import { FieldValue, Timestamp } from "firebase/firestore";
-import { CategoryBudgetBase, ExpenseBase, ExpenseCategoryBase, IncomeBase, IncomeSourceBase, IouBase, InvestmentBase, InvestmentTypeBase, PaymentMethodBase } from "./schema";
+import { AccountTransferBase, BankAccountBalanceAdjustmentBase, BankAccountBase, CategoryBudgetBase, ExpenseBase, ExpenseCategoryBase, IncomeBase, IncomeSourceBase, IouBase, InvestmentBase, InvestmentTypeBase, PaymentChannelBudgetBase, PaymentMethodBase } from "./schema";
 
 export interface ExpenseDB extends ExpenseBase {
     date: Timestamp;
@@ -36,6 +36,10 @@ export interface PaymentMethodDB extends PaymentMethodBase {
     createdAt: Timestamp | FieldValue;
 }
 
+export interface PaymentChannelBudgetDB extends PaymentChannelBudgetBase {
+    createdAt: Timestamp | FieldValue;
+}
+
 export interface IouDB {
     expense: IouBase["expense"];
     paymentMethod: IouBase["paymentMethod"];
@@ -46,5 +50,19 @@ export interface IouDB {
     monthKey?: string;
     isPaid: IouBase["isPaid"];
     paidAt: Timestamp | null;
+    createdAt: Timestamp | FieldValue;
+}
+
+export interface AccountTransferDB extends AccountTransferBase {
+    date: Timestamp;
+    createdAt: Timestamp | FieldValue;
+}
+
+export interface BankAccountDB extends BankAccountBase {
+    createdAt: Timestamp | FieldValue;
+}
+
+export interface BankAccountBalanceAdjustmentDB extends BankAccountBalanceAdjustmentBase {
+    date: Timestamp;
     createdAt: Timestamp | FieldValue;
 }

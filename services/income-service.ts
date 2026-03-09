@@ -25,6 +25,7 @@ const incomeConverter: FirestoreDataConverter<Income> = {
         return {
             amount: income.amount,
             source: income.source,
+            bankAccount: income.bankAccount,
             description: income.description,
             date: Timestamp.fromDate(income.date),
             monthKey: income.monthKey,
@@ -41,6 +42,7 @@ const incomeConverter: FirestoreDataConverter<Income> = {
             id: snapshot.id,
             amount: data.amount,
             source: data.source,
+            bankAccount: data.bankAccount,
             description: data.description,
             date: data.date.toDate(),
             monthKey: data.monthKey,
