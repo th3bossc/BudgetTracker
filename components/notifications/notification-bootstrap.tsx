@@ -3,6 +3,7 @@ import {
     clearManagedScheduledNotifications,
     handleManagedNotificationResponse,
     initializeNotifications,
+    notificationsSupported,
     syncManagedNotifications,
 } from "@/services/notification-service";
 import { router } from "expo-router";
@@ -14,12 +15,20 @@ export default function NotificationBootstrap() {
     const { user } = useAuth();
 
     useEffect(() => {
+        if (!notificationsSupported) {
+            return;
+        }
+
         initializeNotifications().catch((error) => {
             console.error("notification initialization failed", error);
         });
     }, []);
 
     useEffect(() => {
+        if (!notificationsSupported) {
+            return;
+        }
+
         if (!user) {
             clearManagedScheduledNotifications().catch((error) => {
                 console.error("notification clear failed", error);

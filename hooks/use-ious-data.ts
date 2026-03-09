@@ -6,7 +6,7 @@ import type { Expense, Iou, PaymentMethod } from "@/types/schema";
 import { createLookupMap } from "@/utils/create-lookup-map";
 import { useEffect, useMemo, useState } from "react";
 
-export const useIousData = (filters: IouFilters) => {
+export const useIousData = (filters: IouFilters, showPaidItems: boolean) => {
     const [initialLoading, setInitialLoading] = useState<boolean>(true);
     const [rawIous, setRawIous] = useState<Iou[]>([]);
     const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -35,12 +35,16 @@ export const useIousData = (filters: IouFilters) => {
             result = result.filter(i => i.paymentMethod.id === filters.paymentMethodId);
         }
 
-        if (filters.status === "open") {
+        if (!showPaidItems) {
             result = result.filter(i => !i.isPaid);
-        }
+        } else {
+            if (filters.status === "open") {
+                result = result.filter(i => !i.isPaid);
+            }
 
-        if (filters.status === "paid") {
-            result = result.filter(i => i.isPaid);
+            if (filters.status === "paid") {
+                result = result.filter(i => i.isPaid);
+            }
         }
 
         if (filters.amount) {
@@ -68,18 +72,31 @@ export const useIousData = (filters: IouFilters) => {
                     ? a.amountLeft - b.amountLeft
                     : b.amountLeft - a.amountLeft
             );
-        }
+        } else {
+            const getMonthKey = (iou: Iou) => iou.createdMonthKey || iou.expenseMonthKey || "";
+            const sortOrder = filters.sortOrder ?? "desc";
 
-        if (filters.sortBy === "date") {
-            result.sort((a, b) =>
-                filters.sortOrder === "asc"
+            result.sort((a, b) => {
+                const monthA = getMonthKey(a);
+                const monthB = getMonthKey(b);
+                if (monthA !== monthB) {
+                    return monthB.localeCompare(monthA);
+                }
+
+                const statusA = a.isPaid ? 1 : 0;
+                const statusB = b.isPaid ? 1 : 0;
+                if (statusA !== statusB) {
+                    return statusA - statusB;
+                }
+
+                return sortOrder === "asc"
                     ? a.createdAt.getTime() - b.createdAt.getTime()
-                    : b.createdAt.getTime() - a.createdAt.getTime()
-            );
+                    : b.createdAt.getTime() - a.createdAt.getTime();
+            });
         }
 
         return result;
-    }, [rawIous, filters]);
+    }, [rawIous, filters, showPaidItems]);
 
     return {
         loading: initialLoading,
