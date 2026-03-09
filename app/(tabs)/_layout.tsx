@@ -95,6 +95,20 @@ export default function TabLayout() {
             />
 
             <Tabs.Screen
+                name="transfers"
+                options={{
+                    href: null,
+                }}
+            />
+
+            <Tabs.Screen
+                name="bank-accounts"
+                options={{
+                    href: null,
+                }}
+            />
+
+            <Tabs.Screen
                 name="finances"
                 options={{
                     title: "Finances",

@@ -3,20 +3,30 @@ import Loading from "@/components/common/loading";
 import MonthlySummaryCard from "@/components/dashboard/monthly-summary-card";
 import CategoryBudgetSection from "@/components/finances/category-budget-section";
 import CategoryPieChart from "@/components/finances/category-pie-chart";
+import PaymentChannelBudgetSection from "@/components/finances/payment-channel-budget-section";
+import PaymentChannelPieChart from "@/components/finances/payment-channel-pie-chart";
 import { useMonthlyBudgetData } from "@/hooks/use-monthly-budget-data";
+import { useMonthlyPaymentChannelBudgetData } from "@/hooks/use-monthly-payment-channel-budget-data";
 import { getMonthKey } from "@/utils/date";
 import { generateMonthOptions } from "@/utils/month-utils";
 import { router } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { ScrollView } from "react-native";
-import { Divider, FAB, useTheme } from "react-native-paper";
+import { Divider, FAB, SegmentedButtons, useTheme } from "react-native-paper";
 import { Dropdown } from "react-native-paper-dropdown";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+type BudgetTab = "category" | "payment-channel";
 
 export default function FinancesPage() {
     const theme = useTheme();
     const [monthKey, setMonthKey] = useState<string>(getMonthKey(new Date()));
+    const [activeTab, setActiveTab] = useState<BudgetTab>("category");
     const { loading, budgetUsed, summary } = useMonthlyBudgetData(monthKey);
+    const {
+        loading: paymentChannelLoading,
+        budgetUsed: paymentChannelBudgetUsed,
+    } = useMonthlyPaymentChannelBudgetData(monthKey);
 
     const monthOptions = useMemo(() => generateMonthOptions(24), []);
 
@@ -27,7 +37,7 @@ export default function FinancesPage() {
         setMonthKey(val);
     }, []);
 
-    if (loading) {
+    if (loading || paymentChannelLoading) {
         return <Loading />
     }
 
@@ -58,13 +68,38 @@ export default function FinancesPage() {
 
                 <Divider style={{ marginVertical: 16 }} />
 
-                <CategoryBudgetSection budgetUsed={budgetUsed} />
-
-                <Divider />
-
-                <CategoryPieChart
-                    budgetUsed={budgetUsed}
+                <SegmentedButtons
+                    value={activeTab}
+                    onValueChange={(val) => setActiveTab(val as BudgetTab)}
+                    buttons={[
+                        {
+                            value: "category",
+                            icon: "shape",
+                            label: "Category",
+                        },
+                        {
+                            value: "payment-channel",
+                            icon: "credit-card-outline",
+                            label: "Payment Channel",
+                        },
+                    ]}
                 />
+
+                <Divider style={{ marginVertical: 16 }} />
+
+                {activeTab === "category"
+                    ? <>
+                        <CategoryBudgetSection budgetUsed={budgetUsed} />
+                        <Divider />
+                        <CategoryPieChart budgetUsed={budgetUsed} />
+                    </>
+                    : <>
+                        <PaymentChannelBudgetSection budgetUsed={paymentChannelBudgetUsed} />
+                        <Divider />
+                        <PaymentChannelPieChart budgetUsed={paymentChannelBudgetUsed} />
+                    </>
+                }
+
 
             </ScrollView>
 
@@ -75,7 +110,11 @@ export default function FinancesPage() {
                     right: 16,
                     bottom: 16,
                 }}
-                onPress={() => router.push(`/budget/${monthKey}`)}
+                onPress={() => router.push(
+                    activeTab === "category"
+                        ? `/budget/${monthKey}` as any
+                        : `/payment-channel-budget/${monthKey}` as any
+                )}
             />
         </SafeAreaView>
     )

@@ -1,59 +1,39 @@
 import { useState } from "react";
 import { View, Platform } from "react-native";
-import {
-    TextInput,
-    Button,
-    HelperText,
-    Divider,
-} from "react-native-paper";
+import { Button, Divider, HelperText, TextInput } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Dropdown } from "react-native-paper-dropdown";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
 import { useRouter } from "expo-router";
 import { getMonthKey } from "@/utils/date";
-import type { Income } from "@/types/schema";
-import type { IncomeCreateInput, IncomeUpdateInput } from "@/types/create";
+import type { AccountTransfer } from "@/types/schema";
+import type { AccountTransferCreateInput, AccountTransferUpdateInput } from "@/types/create";
 
 interface Props {
-    initialData?: Income;
-    onSubmit: ((data: IncomeCreateInput) => Promise<void>) | ((data: IncomeUpdateInput) => Promise<void>);
+    initialData?: AccountTransfer;
+    onSubmit: ((data: AccountTransferCreateInput) => Promise<void>) | ((data: AccountTransferUpdateInput) => Promise<void>);
     loading?: boolean;
 }
 
-export default function IncomeForm({
+export default function AccountTransferForm({
     initialData,
     onSubmit,
     loading,
 }: Props) {
     const router = useRouter();
-    const { incomeSources, bankAccounts } = useFinanceConfig();
+    const { bankAccounts } = useFinanceConfig();
 
-    const [amount, setAmount] = useState(
-        initialData?.amount?.toString() ?? ""
+    const [fromBankAccountId, setFromBankAccountId] = useState(
+        initialData?.fromBankAccount.id ?? ""
     );
-    const [description, setDescription] = useState(
-        initialData?.description ?? ""
+    const [toBankAccountId, setToBankAccountId] = useState(
+        initialData?.toBankAccount.id ?? ""
     );
-    const [sourceId, setSourceId] = useState(
-        initialData?.source.id ?? ""
-    );
-    const [bankAccountId, setBankAccountId] = useState(
-        initialData?.bankAccount?.id ?? ""
-    );
-    const [date, setDate] = useState<Date>(
-        initialData?.date ?? new Date()
-    );
-
+    const [amount, setAmount] = useState(initialData?.amount?.toString() ?? "");
+    const [description, setDescription] = useState(initialData?.description ?? "");
+    const [date, setDate] = useState<Date>(initialData?.date ?? new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [error, setError] = useState<string | null>(null);
-
-    const sourceOptions = [
-        ...incomeSources.map(s => ({
-            label: s.name,
-            value: s.id,
-        })),
-        { label: "+ Add New Income Source", value: "__add_new__" },
-    ];
 
     const bankAccountOptions = [
         ...bankAccounts.map(account => ({
@@ -64,16 +44,28 @@ export default function IncomeForm({
     ];
 
     const handleSubmit = async () => {
-        if (!amount || !sourceId || !bankAccountId) {
-            setError("Amount, source and destination account are required.");
+        const parsedAmount = Number(amount);
+
+        if (!fromBankAccountId || !toBankAccountId) {
+            setError("From and to accounts are required.");
+            return;
+        }
+
+        if (fromBankAccountId === toBankAccountId) {
+            setError("From and to accounts must be different.");
+            return;
+        }
+
+        if (!amount || Number.isNaN(parsedAmount) || parsedAmount <= 0) {
+            setError("Amount must be a positive number.");
             return;
         }
 
         await onSubmit({
-            amount: Number(amount),
+            fromBankAccount: { id: fromBankAccountId },
+            toBankAccount: { id: toBankAccountId },
+            amount: parsedAmount,
             description,
-            source: { id: sourceId },
-            bankAccount: { id: bankAccountId },
             date,
             monthKey: getMonthKey(date),
         });
@@ -83,6 +75,43 @@ export default function IncomeForm({
 
     return (
         <View style={{ gap: 24 }}>
+            <Dropdown
+                label="From Account"
+                mode="outlined"
+                value={fromBankAccountId}
+                options={bankAccountOptions}
+                onSelect={(val?: string) => {
+                    if (!val) {
+                        return;
+                    }
+
+                    if (val === "__add_new__") {
+                        router.push("/bank-account/create");
+                        return;
+                    }
+
+                    setFromBankAccountId(val);
+                }}
+            />
+
+            <Dropdown
+                label="To Account"
+                mode="outlined"
+                value={toBankAccountId}
+                options={bankAccountOptions}
+                onSelect={(val?: string) => {
+                    if (!val) {
+                        return;
+                    }
+
+                    if (val === "__add_new__") {
+                        router.push("/bank-account/create");
+                        return;
+                    }
+
+                    setToBankAccountId(val);
+                }}
+            />
 
             <TextInput
                 label="Amount"
@@ -93,42 +122,10 @@ export default function IncomeForm({
             />
 
             <TextInput
-                label="Description"
+                label="Description (optional)"
                 value={description}
                 onChangeText={setDescription}
                 mode="outlined"
-            />
-
-            <Dropdown
-                label="Income Source"
-                mode="outlined"
-                value={sourceId}
-                options={sourceOptions}
-                onSelect={(val?: string) => {
-                    if (!val)
-                        return;
-                    if (val === "__add_new__") {
-                        router.push("/income-source/create");
-                        return;
-                    }
-                    setSourceId(val);
-                }}
-            />
-
-            <Dropdown
-                label="Destination Account"
-                mode="outlined"
-                value={bankAccountId}
-                options={bankAccountOptions}
-                onSelect={(val?: string) => {
-                    if (!val)
-                        return;
-                    if (val === "__add_new__") {
-                        router.push("/bank-account/create");
-                        return;
-                    }
-                    setBankAccountId(val);
-                }}
             />
 
             <TextInput
@@ -146,7 +143,9 @@ export default function IncomeForm({
                     display={Platform.OS === "ios" ? "inline" : "default"}
                     onChange={(_, selectedDate) => {
                         setShowDatePicker(false);
-                        if (selectedDate) setDate(selectedDate);
+                        if (selectedDate) {
+                            setDate(selectedDate);
+                        }
                     }}
                 />
             )}
@@ -165,9 +164,8 @@ export default function IncomeForm({
                 loading={loading}
                 contentStyle={{ paddingVertical: 8 }}
             >
-                {initialData ? "Update Income" : "Create Income"}
+                {initialData ? "Update Transfer" : "Create Transfer"}
             </Button>
-
         </View>
     );
 }

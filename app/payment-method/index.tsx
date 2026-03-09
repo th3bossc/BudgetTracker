@@ -17,7 +17,11 @@ import { updatePaymentMethod } from "@/services/payment-method-service";
 export default function PaymentMethodListPage() {
     const router = useRouter();
     const theme = useTheme();
-    const { paymentMethods } = useFinanceConfig();
+    const { paymentMethods, bankAccounts } = useFinanceConfig();
+    const bankAccountsMap = bankAccounts.reduce<Record<string, string>>((acc, account) => {
+        acc[account.id] = account.name;
+        return acc;
+    }, {});
 
     const toggleArchive = useCallback(async (id: string, current: boolean) => {
         await updatePaymentMethod(id, {
@@ -52,13 +56,20 @@ export default function PaymentMethodListPage() {
                         >
                             <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
                                 <Icon source={item.icon || "credit-card"} size={20} />
-                                <Text
-                                    style={{
-                                        opacity: item.isArchived ? 0.5 : 1,
-                                    }}
-                                >
-                                    {item.name}
-                                </Text>
+                                <View>
+                                    <Text
+                                        style={{
+                                            opacity: item.isArchived ? 0.5 : 1,
+                                        }}
+                                    >
+                                        {item.name}
+                                    </Text>
+                                    {item.bankAccount?.id ? (
+                                        <Text variant="bodySmall">
+                                            {bankAccountsMap[item.bankAccount.id] ?? "Unknown account"}
+                                        </Text>
+                                    ) : null}
+                                </View>
                             </View>
 
                             <Switch

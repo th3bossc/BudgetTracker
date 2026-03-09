@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { subscribeToExpenseCategories } from "@/services/expense-category-service";
 import { subscribeToIncomeSources } from "@/services/income-source-service";
 import { subscribeToInvestmentTypes } from "@/services/investment-type-service";
-import { ExpenseCategory, IncomeSource, InvestmentType, PaymentMethod } from "@/types/schema";
+import { BankAccount, ExpenseCategory, IncomeSource, InvestmentType, PaymentMethod } from "@/types/schema";
 import { subscribeToPaymentMethods } from "@/services/payment-method-service";
+import { subscribeToBankAccounts } from "@/services/bank-account-service";
 
 export interface FinanceFilterData {
     loading: boolean;
@@ -11,6 +12,7 @@ export interface FinanceFilterData {
     incomeSources: IncomeSource[];
     investmentTypes: InvestmentType[];
     paymentMethods: PaymentMethod[];
+    bankAccounts: BankAccount[];
 }
 
 export const useFinanceConfig = (): FinanceFilterData => {
@@ -20,6 +22,7 @@ export const useFinanceConfig = (): FinanceFilterData => {
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
     const [incomeSources, setIncomeSources] = useState<IncomeSource[]>([]);
     const [investmentTypes, setInvestmentTypes] = useState<InvestmentType[]>([]);
+    const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
 
 
 
@@ -28,6 +31,7 @@ export const useFinanceConfig = (): FinanceFilterData => {
         const paymentMethodsUnsub = subscribeToPaymentMethods(setPaymentMethods);
         const incomeSourcesUnsub = subscribeToIncomeSources(setIncomeSources);
         const investmentTypesUnsub = subscribeToInvestmentTypes(setInvestmentTypes);
+        const bankAccountsUnsub = subscribeToBankAccounts(setBankAccounts);
         setLoading(false);
 
         return () => {
@@ -35,6 +39,7 @@ export const useFinanceConfig = (): FinanceFilterData => {
             paymentMethodsUnsub();
             incomeSourcesUnsub();
             investmentTypesUnsub();
+            bankAccountsUnsub();
         }
     }, []);
 
@@ -44,5 +49,6 @@ export const useFinanceConfig = (): FinanceFilterData => {
         incomeSources: [...incomeSources].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
         investmentTypes: [...investmentTypes].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
         paymentMethods: [...paymentMethods].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
+        bankAccounts: [...bankAccounts].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
     };
 };
