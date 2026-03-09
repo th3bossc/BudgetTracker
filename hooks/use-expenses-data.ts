@@ -39,6 +39,14 @@ export const useExpensesData = (filters: ExpenseFilters) => {
         }, {});
     }, [ious]);
 
+    const expenseOutstandingMap = useMemo(() => {
+        return ious.reduce<Record<string, number>>((acc, iou) => {
+            const outstanding = Math.max(iou.amountLeft, 0);
+            acc[iou.expense.id] = outstanding;
+            return acc;
+        }, {});
+    }, [ious]);
+
     const filteredExpenses = useMemo(() => {
         let result = [...rawExpenses];
 
@@ -98,5 +106,6 @@ export const useExpensesData = (filters: ExpenseFilters) => {
         categoriesMap,
         paymentMethodsMap,
         expenseRecoveryMap,
+        expenseOutstandingMap,
     };
 };

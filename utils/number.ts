@@ -16,5 +16,7 @@ export const formatNumber = (value: number): string => {
 };
 
 export const formatCurrency = (value: number): string => {
-    return `₹ ${formatNumber(value)}`;
+    const finiteValue = toFiniteNumber(value);
+    const sign = finiteValue < 0 ? "-" : "";
+    return `${sign}₹ ${formatNumber(Math.abs(finiteValue))}`;
 };

@@ -1,6 +1,7 @@
 export interface MonthlyAggregate {
     month: string;
     total: number;
+    auxiliaryTotal?: number;
 }
 
 export interface ExpenseFilters {

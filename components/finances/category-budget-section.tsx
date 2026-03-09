@@ -17,6 +17,7 @@ export default function CategoryBudgetSection({
           category={item.category}
           amountUsed={item.amountUsed}
           budgetAmount={item.budget}
+          amountYetToGetBack={item.amountYetToGetBack}
         />
       ))}
     </List.Section>
