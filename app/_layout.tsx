@@ -1,4 +1,5 @@
 import { AuthProvider } from "@/providers/auth-provider";
+import NotificationBootstrap from "@/components/notifications/notification-bootstrap";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "react-native";
@@ -25,6 +26,7 @@ export default function RootLayout() {
   return (
     <PaperProvider theme={theme}>
       <AuthProvider>
+        <NotificationBootstrap />
         <Stack screenOptions={{ headerShown: false }} />
         <StatusBar style="auto" />
       </AuthProvider>
