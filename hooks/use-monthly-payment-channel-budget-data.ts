@@ -4,6 +4,7 @@ import { useFinanceConfig } from "./use-finance-config";
 import { subscribeToExpenses } from "@/services/expense-service";
 import { subscribeToIous } from "@/services/iou-service";
 import { subscribeToMonthlyPaymentChannelBudgets } from "@/services/payment-channel-budget-service";
+import { getIouOutstandingAmount, getIouRecoveredAmount } from "@/utils/iou";
 
 export interface PaymentChannelBudgetUsed {
     paymentMethod: PaymentMethod;
@@ -69,7 +70,7 @@ export const useMonthlyPaymentChannelBudgetData = (monthKey: string): MonthlyPay
                 if (!expense || expense.monthKey !== monthKey)
                     return acc;
 
-                const recovered = Math.max(iou.initialAmount - iou.amountLeft, 0);
+                const recovered = getIouRecoveredAmount(iou);
                 const methodId = expense.paymentMethod.id;
                 acc[methodId] = (acc[methodId] ?? 0) + recovered;
                 return acc;
@@ -83,7 +84,7 @@ export const useMonthlyPaymentChannelBudgetData = (monthKey: string): MonthlyPay
                 if (!expense || expense.monthKey !== monthKey)
                     return acc;
 
-                const pending = Math.max(iou.amountLeft, 0);
+                const pending = getIouOutstandingAmount(iou);
                 const methodId = expense.paymentMethod.id;
                 acc[methodId] = (acc[methodId] ?? 0) + pending;
                 return acc;

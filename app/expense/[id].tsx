@@ -6,6 +6,7 @@ import {
 import { getIous } from "@/services/iou-service";
 import { ExpenseUpdateInput } from "@/types/create";
 import type { Expense } from "@/types/schema";
+import { getIouRecoveredAmount } from "@/utils/iou";
 import { formatCurrency } from "@/utils/number";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -39,9 +40,7 @@ export default function EditExpensePage() {
       setExpense(found ?? null);
       if (found) {
         const iou = ious.find(item => item.expense.id === found.id);
-        const recovered = iou
-          ? Math.max(iou.initialAmount - iou.amountLeft, 0)
-          : 0;
+        const recovered = iou ? getIouRecoveredAmount(iou) : 0;
         setRecoveredAmount(recovered);
       } else {
         setRecoveredAmount(0);

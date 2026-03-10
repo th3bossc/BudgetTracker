@@ -20,7 +20,11 @@ type ManagedNotificationData = {
 
 export const notificationsSupported = Platform.OS !== "web" && Constants.appOwnership !== "expo";
 
-if (notificationsSupported) {
+const configureNotificationHandler = () => {
+    if (!notificationsSupported) {
+        return;
+    }
+
     Notifications.setNotificationHandler({
         handleNotification: async () => ({
             shouldShowBanner: true,
@@ -29,7 +33,7 @@ if (notificationsSupported) {
             shouldSetBadge: false,
         }),
     });
-}
+};
 
 const getLastDayOfMonth = (year: number, monthIndex: number) => {
     return new Date(year, monthIndex + 1, 0).getDate();
@@ -57,6 +61,8 @@ export const initializeNotifications = async () => {
     if (!notificationsSupported) {
         return;
     }
+
+    configureNotificationHandler();
 
     await Notifications.setNotificationCategoryAsync(IOU_ACTION_CATEGORY, [
         {

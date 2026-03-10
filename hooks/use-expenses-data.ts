@@ -5,6 +5,7 @@ import { subscribeToPaymentMethods } from "@/services/payment-method-service";
 import { ExpenseFilters } from "@/types/common";
 import { Expense, ExpenseCategory, Iou, PaymentMethod } from "@/types/schema";
 import { createLookupMap } from "@/utils/create-lookup-map";
+import { getIouOutstandingAmount, getIouRecoveredAmount } from "@/utils/iou";
 import { useEffect, useMemo, useState } from "react";
 
 export const useExpensesData = (filters: ExpenseFilters) => {
@@ -33,7 +34,7 @@ export const useExpensesData = (filters: ExpenseFilters) => {
     const paymentMethodsMap = useMemo(() => createLookupMap(paymentMethods), [paymentMethods]);
     const expenseRecoveryMap = useMemo(() => {
         return ious.reduce<Record<string, number>>((acc, iou) => {
-            const recovered = Math.max(iou.initialAmount - iou.amountLeft, 0);
+            const recovered = getIouRecoveredAmount(iou);
             acc[iou.expense.id] = recovered;
             return acc;
         }, {});
@@ -41,7 +42,7 @@ export const useExpensesData = (filters: ExpenseFilters) => {
 
     const expenseOutstandingMap = useMemo(() => {
         return ious.reduce<Record<string, number>>((acc, iou) => {
-            const outstanding = Math.max(iou.amountLeft, 0);
+            const outstanding = getIouOutstandingAmount(iou);
             acc[iou.expense.id] = outstanding;
             return acc;
         }, {});
