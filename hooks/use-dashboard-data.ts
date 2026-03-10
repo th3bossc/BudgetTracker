@@ -6,6 +6,7 @@ import type { MonthlyAggregate } from "@/types/common";
 import { Expense, Income, Iou, Investment } from "@/types/schema";
 import { getMonthKey } from "@/utils/date";
 import { groupByMonth } from "@/utils/group-by-month";
+import { getIouOutstandingAmount, getIouRecoveredAmount } from "@/utils/iou";
 import { useEffect, useState } from "react";
 
 export interface DashboardSummary {
@@ -86,17 +87,21 @@ export const useDashboardData = (): DashboardData => {
                     .filter(i => i.monthKey == currentMonth)
                     .reduce((sum, i) => sum + i.amount, 0);
 
+                const currentIouRecovered = ious
+                    .filter(i => i.expenseMonthKey == currentMonth)
+                    .reduce((sum, i) => sum + getIouRecoveredAmount(i), 0);
+
                 const currentIouOutstanding = ious
                     .filter(i => i.expenseMonthKey == currentMonth)
-                    .reduce((sum, i) => sum + Math.max(i.amountLeft, 0), 0);
+                    .reduce((sum, i) => sum + getIouOutstandingAmount(i), 0);
 
                 setSummary({
                     income: currentIncome,
-                    expense: Math.max(currentExpense - currentIouOutstanding, 0),
+                    expense: Math.max(currentExpense - currentIouRecovered, 0),
                     investment: currentInvestments,
                     expenseYetToGetBack: currentIouOutstanding,
-                    netSavings: currentIncome - currentExpense + currentIouOutstanding,
-                    cashflow: currentIncome - currentExpense - currentInvestments + currentIouOutstanding
+                    netSavings: currentIncome - currentExpense + currentIouRecovered,
+                    cashflow: currentIncome - currentExpense - currentInvestments + currentIouRecovered
                 })
 
                 const incomeAgg = groupByMonth(incomes).slice(0, 3);
@@ -105,22 +110,24 @@ export const useDashboardData = (): DashboardData => {
                 const iouAgg = groupByMonth(
                     ious.map(iou => ({
                         monthKey: iou.expenseMonthKey,
-                        amount: Math.max(iou.amountLeft, 0),
+                        amount: getIouRecoveredAmount(iou),
                     }))
                 ).slice(0, 3);
 
                 const iouMonthKeyMap = new Map<string, number>();
                 iouAgg.forEach(item => iouMonthKeyMap.set(item.month, item.total));
 
-                const expenseWithOutstandingAgg = expenseAgg.map(({ month, total }) => ({
+                const expenseWithRecoveredAgg = expenseAgg.map(({ month, total }) => ({
                     month: month,
                     total: Math.max(total - (iouMonthKeyMap.get(month) ?? 0), 0),
-                    auxiliaryTotal: iouMonthKeyMap.get(month) ?? 0,
+                    auxiliaryTotal: ious
+                        .filter(iou => iou.expenseMonthKey === month)
+                        .reduce((sum, iou) => sum + getIouOutstandingAmount(iou), 0),
                 }));
 
                 setMonthlyData({
                     incomes: incomeAgg,
-                    expenses: expenseWithOutstandingAgg,
+                    expenses: expenseWithRecoveredAgg,
                     investments: investmentAgg,
                 });
             }

@@ -91,7 +91,7 @@ export default function ExpenseListPage() {
                     const recoveredAmount = expenseRecoveryMap[item.id] ?? 0;
                     const amountYetToGetBack = expenseOutstandingMap[item.id] ?? 0;
                     const hasIouAttached = recoveredAmount > 0 || amountYetToGetBack > 0;
-                    const netCost = Math.max(item.amount - amountYetToGetBack, 0);
+                    const netCost = Math.max(item.amount - recoveredAmount, 0);
 
                     return (
                         <Card onPress={() => router.push(`/expense/${item.id}`)}>

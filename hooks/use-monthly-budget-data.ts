@@ -7,6 +7,7 @@ import { subscribeToExpenses } from "@/services/expense-service";
 import { subscribeToInvestments } from "@/services/investment-service";
 import { subscribeToIncomes } from "@/services/income-service";
 import { subscribeToIous } from "@/services/iou-service";
+import { getIouOutstandingAmount, getIouRecoveredAmount } from "@/utils/iou";
 
 export interface BudgetUsed {
     category: ExpenseCategory;
@@ -85,17 +86,21 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
                     .filter(i => i.monthKey == monthKey)
                     .reduce((sum, i) => sum + i.amount, 0);
 
+                const currentIouRecovered = ious
+                    .filter(i => i.expenseMonthKey == monthKey)
+                    .reduce((sum, i) => sum + getIouRecoveredAmount(i), 0);
+
                 const currentIouOutstanding = ious
                     .filter(i => i.expenseMonthKey == monthKey)
-                    .reduce((sum, i) => sum + Math.max(i.amountLeft, 0), 0);
+                    .reduce((sum, i) => sum + getIouOutstandingAmount(i), 0);
 
                 setSummary({
                     income: currentIncome,
-                    expense: Math.max(currentExpense - currentIouOutstanding, 0),
+                    expense: Math.max(currentExpense - currentIouRecovered, 0),
                     investment: currentInvestments,
                     expenseYetToGetBack: currentIouOutstanding,
-                    netSavings: currentIncome - currentExpense + currentIouOutstanding,
-                    cashflow: currentIncome - currentExpense - currentInvestments + currentIouOutstanding,
+                    netSavings: currentIncome - currentExpense + currentIouRecovered,
+                    cashflow: currentIncome - currentExpense - currentInvestments + currentIouRecovered,
                 })
 
                 const budgetsMap = budgets.reduce<Record<string, CategoryBudget>>((acc, item) => {
@@ -116,12 +121,12 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
                     if (!expense || expense.monthKey !== monthKey)
                         return acc;
 
-                    const outstanding = Math.max(iou.amountLeft, 0);
+                    const outstanding = getIouOutstandingAmount(iou);
                     acc[expense.category.id] = (acc[expense.category.id] ?? 0) + outstanding;
                     return acc;
                 }, {});
 
-                const iouInitialByCategory = ious.reduce<Record<string, number>>((acc, iou) => {
+                const iouRecoveredByCategory = ious.reduce<Record<string, number>>((acc, iou) => {
                     if (iou.expenseMonthKey !== monthKey)
                         return acc;
 
@@ -129,8 +134,8 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
                     if (!expense || expense.monthKey !== monthKey)
                         return acc;
 
-                    const iouInitialAmount = Math.max(iou.initialAmount, 0);
-                    acc[expense.category.id] = (acc[expense.category.id] ?? 0) + iouInitialAmount;
+                    const recovered = getIouRecoveredAmount(iou);
+                    acc[expense.category.id] = (acc[expense.category.id] ?? 0) + recovered;
                     return acc;
                 }, {});
 
@@ -140,8 +145,8 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
                         .reduce((sum, i) => sum + i.amount, 0);
 
                     const amountYetToGetBack = iouOutstandingByCategory[c.id] ?? 0;
-                    const totalIouEntitled = iouInitialByCategory[c.id] ?? 0;
-                    const amountUsed = Math.max(totalSpent - totalIouEntitled, 0);
+                    const totalRecovered = iouRecoveredByCategory[c.id] ?? 0;
+                    const amountUsed = Math.max(totalSpent - totalRecovered, 0);
                     const budget = budgetsMap[c.id]?.amount ?? 0;
                     return {
                         category: c,

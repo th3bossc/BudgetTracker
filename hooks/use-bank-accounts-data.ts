@@ -15,6 +15,7 @@ import { subscribeToIous } from "@/services/iou-service";
 import { subscribeToAccountTransfers } from "@/services/account-transfer-service";
 import { subscribeToPaymentMethods } from "@/services/payment-method-service";
 import { subscribeToBankAccountBalanceAdjustments } from "@/services/bank-account-balance-adjustment-service";
+import { getIouRecoveredAmount } from "@/utils/iou";
 
 export interface BankAccountComputed extends BankAccount {
     currentBalance: number;
@@ -93,7 +94,7 @@ export const useBankAccountsData = (monthKey?: string) => {
                 ious.forEach((iou) => {
                     const iouAccountId = paymentMethodToAccountIdMap[iou.paymentMethod.id];
                     if (iouAccountId === account.id) {
-                        const recovered = Math.max(iou.initialAmount - iou.amountLeft, 0);
+                        const recovered = getIouRecoveredAmount(iou);
                         currentBalance += recovered;
                     }
                 });
