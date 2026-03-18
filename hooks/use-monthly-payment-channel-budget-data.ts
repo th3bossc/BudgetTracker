@@ -94,6 +94,16 @@ export const useMonthlyPaymentChannelBudgetData = (monthKey: string): MonthlyPay
                 return acc;
             }, {});
 
+            const iouRecoveredToPaymentMethod = ious.reduce<Record<string, number>>((acc, iou) => {
+                const recovered = getIouRecoveredAmount(iou);
+                if (recovered <= 0 || iou.paymentMethod.id === undefined) {
+                    return acc;
+                }
+
+                acc[iou.paymentMethod.id] = (acc[iou.paymentMethod.id] ?? 0) + recovered;
+                return acc;
+            }, {});
+
             const computed: PaymentChannelBudgetUsed[] = paymentMethods.map(method => {
                 const totalSpent = expenses
                     .filter(item => item.monthKey === monthKey && item.paymentMethod.id === method.id)
@@ -103,9 +113,10 @@ export const useMonthlyPaymentChannelBudgetData = (monthKey: string): MonthlyPay
                     .reduce((sum, item) => sum + item.amount, 0);
 
                 const recovered = iouRecoveredByMethod[method.id] ?? 0;
+                const recoveredToCard = iouRecoveredToPaymentMethod[method.id] ?? 0;
                 const pending = iouPendingByMethod[method.id] ?? 0;
                 const amountUsed = method.isCreditCard
-                    ? totalSpent - totalPayments
+                    ? totalSpent - totalPayments - recoveredToCard
                     : Math.max(totalSpent - recovered, 0);
 
                 return {

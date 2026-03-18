@@ -78,12 +78,17 @@ export default function PaymentMethodListPage() {
                                         </Text>
                                     ) : null}
                                     {item.isCreditCard && creditCardMap[item.id] ? (
-                                        <Text variant="bodySmall">
-                                            Used: {formatCurrency(creditCardMap[item.id].amountUsed)}
-                                            {typeof creditCardMap[item.id].creditLimit === "number"
-                                                ? ` / ${formatCurrency(creditCardMap[item.id].creditLimit)}`
-                                                : ""}
-                                        </Text>
+                                        <>
+                                            <Text variant="bodySmall">
+                                                Used: {formatCurrency(creditCardMap[item.id].amountUsed)}
+                                                {typeof creditCardMap[item.id].creditLimit === "number"
+                                                    ? ` / ${formatCurrency(creditCardMap[item.id].creditLimit)}`
+                                                    : ""}
+                                            </Text>
+                                            <Text variant="bodySmall">
+                                                Available: {formatCurrency(creditCardMap[item.id].availableCredit ?? 0)}
+                                            </Text>
+                                        </>
                                     ) : null}
                                 </View>
                             </View>

@@ -170,7 +170,7 @@ export default function AccountsInsightsSection({
                                                 : theme.colors.primaryContainer,
                                         }}
                                     >
-                                        {card.netBalance < 0
+                                        {card.liabilityBalance < 0
                                             ? "Credit"
                                             : card.isOverLimit
                                                 ? "Over Limit"
@@ -190,7 +190,10 @@ export default function AccountsInsightsSection({
                                     This Month Payments: {formatCurrency(card.monthlyPayments)}
                                 </Text>
                                 <Text variant="bodySmall">
-                                    Net Balance: {formatCurrency(card.netBalance)}
+                                    Available Balance: {formatCurrency(card.availableCredit ?? 0)}
+                                </Text>
+                                <Text variant="bodySmall">
+                                    Liability Balance: {formatCurrency(card.liabilityBalance)}
                                 </Text>
                                 <Button
                                     compact

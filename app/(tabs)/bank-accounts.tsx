@@ -217,7 +217,7 @@ export default function BankAccountsPage() {
                                                     : theme.colors.primaryContainer,
                                             }}
                                         >
-                                            {card.netBalance < 0 ? "Credit" : "In Use"}
+                                            {card.liabilityBalance < 0 ? "Credit" : "In Use"}
                                         </Chip>
                                     </View>
                                     <Text variant="bodyLarge">
@@ -227,7 +227,10 @@ export default function BankAccountsPage() {
                                             : ""}
                                     </Text>
                                     <Text variant="bodySmall">
-                                        Net Balance: {formatCurrency(card.netBalance)}
+                                        Available Balance: {formatCurrency(card.availableCredit ?? 0)}
+                                    </Text>
+                                    <Text variant="bodySmall">
+                                        Liability Balance: {formatCurrency(card.liabilityBalance)}
                                     </Text>
                                     <Text variant="bodySmall">
                                         This Month Payments: {formatCurrency(card.monthlyPayments)}
