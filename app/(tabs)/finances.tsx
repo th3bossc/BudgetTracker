@@ -14,19 +14,17 @@ import { getMonthKey } from "@/utils/date";
 import { generateMonthOptions } from "@/utils/month-utils";
 import { router } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { ScrollView } from "react-native";
-import { Divider, FAB, SegmentedButtons, useTheme } from "react-native-paper";
+import { ScrollView, View } from "react-native";
+import { Button, Divider, SegmentedButtons, Text, useTheme } from "react-native-paper";
 import { Dropdown } from "react-native-paper-dropdown";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-type FinancesView = "budgets" | "accounts";
-type BudgetTab = "category" | "payment-channel";
+type FinancesView = "overview" | "accounts" | "budgets";
 
 export default function FinancesPage() {
     const theme = useTheme();
     const [monthKey, setMonthKey] = useState<string>(getMonthKey(new Date()));
-    const [activeView, setActiveView] = useState<FinancesView>("budgets");
-    const [activeTab, setActiveTab] = useState<BudgetTab>("category");
+    const [activeView, setActiveView] = useState<FinancesView>("overview");
     const { loading, budgetUsed, summary } = useMonthlyBudgetData(monthKey);
     const {
         loading: paymentChannelLoading,
@@ -76,16 +74,15 @@ export default function FinancesPage() {
 
                 <Divider style={{ marginVertical: 16 }} />
 
-                <MonthlySummaryCard
-                    summary={summary}
-                />
-
-                <Divider style={{ marginVertical: 16 }} />
-
                 <SegmentedButtons
                     value={activeView}
                     onValueChange={(val) => setActiveView(val as FinancesView)}
                     buttons={[
+                        {
+                            value: "overview",
+                            icon: "view-dashboard-outline",
+                            label: "Overview",
+                        },
                         {
                             value: "budgets",
                             icon: "chart-donut",
@@ -101,7 +98,19 @@ export default function FinancesPage() {
 
                 <Divider style={{ marginVertical: 16 }} />
 
-                {activeView === "accounts" ? (
+                {activeView === "overview" ? (
+                    <View style={{ gap: 20 }}>
+                        <MonthlySummaryCard
+                            summary={summary}
+                        />
+
+                        <CategoryPieChart budgetUsed={budgetUsed} />
+
+                        <Divider />
+
+                        <PaymentChannelPieChart budgetUsed={paymentChannelBudgetUsed} />
+                    </View>
+                ) : activeView === "accounts" ? (
                     <AccountsInsightsSection
                         accounts={accounts}
                         creditCards={creditCards}
@@ -109,58 +118,34 @@ export default function FinancesPage() {
                         monthlyFlowByAccountId={monthlyFlowByAccountId}
                     />
                 ) : (
-                    <>
-                        <SegmentedButtons
-                            value={activeTab}
-                            onValueChange={(val) => setActiveTab(val as BudgetTab)}
-                            buttons={[
-                                {
-                                    value: "category",
-                                    icon: "shape",
-                                    label: "Category",
-                                },
-                                {
-                                    value: "payment-channel",
-                                    icon: "credit-card-outline",
-                                    label: "Payment Channel",
-                                },
-                            ]}
-                        />
+                    <View style={{ gap: 20 }}>
+                        <View style={{ gap: 10 }}>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                                <Text variant="titleMedium">Category Budgets</Text>
+                                <Button compact onPress={() => router.push(`/budget/${monthKey}` as any)}>
+                                    Edit
+                                </Button>
+                            </View>
+                            <CategoryBudgetSection budgetUsed={budgetUsed} />
+                            <CategoryPieChart budgetUsed={budgetUsed} />
+                        </View>
 
-                        <Divider style={{ marginVertical: 16 }} />
+                        <Divider />
 
-                        {activeTab === "category"
-                            ? <>
-                                <CategoryBudgetSection budgetUsed={budgetUsed} />
-                                <Divider />
-                                <CategoryPieChart budgetUsed={budgetUsed} />
-                            </>
-                            : <>
-                                <PaymentChannelBudgetSection budgetUsed={paymentChannelBudgetUsed} />
-                                <Divider />
-                                <PaymentChannelPieChart budgetUsed={paymentChannelBudgetUsed} />
-                            </>
-                        }
-                    </>
+                        <View style={{ gap: 10 }}>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                                <Text variant="titleMedium">Payment Channels</Text>
+                                <Button compact onPress={() => router.push(`/payment-channel-budget/${monthKey}` as any)}>
+                                    Edit
+                                </Button>
+                            </View>
+                            <PaymentChannelBudgetSection budgetUsed={paymentChannelBudgetUsed} />
+                            <PaymentChannelPieChart budgetUsed={paymentChannelBudgetUsed} />
+                        </View>
+                    </View>
                 )}
 
             </ScrollView>
-
-            {activeView === "budgets" && (
-                <FAB
-                    icon="pencil"
-                    style={{
-                        position: "absolute",
-                        right: 16,
-                        bottom: 16,
-                    }}
-                    onPress={() => router.push(
-                        activeTab === "category"
-                            ? `/budget/${monthKey}` as any
-                            : `/payment-channel-budget/${monthKey}` as any
-                    )}
-                />
-            )}
         </SafeAreaView>
     )
 }
