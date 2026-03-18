@@ -49,6 +49,14 @@ export interface PaymentMethodBase {
     billingDueDay?: number;
 }
 
+export interface CreditCardPaymentBase {
+    paymentMethod: { id: string, name?: string };
+    bankAccount: { id: string, name?: string };
+    amount: number;
+    description?: string;
+    monthKey: string;
+}
+
 export interface ExpenseBase {
     amount: number;
     category: { id: string, name?: string };
@@ -126,6 +134,10 @@ export interface IncomeSource extends BaseDoc, IncomeSourceBase {};
 export interface InvestmentType extends BaseDoc, InvestmentTypeBase {};
 
 export interface PaymentMethod extends BaseDoc, PaymentMethodBase {};
+
+export interface CreditCardPayment extends BaseDoc, CreditCardPaymentBase {
+    date: Date;
+};
 
 export interface Expense extends BaseDoc, ExpenseBase {
     date: Date;

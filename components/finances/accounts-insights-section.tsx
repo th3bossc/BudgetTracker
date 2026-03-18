@@ -1,18 +1,22 @@
 import type { AccountMonthlyFlow, BankAccountComputed } from "@/hooks/use-bank-accounts-data";
+import type { CreditCardComputed } from "@/hooks/use-credit-card-data";
 import { formatCurrency } from "@/utils/number";
 import { useMemo } from "react";
 import { View } from "react-native";
-import { Card, Chip, Divider, Text, useTheme } from "react-native-paper";
+import { Button, Card, Chip, Divider, Text, useTheme } from "react-native-paper";
 import SectionHeader from "../dashboard/section-header";
+import { router } from "expo-router";
 
 interface Props {
     accounts: BankAccountComputed[];
+    creditCards: CreditCardComputed[];
     monthlyFlowByAccountId: Record<string, AccountMonthlyFlow>;
     monthKey: string;
 }
 
 export default function AccountsInsightsSection({
     accounts,
+    creditCards,
     monthlyFlowByAccountId,
     monthKey,
 }: Props) {
@@ -116,6 +120,7 @@ export default function AccountsInsightsSection({
                             const flow = monthlyFlowByAccountId[account.id] ?? {
                                 incomeIn: 0,
                                 expenseOut: 0,
+                                creditCardPaymentOut: 0,
                                 transferIn: 0,
                                 transferOut: 0,
                                 adjustmentNet: 0,
@@ -126,6 +131,9 @@ export default function AccountsInsightsSection({
                                     <Text variant="bodyLarge">{account.name}</Text>
                                     <Text variant="bodySmall">Income In: {formatCurrency(flow.incomeIn)}</Text>
                                     <Text variant="bodySmall">Expense Out: {formatCurrency(flow.expenseOut)}</Text>
+                                    <Text variant="bodySmall">
+                                        Credit Card Payments: {formatCurrency(flow.creditCardPaymentOut)}
+                                    </Text>
                                     <Text variant="bodySmall">
                                         Transfers Net: {formatCurrency(flow.transferIn - flow.transferOut)}
                                     </Text>
@@ -140,6 +148,63 @@ export default function AccountsInsightsSection({
                                 </View>
                             );
                         })
+                    )}
+                </Card.Content>
+            </Card>
+
+            <Card>
+                <Card.Content style={{ gap: 12 }}>
+                    <Text variant="titleMedium">Credit Cards</Text>
+                    {creditCards.length === 0 ? (
+                        <Text variant="bodyMedium">No credit cards yet.</Text>
+                    ) : (
+                        creditCards.map((card) => (
+                            <View key={card.id} style={{ gap: 4 }}>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                                    <Text variant="bodyLarge">{card.name}</Text>
+                                    <Chip
+                                        compact
+                                        style={{
+                                            backgroundColor: card.isOverLimit
+                                                ? theme.colors.errorContainer
+                                                : theme.colors.primaryContainer,
+                                        }}
+                                    >
+                                        {card.netBalance < 0
+                                            ? "Credit"
+                                            : card.isOverLimit
+                                                ? "Over Limit"
+                                                : "Active"}
+                                    </Chip>
+                                </View>
+                                <Text variant="bodyMedium">
+                                    Used: {formatCurrency(card.amountUsed)}
+                                    {typeof card.creditLimit === "number"
+                                        ? ` / ${formatCurrency(card.creditLimit)}`
+                                        : ""}
+                                </Text>
+                                <Text variant="bodySmall">
+                                    This Month Charges: {formatCurrency(card.monthlyCharges)}
+                                </Text>
+                                <Text variant="bodySmall">
+                                    This Month Payments: {formatCurrency(card.monthlyPayments)}
+                                </Text>
+                                <Text variant="bodySmall">
+                                    Net Balance: {formatCurrency(card.netBalance)}
+                                </Text>
+                                <Button
+                                    compact
+                                    style={{ alignSelf: "flex-start", marginTop: 4 }}
+                                    onPress={() => router.push({
+                                        pathname: "/credit-card-payment/create",
+                                        params: { paymentMethodId: card.id },
+                                    })}
+                                >
+                                    Record Payment
+                                </Button>
+                                <Divider style={{ marginTop: 8 }} />
+                            </View>
+                        ))
                     )}
                 </Card.Content>
             </Card>

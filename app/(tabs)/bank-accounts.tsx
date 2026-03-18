@@ -2,12 +2,14 @@ import Header from "@/components/common/header";
 import Loading from "@/components/common/loading";
 import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
 import { useBankAccountsData } from "@/hooks/use-bank-accounts-data";
+import { useCreditCardData } from "@/hooks/use-credit-card-data";
 import { addBankAccountBalanceAdjustment } from "@/services/bank-account-balance-adjustment-service";
 import { deleteBankAccount } from "@/services/bank-account-service";
+import type { BankAccountComputed } from "@/hooks/use-bank-accounts-data";
 import { getMonthKey } from "@/utils/date";
 import { formatCurrency } from "@/utils/number";
 import { useRouter } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList, View } from "react-native";
 import {
     Button,
@@ -15,6 +17,7 @@ import {
     Chip,
     Dialog,
     FAB,
+    Divider,
     IconButton,
     Portal,
     Text,
@@ -23,19 +26,112 @@ import {
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+interface BalanceAdjustDialogProps {
+    account: BankAccountComputed | null;
+    visible: boolean;
+    loading: boolean;
+    onDismiss: () => void;
+    onSubmit: (targetBalance: number) => Promise<void>;
+}
+
+function BalanceAdjustDialog({
+    account,
+    visible,
+    loading,
+    onDismiss,
+    onSubmit,
+}: BalanceAdjustDialogProps) {
+    const theme = useTheme();
+    const [targetBalance, setTargetBalance] = useState("");
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!visible || !account) {
+            setTargetBalance("");
+            setError(null);
+            return;
+        }
+
+        setTargetBalance(account.currentBalance.toString());
+        setError(null);
+    }, [account, visible]);
+
+    const handleSubmit = useCallback(async () => {
+        if (!account) {
+            return;
+        }
+
+        const parsedTarget = Number(targetBalance);
+        if (!targetBalance || Number.isNaN(parsedTarget)) {
+            setError("Enter a valid target balance.");
+            return;
+        }
+
+        if (parsedTarget === account.currentBalance) {
+            setError("Target balance is already current balance.");
+            return;
+        }
+
+        try {
+            await onSubmit(parsedTarget);
+        } catch (submitError) {
+            console.error("failed to adjust balance", submitError);
+            setError("Unable to adjust balance right now.");
+        }
+    }, [account, onSubmit, targetBalance]);
+
+    return (
+        <Portal>
+            <Dialog visible={visible} onDismiss={onDismiss}>
+                <Dialog.Title>Set Current Balance</Dialog.Title>
+                <Dialog.Content>
+                    <Text variant="bodyMedium" style={{ marginBottom: 12 }}>
+                        Account: {account?.name ?? "-"}
+                    </Text>
+                    <TextInput
+                        autoFocus
+                        label="Target Balance"
+                        value={targetBalance}
+                        onChangeText={(value) => {
+                            setTargetBalance(value);
+                            if (error) {
+                                setError(null);
+                            }
+                        }}
+                        keyboardType="decimal-pad"
+                        inputMode="decimal"
+                        mode="outlined"
+                        error={!!error}
+                    />
+                    {error ? (
+                        <Text variant="bodySmall" style={{ marginTop: 8, color: theme.colors.error }}>
+                            {error}
+                        </Text>
+                    ) : null}
+                </Dialog.Content>
+                <Dialog.Actions>
+                    <Button onPress={onDismiss}>Cancel</Button>
+                    <Button loading={loading} onPress={handleSubmit}>
+                        Save
+                    </Button>
+                </Dialog.Actions>
+            </Dialog>
+        </Portal>
+    );
+}
+
 export default function BankAccountsPage() {
     const theme = useTheme();
     const router = useRouter();
 
     const { loading, accounts } = useBankAccountsData();
+    const { loading: creditCardsLoading, creditCards } = useCreditCardData(getMonthKey(new Date()));
 
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState<boolean>(false);
 
     const [adjustAccountId, setAdjustAccountId] = useState<string | null>(null);
-    const [targetBalance, setTargetBalance] = useState<string>("");
     const [adjusting, setAdjusting] = useState<boolean>(false);
-    const [adjustError, setAdjustError] = useState<string | null>(null);
 
     const selectedAdjustAccount = useMemo(
         () => accounts.find(item => item.id === adjustAccountId) ?? null,
@@ -58,25 +154,15 @@ export default function BankAccountsPage() {
         }
     }, [deleteId]);
 
-    const handleAdjustBalance = useCallback(async () => {
+    const handleAdjustBalance = useCallback(async (parsedTarget: number) => {
         if (!selectedAdjustAccount) {
             return;
         }
 
-        const parsedTarget = Number(targetBalance);
-        if (!targetBalance || Number.isNaN(parsedTarget)) {
-            setAdjustError("Enter a valid target balance.");
-            return;
-        }
-
         const delta = parsedTarget - selectedAdjustAccount.currentBalance;
-        if (delta === 0) {
-            setAdjustError("Target balance is already current balance.");
-            return;
-        }
 
+        setAdjusting(true);
         try {
-            setAdjusting(true);
             await addBankAccountBalanceAdjustment({
                 bankAccount: { id: selectedAdjustAccount.id },
                 amount: delta,
@@ -85,17 +171,12 @@ export default function BankAccountsPage() {
                 monthKey: getMonthKey(new Date()),
             });
             setAdjustAccountId(null);
-            setTargetBalance("");
-            setAdjustError(null);
-        } catch (error) {
-            console.error("failed to adjust balance", error);
-            setAdjustError("Unable to adjust balance right now.");
         } finally {
             setAdjusting(false);
         }
-    }, [selectedAdjustAccount, targetBalance]);
+    }, [selectedAdjustAccount]);
 
-    if (loading || deleting) {
+    if (loading || creditCardsLoading || deleting) {
         return <Loading />;
     }
 
@@ -107,16 +188,64 @@ export default function BankAccountsPage() {
                 backgroundColor: theme.colors.background,
             }}
         >
-            <Header title="Bank Accounts" />
+            <Header title="Bank Accounts & Credit Cards" />
 
             <FlatList
-                contentContainerStyle={{ gap: 12 }}
+                contentContainerStyle={{ gap: 12, paddingBottom: 96 }}
                 data={accounts}
                 keyExtractor={(item) => item.id}
                 ListEmptyComponent={
                     <Text variant="bodyLarge" style={{ textAlign: "center", marginTop: 16 }}>
                         No bank accounts yet.
                     </Text>
+                }
+                ListFooterComponent={
+                    <View style={{ gap: 12 }}>
+                        <Divider style={{ marginVertical: 4 }} />
+                        <Text variant="titleMedium">Credit Cards</Text>
+                        {creditCards.length === 0 ? (
+                            <Text variant="bodyMedium">No credit cards yet.</Text>
+                        ) : creditCards.map((card) => (
+                            <Card key={card.id}>
+                                <Card.Content style={{ gap: 4 }}>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                                        <Text variant="titleMedium">{card.name}</Text>
+                                        <Chip
+                                            style={{
+                                                backgroundColor: card.isOverLimit
+                                                    ? theme.colors.errorContainer
+                                                    : theme.colors.primaryContainer,
+                                            }}
+                                        >
+                                            {card.netBalance < 0 ? "Credit" : "In Use"}
+                                        </Chip>
+                                    </View>
+                                    <Text variant="bodyLarge">
+                                        Used: {formatCurrency(card.amountUsed)}
+                                        {typeof card.creditLimit === "number"
+                                            ? ` / ${formatCurrency(card.creditLimit)}`
+                                            : ""}
+                                    </Text>
+                                    <Text variant="bodySmall">
+                                        Net Balance: {formatCurrency(card.netBalance)}
+                                    </Text>
+                                    <Text variant="bodySmall">
+                                        This Month Payments: {formatCurrency(card.monthlyPayments)}
+                                    </Text>
+                                    <Button
+                                        compact
+                                        style={{ alignSelf: "flex-start", marginTop: 4 }}
+                                        onPress={() => router.push({
+                                            pathname: "/credit-card-payment/create",
+                                            params: { paymentMethodId: card.id },
+                                        })}
+                                    >
+                                        Record Payment
+                                    </Button>
+                                </Card.Content>
+                            </Card>
+                        ))}
+                    </View>
                 }
                 renderItem={({ item }) => (
                     <Card onPress={() => router.push(`/bank-account/${item.id}`)}>
@@ -151,8 +280,6 @@ export default function BankAccountsPage() {
                                     onPress={(e) => {
                                         e.stopPropagation();
                                         setAdjustAccountId(item.id);
-                                        setTargetBalance(item.currentBalance.toString());
-                                        setAdjustError(null);
                                     }}
                                 >
                                     Set Balance
@@ -188,35 +315,13 @@ export default function BankAccountsPage() {
                 onDismiss={() => setDeleteId(null)}
             />
 
-            <Portal>
-                <Dialog visible={!!adjustAccountId} onDismiss={() => setAdjustAccountId(null)}>
-                    <Dialog.Title>Set Current Balance</Dialog.Title>
-                    <Dialog.Content>
-                        <Text variant="bodyMedium" style={{ marginBottom: 12 }}>
-                            Account: {selectedAdjustAccount?.name ?? "-"}
-                        </Text>
-                        <TextInput
-                            label="Target Balance"
-                            value={targetBalance}
-                            onChangeText={setTargetBalance}
-                            keyboardType="numeric"
-                            mode="outlined"
-                            error={!!adjustError}
-                        />
-                        {adjustError ? (
-                            <Text variant="bodySmall" style={{ marginTop: 8, color: theme.colors.error }}>
-                                {adjustError}
-                            </Text>
-                        ) : null}
-                    </Dialog.Content>
-                    <Dialog.Actions>
-                        <Button onPress={() => setAdjustAccountId(null)}>Cancel</Button>
-                        <Button loading={adjusting} onPress={handleAdjustBalance}>
-                            Save
-                        </Button>
-                    </Dialog.Actions>
-                </Dialog>
-            </Portal>
+            <BalanceAdjustDialog
+                account={selectedAdjustAccount}
+                visible={!!adjustAccountId}
+                loading={adjusting}
+                onDismiss={() => setAdjustAccountId(null)}
+                onSubmit={handleAdjustBalance}
+            />
         </SafeAreaView>
     );
 }

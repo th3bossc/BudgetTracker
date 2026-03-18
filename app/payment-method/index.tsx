@@ -2,6 +2,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, View } from "react-native";
 import {
     Appbar,
+    Button,
     Card,
     Icon,
     Text,
@@ -13,13 +14,20 @@ import { useRouter } from "expo-router";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
 import { useCallback } from "react";
 import { updatePaymentMethod } from "@/services/payment-method-service";
+import { useCreditCardData } from "@/hooks/use-credit-card-data";
+import { formatCurrency } from "@/utils/number";
 
 export default function PaymentMethodListPage() {
     const router = useRouter();
     const theme = useTheme();
     const { paymentMethods, bankAccounts } = useFinanceConfig();
+    const { creditCards } = useCreditCardData();
     const bankAccountsMap = bankAccounts.reduce<Record<string, string>>((acc, account) => {
         acc[account.id] = account.name;
+        return acc;
+    }, {});
+    const creditCardMap = creditCards.reduce<Record<string, typeof creditCards[number]>>((acc, card) => {
+        acc[card.id] = card;
         return acc;
     }, {});
 
@@ -69,15 +77,38 @@ export default function PaymentMethodListPage() {
                                             {bankAccountsMap[item.bankAccount.id] ?? "Unknown account"}
                                         </Text>
                                     ) : null}
+                                    {item.isCreditCard && creditCardMap[item.id] ? (
+                                        <Text variant="bodySmall">
+                                            Used: {formatCurrency(creditCardMap[item.id].amountUsed)}
+                                            {typeof creditCardMap[item.id].creditLimit === "number"
+                                                ? ` / ${formatCurrency(creditCardMap[item.id].creditLimit)}`
+                                                : ""}
+                                        </Text>
+                                    ) : null}
                                 </View>
                             </View>
-
-                            <Switch
-                                value={!item.isArchived}
-                                onValueChange={() =>
-                                    toggleArchive(item.id, item.isArchived ?? false)
-                                }
-                            />
+                            <View style={{ alignItems: "flex-end", justifyContent: "center" }}>
+                                {item.isCreditCard ? (
+                                    <Button
+                                        compact
+                                        onPress={(e) => {
+                                            e.stopPropagation();
+                                            router.push({
+                                                pathname: "/credit-card-payment/create",
+                                                params: { paymentMethodId: item.id },
+                                            });
+                                        }}
+                                    >
+                                        Pay
+                                    </Button>
+                                ) : null}
+                                <Switch
+                                    value={!item.isArchived}
+                                    onValueChange={() =>
+                                        toggleArchive(item.id, item.isArchived ?? false)
+                                    }
+                                />
+                            </View>
                         </Card.Content>
                     </Card>
                 )}

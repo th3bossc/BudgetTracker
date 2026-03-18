@@ -121,6 +121,13 @@ export default function TabLayout() {
                     ),
                 }}
             />
+
+            <Tabs.Screen
+                name="credit-card-payments"
+                options={{
+                    href: null,
+                }}
+            />
         </Tabs>
     );
 }

@@ -79,7 +79,7 @@ export default function InvestmentListPage() {
             />
 
             <FlatList
-                contentContainerStyle={{ padding: 16, gap: 12 }}
+                contentContainerStyle={{ gap: 12 }}
                 data={investments}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (

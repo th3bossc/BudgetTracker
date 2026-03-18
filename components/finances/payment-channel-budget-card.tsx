@@ -19,7 +19,8 @@ export default function PaymentChannelBudgetCard({
     amountPending,
 }: Props) {
     const theme = useTheme();
-    const percentage = budgetAmount > 0 ? amountUsed / budgetAmount : 0;
+    const normalizedUsed = Math.max(amountUsed, 0);
+    const percentage = budgetAmount > 0 ? normalizedUsed / budgetAmount : 0;
     const animatedValue = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
@@ -54,6 +55,12 @@ export default function PaymentChannelBudgetCard({
                         {formatCurrency(amountUsed)} / {formatCurrency(budgetAmount)} (
                         {formatNumber(percentage * 100)}%)
                     </Text>
+
+                    {amountUsed < 0 && (
+                        <Text variant="bodySmall" style={{ color: theme.colors.primary }}>
+                            Credit balance: {formatCurrency(Math.abs(amountUsed))}
+                        </Text>
+                    )}
 
                     {amountPending > 0 && (
                         <Text variant="bodySmall">

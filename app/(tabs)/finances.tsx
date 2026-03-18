@@ -7,6 +7,7 @@ import AccountsInsightsSection from "@/components/finances/accounts-insights-sec
 import PaymentChannelBudgetSection from "@/components/finances/payment-channel-budget-section";
 import PaymentChannelPieChart from "@/components/finances/payment-channel-pie-chart";
 import { useBankAccountsData } from "@/hooks/use-bank-accounts-data";
+import { useCreditCardData } from "@/hooks/use-credit-card-data";
 import { useMonthlyBudgetData } from "@/hooks/use-monthly-budget-data";
 import { useMonthlyPaymentChannelBudgetData } from "@/hooks/use-monthly-payment-channel-budget-data";
 import { getMonthKey } from "@/utils/date";
@@ -36,6 +37,10 @@ export default function FinancesPage() {
         accounts,
         monthlyFlowByAccountId,
     } = useBankAccountsData(monthKey);
+    const {
+        loading: creditCardsLoading,
+        creditCards,
+    } = useCreditCardData(monthKey);
 
     const monthOptions = useMemo(() => generateMonthOptions(24), []);
 
@@ -46,7 +51,7 @@ export default function FinancesPage() {
         setMonthKey(val);
     }, []);
 
-    if (loading || paymentChannelLoading || bankAccountsLoading) {
+    if (loading || paymentChannelLoading || bankAccountsLoading || creditCardsLoading) {
         return <Loading />
     }
 
@@ -99,6 +104,7 @@ export default function FinancesPage() {
                 {activeView === "accounts" ? (
                     <AccountsInsightsSection
                         accounts={accounts}
+                        creditCards={creditCards}
                         monthKey={monthKey}
                         monthlyFlowByAccountId={monthlyFlowByAccountId}
                     />

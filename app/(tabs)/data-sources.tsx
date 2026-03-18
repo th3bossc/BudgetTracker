@@ -9,17 +9,19 @@ import InvestmentsPage from "./investments";
 import IousPage from "./ious";
 import TransfersPage from "./transfers";
 import BankAccountsPage from "./bank-accounts";
+import CreditCardPaymentsPage from "./credit-card-payments";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-type DataSourceTab = "expenses" | "incomes" | "investments" | "ious" | "transfers" | "accounts";
+type DataSourceTab = "expenses" | "incomes" | "investments" | "ious" | "transfers" | "accounts" | "credit-card-payments";
 
 const tabs: { key: DataSourceTab; label: string, icon: string }[] = [
     { key: "expenses", label: "Expenses", icon: "cash-minus" },
     { key: "incomes", label: "Incomes", icon: "cash-plus" },
     { key: "investments", label: "Investments", icon: "chart-line" },
     { key: "ious", label: "IOUs", icon: "cash-refund" },
-    { key: "transfers", label: "Transfers", icon: "bank-transfer" },
     { key: "accounts", label: "Accounts", icon: "bank-outline" },
+    { key: "transfers", label: "Transfers", icon: "bank-transfer" },
+    { key: "credit-card-payments", label: "CC Payments", icon: "credit-card-check-outline" },
 ];
 
 export default function DataSourcesPage() {
@@ -35,10 +37,19 @@ export default function DataSourcesPage() {
         ious: { x: 0, width: 0 },
         transfers: { x: 0, width: 0 },
         accounts: { x: 0, width: 0 },
+        "credit-card-payments": { x: 0, width: 0 },
     });
 
     const initialTab = useMemo<DataSourceTab>(() => {
-        if (source === "expenses" || source === "incomes" || source === "investments" || source === "ious" || source === "transfers" || source === "accounts") {
+        if (
+            source === "expenses"
+            || source === "incomes"
+            || source === "investments"
+            || source === "ious"
+            || source === "accounts"
+            || source === "transfers"
+            || source === "credit-card-payments"
+        ) {
             return source;
         }
 
@@ -104,13 +115,17 @@ export default function DataSourcesPage() {
         if (item === "investments") {
             return <View style={{ width, flex: 1 }}><InvestmentsPage /></View>;
         }
+        
+        if (item === "accounts") {
+            return <View style={{ width, flex: 1 }}><BankAccountsPage /></View>;
+        }
 
         if (item === "transfers") {
             return <View style={{ width, flex: 1 }}><TransfersPage /></View>;
         }
 
-        if (item === "accounts") {
-            return <View style={{ width, flex: 1 }}><BankAccountsPage /></View>;
+        if (item === "credit-card-payments") {
+            return <View style={{ width, flex: 1 }}><CreditCardPaymentsPage /></View>;
         }
 
         return <View style={{ width, flex: 1 }}><IousPage /></View>;
@@ -139,7 +154,9 @@ export default function DataSourcesPage() {
                             style={{
                                 flexDirection: "row",
                                 alignItems: "center",
+                                justifyContent: "center",
                                 gap: 8,
+                                minWidth: 118,
                                 paddingHorizontal: 14,
                                 paddingVertical: 10,
                                 borderRadius: 999,

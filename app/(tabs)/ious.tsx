@@ -92,7 +92,7 @@ export default function IousPage() {
                 onPress={showFiltersHandler}
             />
 
-            <View style={{ paddingHorizontal: 16, paddingTop: 8, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+            <View style={{ padding: 8, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                 <Text variant="bodyMedium">Show paid IOUs</Text>
                 <Switch
                     value={showPaidItems}
@@ -109,7 +109,7 @@ export default function IousPage() {
             </View>
 
             <FlatList
-                contentContainerStyle={{ padding: 16, gap: 12 }}
+                contentContainerStyle={{ paddingTop: 8, gap: 12 }}
                 data={ious}
                 keyExtractor={(item) => item.id}
                 ListEmptyComponent={
