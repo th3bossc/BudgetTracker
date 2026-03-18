@@ -3,6 +3,7 @@ import {
     AccountTransfer,
     BankAccount,
     BankAccountBalanceAdjustment,
+    CreditCardPayment,
     Expense,
     Income,
     Iou,
@@ -15,6 +16,7 @@ import { subscribeToIous } from "@/services/iou-service";
 import { subscribeToAccountTransfers } from "@/services/account-transfer-service";
 import { subscribeToPaymentMethods } from "@/services/payment-method-service";
 import { subscribeToBankAccountBalanceAdjustments } from "@/services/bank-account-balance-adjustment-service";
+import { subscribeToCreditCardPayments } from "@/services/credit-card-payment-service";
 import { getIouRecoveredAmount } from "@/utils/iou";
 
 export interface BankAccountComputed extends BankAccount {
@@ -25,6 +27,7 @@ export interface BankAccountComputed extends BankAccount {
 export interface AccountMonthlyFlow {
     incomeIn: number;
     expenseOut: number;
+    creditCardPaymentOut: number;
     transferIn: number;
     transferOut: number;
     adjustmentNet: number;
@@ -38,6 +41,7 @@ export const useBankAccountsData = (monthKey?: string) => {
     const [ious, setIous] = useState<Iou[]>([]);
     const [transfers, setTransfers] = useState<AccountTransfer[]>([]);
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+    const [creditCardPayments, setCreditCardPayments] = useState<CreditCardPayment[]>([]);
     const [adjustments, setAdjustments] = useState<BankAccountBalanceAdjustment[]>([]);
     const [initialLoading, setInitialLoading] = useState<boolean>(true);
 
@@ -48,6 +52,7 @@ export const useBankAccountsData = (monthKey?: string) => {
         const iousUnsub = subscribeToIous(setIous);
         const transfersUnsub = subscribeToAccountTransfers(setTransfers);
         const methodsUnsub = subscribeToPaymentMethods(setPaymentMethods);
+        const creditCardPaymentsUnsub = subscribeToCreditCardPayments(setCreditCardPayments);
         const adjustmentsUnsub = subscribeToBankAccountBalanceAdjustments(setAdjustments);
         setInitialLoading(false);
 
@@ -58,9 +63,17 @@ export const useBankAccountsData = (monthKey?: string) => {
             iousUnsub();
             transfersUnsub();
             methodsUnsub();
+            creditCardPaymentsUnsub();
             adjustmentsUnsub();
         };
     }, []);
+
+    const paymentMethodMap = useMemo(() => {
+        return paymentMethods.reduce<Record<string, PaymentMethod>>((acc, method) => {
+            acc[method.id] = method;
+            return acc;
+        }, {});
+    }, [paymentMethods]);
 
     const paymentMethodToAccountIdMap = useMemo(() => {
         return paymentMethods.reduce<Record<string, string>>((acc, method) => {
@@ -86,16 +99,24 @@ export const useBankAccountsData = (monthKey?: string) => {
 
                 expenses.forEach((expense) => {
                     const expenseAccountId = paymentMethodToAccountIdMap[expense.paymentMethod.id];
-                    if (expenseAccountId === account.id) {
+                    const method = paymentMethodMap[expense.paymentMethod.id];
+                    if (expenseAccountId === account.id && !method?.isCreditCard) {
                         currentBalance -= expense.amount;
                     }
                 });
 
                 ious.forEach((iou) => {
                     const iouAccountId = paymentMethodToAccountIdMap[iou.paymentMethod.id];
-                    if (iouAccountId === account.id) {
+                    const method = paymentMethodMap[iou.paymentMethod.id];
+                    if (iouAccountId === account.id && !method?.isCreditCard) {
                         const recovered = getIouRecoveredAmount(iou);
                         currentBalance += recovered;
+                    }
+                });
+
+                creditCardPayments.forEach((payment) => {
+                    if (payment.bankAccount.id === account.id) {
+                        currentBalance -= payment.amount;
                     }
                 });
 
@@ -124,7 +145,17 @@ export const useBankAccountsData = (monthKey?: string) => {
                 };
             })
             .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-    }, [accounts, incomes, expenses, ious, transfers, paymentMethodToAccountIdMap, adjustments]);
+    }, [
+        accounts,
+        adjustments,
+        creditCardPayments,
+        expenses,
+        incomes,
+        ious,
+        paymentMethodMap,
+        paymentMethodToAccountIdMap,
+        transfers,
+    ]);
 
     const monthlyFlowByAccountId = useMemo<Record<string, AccountMonthlyFlow>>(() => {
         if (!monthKey) {
@@ -136,6 +167,7 @@ export const useBankAccountsData = (monthKey?: string) => {
             init[account.id] = {
                 incomeIn: 0,
                 expenseOut: 0,
+                creditCardPaymentOut: 0,
                 transferIn: 0,
                 transferOut: 0,
                 adjustmentNet: 0,
@@ -163,13 +195,28 @@ export const useBankAccountsData = (monthKey?: string) => {
             }
 
             const accountId = paymentMethodToAccountIdMap[expense.paymentMethod.id];
+            const method = paymentMethodMap[expense.paymentMethod.id];
             const flow = accountId ? init[accountId] : undefined;
-            if (!flow) {
+            if (!flow || method?.isCreditCard) {
                 return;
             }
 
             flow.expenseOut += expense.amount;
             flow.netFlow -= expense.amount;
+        });
+
+        creditCardPayments.forEach((payment) => {
+            if (payment.monthKey !== monthKey) {
+                return;
+            }
+
+            const flow = init[payment.bankAccount.id];
+            if (!flow) {
+                return;
+            }
+
+            flow.creditCardPaymentOut += payment.amount;
+            flow.netFlow -= payment.amount;
         });
 
         transfers.forEach((transfer) => {
@@ -205,7 +252,17 @@ export const useBankAccountsData = (monthKey?: string) => {
         });
 
         return init;
-    }, [monthKey, accounts, incomes, expenses, transfers, adjustments, paymentMethodToAccountIdMap]);
+    }, [
+        monthKey,
+        accounts,
+        adjustments,
+        creditCardPayments,
+        expenses,
+        incomes,
+        paymentMethodMap,
+        paymentMethodToAccountIdMap,
+        transfers,
+    ]);
 
     return {
         loading: initialLoading,

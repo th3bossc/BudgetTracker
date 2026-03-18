@@ -1,4 +1,4 @@
-import type { AccountTransfer, BankAccount, BankAccountBalanceAdjustment, ExpenseCategory, Expense, Income, IncomeSource, Iou, Investment, InvestmentType, PaymentMethod } from "./schema";
+import type { AccountTransfer, BankAccount, BankAccountBalanceAdjustment, CreditCardPayment, ExpenseCategory, Expense, Income, IncomeSource, Iou, Investment, InvestmentType, PaymentMethod } from "./schema";
 
 export type OmittedKeys = 'id' | 'createdAt';
 
@@ -10,6 +10,7 @@ export type ExpenseCategoryCreateInput = CreateInput<ExpenseCategory>;
 export type IncomeSourceCreateInput = CreateInput<IncomeSource>;
 export type InvestmentTypeCreateInput = CreateInput<InvestmentType>;
 export type PaymentMethodCreateInput = CreateInput<PaymentMethod>;
+export type CreditCardPaymentCreateInput = CreateInput<CreditCardPayment>;
 
 export type ExpenseCreateInput = CreateInput<Expense>;
 export type IncomeCreateInput = CreateInput<Income>;
@@ -24,6 +25,7 @@ export type ExpenseCategoryUpdateInput = UpdateInput<ExpenseCategory>;
 export type IncomeSourceUpdateInput = UpdateInput<IncomeSource>;
 export type InvestmentTypeUpdateInput = UpdateInput<InvestmentType>;
 export type PaymentMethodUpdateInput = UpdateInput<PaymentMethod>;
+export type CreditCardPaymentUpdateInput = UpdateInput<CreditCardPayment>;
 
 export type ExpenseUpdateInput = UpdateInput<Expense>;
 export type IncomeUpdateInput = UpdateInput<Income>;

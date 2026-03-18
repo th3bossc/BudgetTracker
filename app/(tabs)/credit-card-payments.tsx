@@ -1,24 +1,52 @@
 import Header from "@/components/common/header";
 import Loading from "@/components/common/loading";
 import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
-import { useAccountTransfersData } from "@/hooks/use-account-transfers-data";
-import { deleteAccountTransfer } from "@/services/account-transfer-service";
+import { useFinanceConfig } from "@/hooks/use-finance-config";
+import {
+    deleteCreditCardPayment,
+    subscribeToCreditCardPayments,
+} from "@/services/credit-card-payment-service";
+import type { CreditCardPayment } from "@/types/schema";
 import { formatCurrency } from "@/utils/number";
 import { truncateText } from "@/utils/text";
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
-import { FlatList, ScrollView, View } from "react-native";
-import { Card, Chip, FAB, Icon, IconButton, Text, useTheme } from "react-native-paper";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { FlatList, View } from "react-native";
+import { Card, Chip, FAB, IconButton, Text, useTheme } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function TransfersPage() {
+export default function CreditCardPaymentsPage() {
     const theme = useTheme();
     const router = useRouter();
+    const { loading: configLoading, paymentMethods, bankAccounts } = useFinanceConfig();
 
-    const [deleting, setDeleting] = useState<boolean>(false);
+    const [payments, setPayments] = useState<CreditCardPayment[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [deleting, setDeleting] = useState(false);
     const [deleteId, setDeleteId] = useState<string | null>(null);
 
-    const { loading, transfers, bankAccountsMap } = useAccountTransfersData();
+    useEffect(() => {
+        const unsubscribe = subscribeToCreditCardPayments((items) => {
+            setPayments(items);
+            setLoading(false);
+        });
+
+        return unsubscribe;
+    }, []);
+
+    const paymentMethodsMap = useMemo(() => {
+        return paymentMethods.reduce<Record<string, typeof paymentMethods[number]>>((acc, item) => {
+            acc[item.id] = item;
+            return acc;
+        }, {});
+    }, [paymentMethods]);
+
+    const bankAccountsMap = useMemo(() => {
+        return bankAccounts.reduce<Record<string, typeof bankAccounts[number]>>((acc, item) => {
+            acc[item.id] = item;
+            return acc;
+        }, {});
+    }, [bankAccounts]);
 
     const handleDelete = useCallback(async () => {
         if (!deleteId) {
@@ -27,18 +55,16 @@ export default function TransfersPage() {
 
         try {
             setDeleting(true);
-            await deleteAccountTransfer(deleteId);
+            await deleteCreditCardPayment(deleteId);
         } catch (error) {
-            console.error("something went wrong while deleting transfer", error);
+            console.error("something went wrong while deleting credit card payment", error);
         } finally {
             setDeleteId(null);
             setDeleting(false);
         }
     }, [deleteId]);
 
-    const handleCancelDelete = useCallback(() => setDeleteId(null), []);
-
-    if (loading || deleting) {
+    if (loading || configLoading || deleting) {
         return <Loading />;
     }
 
@@ -50,23 +76,23 @@ export default function TransfersPage() {
                 backgroundColor: theme.colors.background,
             }}
         >
-            <Header title="Money Movements" />
+            <Header title="Credit Card Payments" />
 
             <FlatList
                 contentContainerStyle={{ gap: 12 }}
-                data={transfers}
+                data={payments}
                 keyExtractor={(item) => item.id}
                 ListEmptyComponent={
                     <Text variant="bodyLarge" style={{ textAlign: "center", marginTop: 16 }}>
-                        No money movements yet.
+                        No credit card payments yet.
                     </Text>
                 }
                 renderItem={({ item }) => {
-                    const fromAccount = bankAccountsMap[item.fromBankAccount.id];
-                    const toAccount = bankAccountsMap[item.toBankAccount.id];
+                    const paymentMethod = paymentMethodsMap[item.paymentMethod.id];
+                    const bankAccount = bankAccountsMap[item.bankAccount.id];
 
                     return (
-                        <Card onPress={() => router.push(`/account-transfer/${item.id}`)}>
+                        <Card>
                             <Card.Content>
                                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                                     <Text variant="titleMedium">{formatCurrency(item.amount)}</Text>
@@ -79,17 +105,24 @@ export default function TransfersPage() {
                                     </Text>
                                 ) : null}
 
-                                <View
-                                    style={{
-                                        marginTop: 10,
-                                        gap: 8,
-                                    }}
-                                >
-                                    <ScrollView
-                                        horizontal
-                                        showsHorizontalScrollIndicator={false}
-                                        contentContainerStyle={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+                                <Text variant="bodySmall" style={{ marginTop: 6 }}>
+                                    Month: {item.monthKey}
+                                </Text>
+
+                                <View style={{ marginTop: 10, gap: 8 }}>
+                                    <Chip
+                                        style={{
+                                            backgroundColor: "transparent",
+                                            borderWidth: 1,
+                                            borderColor: paymentMethod?.color ?? theme.colors.outline,
+                                        }}
+                                        textStyle={{ color: paymentMethod?.color ?? theme.colors.onSurface }}
+                                        icon={paymentMethod?.icon ?? "credit-card"}
                                     >
+                                        {truncateText(paymentMethod?.name) ?? "Unknown card"}
+                                    </Chip>
+
+                                    <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                                         <Chip
                                             style={{
                                                 backgroundColor: "transparent",
@@ -99,32 +132,13 @@ export default function TransfersPage() {
                                             textStyle={{ color: theme.colors.onSurface }}
                                             icon="bank-outline"
                                         >
-                                            {truncateText(fromAccount?.name) ?? "Unknown"}
+                                            {truncateText(bankAccount?.name) ?? "Unknown account"}
                                         </Chip>
 
-                                        <Icon source="arrow-right" size={16} color={theme.colors.onSurfaceVariant} />
-
-                                        <Chip
-                                            style={{
-                                                backgroundColor: "transparent",
-                                                borderWidth: 1,
-                                                borderColor: theme.colors.outline,
-                                            }}
-                                            textStyle={{ color: theme.colors.onSurface }}
-                                            icon="bank-outline"
-                                        >
-                                            {truncateText(toAccount?.name) ?? "Unknown"}
-                                        </Chip>
-                                    </ScrollView>
-
-                                    <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
                                         <IconButton
                                             icon="delete"
                                             iconColor={theme.colors.error}
-                                            onPress={(e) => {
-                                                e.stopPropagation();
-                                                setDeleteId(item.id);
-                                            }}
+                                            onPress={() => setDeleteId(item.id)}
                                         />
                                     </View>
                                 </View>
@@ -141,13 +155,13 @@ export default function TransfersPage() {
                     right: 16,
                     bottom: 16,
                 }}
-                onPress={() => router.push("/account-transfer/create")}
+                onPress={() => router.push("/credit-card-payment/create")}
             />
 
             <DeleteConfirmationDialog
                 visible={!!deleteId}
                 onConfirm={handleDelete}
-                onDismiss={handleCancelDelete}
+                onDismiss={() => setDeleteId(null)}
             />
         </SafeAreaView>
     );
