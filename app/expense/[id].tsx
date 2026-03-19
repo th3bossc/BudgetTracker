@@ -39,8 +39,9 @@ export default function EditExpensePage() {
       const found = expenses.find(e => e.id === id);
       setExpense(found ?? null);
       if (found) {
-        const iou = ious.find(item => item.expense.id === found.id);
-        const recovered = iou ? getIouRecoveredAmount(iou) : 0;
+        const recovered = ious
+          .filter(item => item.expense.id === found.id)
+          .reduce((sum, item) => sum + getIouRecoveredAmount(item), 0);
         setRecoveredAmount(recovered);
       } else {
         setRecoveredAmount(0);

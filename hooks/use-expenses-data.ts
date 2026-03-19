@@ -35,7 +35,7 @@ export const useExpensesData = (filters: ExpenseFilters) => {
     const expenseRecoveryMap = useMemo(() => {
         return ious.reduce<Record<string, number>>((acc, iou) => {
             const recovered = getIouRecoveredAmount(iou);
-            acc[iou.expense.id] = recovered;
+            acc[iou.expense.id] = (acc[iou.expense.id] ?? 0) + recovered;
             return acc;
         }, {});
     }, [ious]);
@@ -43,7 +43,7 @@ export const useExpensesData = (filters: ExpenseFilters) => {
     const expenseOutstandingMap = useMemo(() => {
         return ious.reduce<Record<string, number>>((acc, iou) => {
             const outstanding = getIouOutstandingAmount(iou);
-            acc[iou.expense.id] = outstanding;
+            acc[iou.expense.id] = (acc[iou.expense.id] ?? 0) + outstanding;
             return acc;
         }, {});
     }, [ious]);
