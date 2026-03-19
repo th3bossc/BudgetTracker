@@ -8,17 +8,15 @@ import {
     deleteDoc,
     doc,
     FirestoreDataConverter,
-    getDocs,
     onSnapshot,
     orderBy,
-    query,
     QueryDocumentSnapshot,
     serverTimestamp,
     SnapshotOptions,
     Timestamp,
     updateDoc,
-    where,
-    limit,
+    getDocs,
+    query,
     getDoc,
 } from "firebase/firestore";
 import { db } from "./firebase";
@@ -82,18 +80,6 @@ export const addIou = async (input: IouCreateInput) => {
         expenseMonthKey: input.expenseMonthKey,
         createdMonthKey: input.createdMonthKey ?? nowMonthKey,
     };
-
-    const duplicateSnapshot = await getDocs(
-        query(
-            collection(db, "users", uid, TABLE_NAME).withConverter(iouConverter),
-            where("expense.id", "==", normalizedInput.expense.id),
-            limit(1),
-        )
-    );
-
-    if (!duplicateSnapshot.empty) {
-        throw new Error("IOU already exists for this expense");
-    }
 
     await addDoc(
         collection(db, "users", uid, TABLE_NAME).withConverter(iouConverter),
