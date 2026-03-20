@@ -56,6 +56,7 @@ export const useMonthlyPaymentChannelBudgetData = (monthKey: string): MonthlyPay
         setComputationLoading(true);
 
         try {
+            const getIouMonthKey = (iou: Iou) => iou.createdMonthKey || iou.expenseMonthKey;
             const budgetsByMethod = budgets.reduce<Record<string, number>>((acc, item) => {
                 acc[item.paymentMethod.id] = item.amount;
                 return acc;
@@ -67,11 +68,11 @@ export const useMonthlyPaymentChannelBudgetData = (monthKey: string): MonthlyPay
             }, {});
 
             const iouRecoveredByMethod = ious.reduce<Record<string, number>>((acc, iou) => {
-                if (iou.expenseMonthKey !== monthKey)
+                if (getIouMonthKey(iou) !== monthKey)
                     return acc;
 
                 const expense = expensesById[iou.expense.id];
-                if (!expense || expense.monthKey !== monthKey)
+                if (!expense)
                     return acc;
 
                 const recovered = getIouRecoveredAmount(iou);
@@ -81,11 +82,11 @@ export const useMonthlyPaymentChannelBudgetData = (monthKey: string): MonthlyPay
             }, {});
 
             const iouPendingByMethod = ious.reduce<Record<string, number>>((acc, iou) => {
-                if (iou.expenseMonthKey !== monthKey)
+                if (getIouMonthKey(iou) !== monthKey)
                     return acc;
 
                 const expense = expensesById[iou.expense.id];
-                if (!expense || expense.monthKey !== monthKey)
+                if (!expense)
                     return acc;
 
                 const pending = getIouOutstandingAmount(iou);

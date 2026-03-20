@@ -74,6 +74,8 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
             setComputationLoadingStatus(true);
 
             try {
+                const getIouMonthKey = (iou: Iou) => iou.createdMonthKey || iou.expenseMonthKey;
+
                 const currentIncome = incomes
                     .filter(i => i.monthKey == monthKey)
                     .reduce((sum, i) => sum + i.amount, 0);
@@ -87,11 +89,11 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
                     .reduce((sum, i) => sum + i.amount, 0);
 
                 const currentIouRecovered = ious
-                    .filter(i => i.expenseMonthKey == monthKey)
+                    .filter(i => getIouMonthKey(i) == monthKey)
                     .reduce((sum, i) => sum + getIouRecoveredAmount(i), 0);
 
                 const currentIouOutstanding = ious
-                    .filter(i => i.expenseMonthKey == monthKey)
+                    .filter(i => getIouMonthKey(i) == monthKey)
                     .reduce((sum, i) => sum + getIouOutstandingAmount(i), 0);
 
                 setSummary({
@@ -114,11 +116,11 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
                 }, {});
 
                 const iouOutstandingByCategory = ious.reduce<Record<string, number>>((acc, iou) => {
-                    if (iou.expenseMonthKey !== monthKey)
+                    if (getIouMonthKey(iou) !== monthKey)
                         return acc;
 
                     const expense = expensesById[iou.expense.id];
-                    if (!expense || expense.monthKey !== monthKey)
+                    if (!expense)
                         return acc;
 
                     const outstanding = getIouOutstandingAmount(iou);
@@ -127,11 +129,11 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
                 }, {});
 
                 const iouRecoveredByCategory = ious.reduce<Record<string, number>>((acc, iou) => {
-                    if (iou.expenseMonthKey !== monthKey)
+                    if (getIouMonthKey(iou) !== monthKey)
                         return acc;
 
                     const expense = expensesById[iou.expense.id];
-                    if (!expense || expense.monthKey !== monthKey)
+                    if (!expense)
                         return acc;
 
                     const recovered = getIouRecoveredAmount(iou);
