@@ -76,6 +76,7 @@ export interface IncomeBase {
 export interface InvestmentBase {
     name: string;
     type: { id: string, name?: string };
+    paymentMethod?: { id: string, name?: string };
     description?: string;
     amount: number;
     monthKey: string;

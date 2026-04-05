@@ -26,7 +26,7 @@ export default function InvestmentForm({
     loading,
 }: Props) {
     const router = useRouter();
-    const { investmentTypes } = useFinanceConfig();
+    const { investmentTypes, paymentMethods } = useFinanceConfig();
 
     const [name, setName] = useState(
         initialData?.name ?? ""
@@ -39,6 +39,9 @@ export default function InvestmentForm({
     );
     const [typeId, setTypeId] = useState(
         initialData?.type?.id ?? ""
+    );
+    const [paymentMethodId, setPaymentMethodId] = useState(
+        initialData?.paymentMethod?.id ?? "__none__"
     );
     const [date, setDate] = useState<Date>(
         initialData?.date ?? new Date()
@@ -55,6 +58,15 @@ export default function InvestmentForm({
         { label: "+ Add New Investment Type", value: "__add_new__" },
     ];
 
+    const paymentMethodOptions = [
+        { label: "No Payment Method", value: "__none__" },
+        ...paymentMethods.map(method => ({
+            label: method.name,
+            value: method.id,
+        })),
+        { label: "+ Add New Payment Method", value: "__add_new__" },
+    ];
+
     const handleSubmit = async () => {
         if (!name || !amount || !typeId) {
             setError("Name, amount and type are required.");
@@ -64,6 +76,9 @@ export default function InvestmentForm({
         await onSubmit({
             name,
             type: { id: typeId },
+            paymentMethod: paymentMethodId === "__none__"
+                ? undefined
+                : { id: paymentMethodId },
             description,
             amount: Number(amount),
             date,
@@ -96,6 +111,22 @@ export default function InvestmentForm({
                         return;
                     }
                     setTypeId(val);
+                }}
+            />
+
+            <Dropdown
+                label="Payment Method (Optional)"
+                mode="outlined"
+                value={paymentMethodId}
+                options={paymentMethodOptions}
+                onSelect={(val?: string) => {
+                    if (!val)
+                        return;
+                    if (val === "__add_new__") {
+                        router.push("/payment-method/create");
+                        return;
+                    }
+                    setPaymentMethodId(val);
                 }}
             />
 

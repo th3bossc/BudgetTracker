@@ -5,6 +5,7 @@ import {
     collection,
     getDocs,
     addDoc,
+    deleteField,
     serverTimestamp,
     FirestoreDataConverter,
     QueryDocumentSnapshot,
@@ -22,7 +23,7 @@ import { getCurrentUserId } from "./firestore-helpers";
 
 const investmentConverter: FirestoreDataConverter<Investment> = {
     toFirestore(investment: Investment): InvestmentDB {
-        return {
+        const payload: InvestmentDB = {
             name: investment.name,
             amount: investment.amount,
             description: investment.description,
@@ -30,7 +31,13 @@ const investmentConverter: FirestoreDataConverter<Investment> = {
             date: Timestamp.fromDate(investment.date),
             monthKey: investment.monthKey,
             createdAt: serverTimestamp(),
+        };
+
+        if (investment.paymentMethod) {
+            payload.paymentMethod = investment.paymentMethod;
         }
+
+        return payload;
     },
     fromFirestore(
         snapshot: QueryDocumentSnapshot,
@@ -44,6 +51,7 @@ const investmentConverter: FirestoreDataConverter<Investment> = {
             amount: data.amount,
             description: data.description,
             type: data.type,
+            paymentMethod: data.paymentMethod,
             date: data.date.toDate(),
             monthKey: data.monthKey,
             createdAt: (data.createdAt as Timestamp)?.toDate?.() ?? new Date(),
@@ -81,10 +89,16 @@ export const updateInvestment = async (
 ) => {
     const uid = getCurrentUserId();
 
-    const payload: any = { ...updates };
+    const payload: any = Object.fromEntries(
+        Object.entries(updates).filter(([key, value]) => key === "paymentMethod" || value !== undefined)
+    );
 
     if (updates.date)
         payload.date = Timestamp.fromDate(updates.date);
+
+    if (Object.prototype.hasOwnProperty.call(updates, "paymentMethod")) {
+        payload.paymentMethod = updates.paymentMethod ?? deleteField();
+    }
 
     await updateDoc(
         doc(db, 'users', uid, TABLE_NAME, investmentId),
