@@ -39,6 +39,7 @@ export default function AccountsInsightsSection({
     const emptyFlow: AccountMonthlyFlow = {
         incomeIn: 0,
         expenseOut: 0,
+        investmentOut: 0,
         creditCardPaymentOut: 0,
         transferIn: 0,
         transferOut: 0,
@@ -125,6 +126,7 @@ export default function AccountsInsightsSection({
                                         <Text variant="bodyMedium">{monthKey} Flow</Text>
                                         <Text variant="bodySmall">Income In: {formatCurrency(flow.incomeIn)}</Text>
                                         <Text variant="bodySmall">Expense Out: {formatCurrency(flow.expenseOut)}</Text>
+                                        <Text variant="bodySmall">Investment Out: {formatCurrency(flow.investmentOut)}</Text>
                                         <Text variant="bodySmall">
                                             Credit Card Payments: {formatCurrency(flow.creditCardPaymentOut)}
                                         </Text>
@@ -185,7 +187,7 @@ export default function AccountsInsightsSection({
                                             : ""}
                                     </Text>
                                     <Text variant="bodySmall">
-                                        This Month Charges: {formatCurrency(card.monthlyCharges)}
+                                        This Month Charges + Investments: {formatCurrency(card.monthlyCharges)}
                                     </Text>
                                     <Text variant="bodySmall">
                                         This Month Payments: {formatCurrency(card.monthlyPayments)}

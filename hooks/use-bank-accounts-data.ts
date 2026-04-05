@@ -7,11 +7,13 @@ import {
     Expense,
     Income,
     Iou,
+    Investment,
     PaymentMethod,
 } from "@/types/schema";
 import { subscribeToBankAccounts } from "@/services/bank-account-service";
 import { subscribeToIncomes } from "@/services/income-service";
 import { subscribeToExpenses } from "@/services/expense-service";
+import { subscribeToInvestments } from "@/services/investment-service";
 import { subscribeToIous } from "@/services/iou-service";
 import { subscribeToAccountTransfers } from "@/services/account-transfer-service";
 import { subscribeToPaymentMethods } from "@/services/payment-method-service";
@@ -27,6 +29,7 @@ export interface BankAccountComputed extends BankAccount {
 export interface AccountMonthlyFlow {
     incomeIn: number;
     expenseOut: number;
+    investmentOut: number;
     creditCardPaymentOut: number;
     transferIn: number;
     transferOut: number;
@@ -38,6 +41,7 @@ export const useBankAccountsData = (monthKey?: string) => {
     const [accounts, setAccounts] = useState<BankAccount[]>([]);
     const [incomes, setIncomes] = useState<Income[]>([]);
     const [expenses, setExpenses] = useState<Expense[]>([]);
+    const [investments, setInvestments] = useState<Investment[]>([]);
     const [ious, setIous] = useState<Iou[]>([]);
     const [transfers, setTransfers] = useState<AccountTransfer[]>([]);
     const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
@@ -49,6 +53,7 @@ export const useBankAccountsData = (monthKey?: string) => {
         const accountsUnsub = subscribeToBankAccounts(setAccounts);
         const incomesUnsub = subscribeToIncomes(setIncomes);
         const expensesUnsub = subscribeToExpenses(setExpenses);
+        const investmentsUnsub = subscribeToInvestments(setInvestments);
         const iousUnsub = subscribeToIous(setIous);
         const transfersUnsub = subscribeToAccountTransfers(setTransfers);
         const methodsUnsub = subscribeToPaymentMethods(setPaymentMethods);
@@ -60,6 +65,7 @@ export const useBankAccountsData = (monthKey?: string) => {
             accountsUnsub();
             incomesUnsub();
             expensesUnsub();
+            investmentsUnsub();
             iousUnsub();
             transfersUnsub();
             methodsUnsub();
@@ -102,6 +108,19 @@ export const useBankAccountsData = (monthKey?: string) => {
                     const method = paymentMethodMap[expense.paymentMethod.id];
                     if (expenseAccountId === account.id && !method?.isCreditCard) {
                         currentBalance -= expense.amount;
+                    }
+                });
+
+                investments.forEach((investment) => {
+                    const paymentMethodId = investment.paymentMethod?.id;
+                    if (!paymentMethodId) {
+                        return;
+                    }
+
+                    const investmentAccountId = paymentMethodToAccountIdMap[paymentMethodId];
+                    const method = paymentMethodMap[paymentMethodId];
+                    if (investmentAccountId === account.id && !method?.isCreditCard) {
+                        currentBalance -= investment.amount;
                     }
                 });
 
@@ -151,6 +170,7 @@ export const useBankAccountsData = (monthKey?: string) => {
         creditCardPayments,
         expenses,
         incomes,
+        investments,
         ious,
         paymentMethodMap,
         paymentMethodToAccountIdMap,
@@ -167,6 +187,7 @@ export const useBankAccountsData = (monthKey?: string) => {
             init[account.id] = {
                 incomeIn: 0,
                 expenseOut: 0,
+                investmentOut: 0,
                 creditCardPaymentOut: 0,
                 transferIn: 0,
                 transferOut: 0,
@@ -203,6 +224,27 @@ export const useBankAccountsData = (monthKey?: string) => {
 
             flow.expenseOut += expense.amount;
             flow.netFlow -= expense.amount;
+        });
+
+        investments.forEach((investment) => {
+            if (investment.monthKey !== monthKey) {
+                return;
+            }
+
+            const paymentMethodId = investment.paymentMethod?.id;
+            if (!paymentMethodId) {
+                return;
+            }
+
+            const accountId = paymentMethodToAccountIdMap[paymentMethodId];
+            const method = paymentMethodMap[paymentMethodId];
+            const flow = accountId ? init[accountId] : undefined;
+            if (!flow || method?.isCreditCard) {
+                return;
+            }
+
+            flow.investmentOut += investment.amount;
+            flow.netFlow -= investment.amount;
         });
 
         creditCardPayments.forEach((payment) => {
@@ -259,6 +301,7 @@ export const useBankAccountsData = (monthKey?: string) => {
         creditCardPayments,
         expenses,
         incomes,
+        investments,
         paymentMethodMap,
         paymentMethodToAccountIdMap,
         transfers,
