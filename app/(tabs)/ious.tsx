@@ -1,5 +1,7 @@
+import AggregateSummary from "@/components/common/aggregate-summary";
 import Header from "@/components/common/header";
 import Loading from "@/components/common/loading";
+import MonthGroupedList from "@/components/common/month-grouped-list";
 import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
 import IousFiltersModal from "@/components/filter-modals/ious-filters";
 import { useIousData } from "@/hooks/use-ious-data";
@@ -8,8 +10,8 @@ import type { IouFilters } from "@/types/common";
 import { formatCurrency } from "@/utils/number";
 import { truncateText } from "@/utils/text";
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
-import { FlatList, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { ScrollView, View } from "react-native";
 import {
     Button,
     Card,
@@ -38,9 +40,13 @@ export default function IousPage() {
     const {
         loading,
         ious,
+        aggregateTotal,
+        monthSections,
         expensesMap,
         paymentMethodsMap,
     } = useIousData(filters, showPaidItems);
+
+    const [expandedMonthKeys, setExpandedMonthKeys] = useState<string[]>([]);
 
     const showFiltersHandler = useCallback(() => {
         setFiltersVisible(true);
@@ -76,6 +82,27 @@ export default function IousPage() {
         }
     }, []);
 
+    useEffect(() => {
+        setExpandedMonthKeys(prev => {
+            const availableMonthKeys = new Set(monthSections.map(section => section.monthKey));
+            const stillExpanded = prev.filter(monthKey => availableMonthKeys.has(monthKey));
+
+            if (stillExpanded.length > 0) {
+                return stillExpanded;
+            }
+
+            return monthSections[0] ? [monthSections[0].monthKey] : [];
+        });
+    }, [monthSections]);
+
+    const toggleMonth = useCallback((monthKey: string) => {
+        setExpandedMonthKeys(prev =>
+            prev.includes(monthKey)
+                ? prev.filter(item => item !== monthKey)
+                : [...prev, monthKey]
+        );
+    }, []);
+
     if (loading || processing) {
         return <Loading />;
     }
@@ -108,16 +135,20 @@ export default function IousPage() {
                 />
             </View>
 
-            <FlatList
-                contentContainerStyle={{ paddingTop: 8, gap: 12 }}
-                data={ious}
-                keyExtractor={(item) => item.id}
-                ListEmptyComponent={
-                    <Text variant="bodyLarge" style={{ textAlign: "center", marginTop: 16 }}>
-                        No IOUs yet.
-                    </Text>
-                }
-                renderItem={({ item }) => {
+            <AggregateSummary
+                label="Filtered Outstanding IOUs"
+                itemCount={ious.length}
+                total={aggregateTotal}
+            />
+
+            <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
+                <MonthGroupedList
+                    sections={monthSections}
+                    expandedMonthKeys={expandedMonthKeys}
+                    onToggleMonth={toggleMonth}
+                    getItemKey={(item) => item.id}
+                    emptyLabel="No IOUs yet."
+                    renderItem={(item) => {
                     const expense = expensesMap[item.expense.id];
                     const paymentMethod = paymentMethodsMap[item.paymentMethod.id];
                     const amountPaid = Math.max(item.initialAmount - item.amountLeft, 0);
@@ -194,8 +225,9 @@ export default function IousPage() {
                             </Card.Content>
                         </Card>
                     );
-                }}
-            />
+                    }}
+                />
+            </ScrollView>
 
             <IousFiltersModal
                 visible={filtersVisible}

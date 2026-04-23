@@ -4,6 +4,7 @@ import { Investment, InvestmentType } from "@/types/schema";
 import { createLookupMap } from "@/utils/create-lookup-map";
 import { subscribeToInvestments } from "@/services/investment-service";
 import { subscribeToInvestmentTypes } from "@/services/investment-type-service";
+import { groupItemsByMonth } from "@/utils/month-utils";
 
 export const useInvestmentsData = (filters: InvestmentFilters) => {
     const [initialLoding, setInitialLoading] = useState<boolean>(true);
@@ -71,9 +72,23 @@ export const useInvestmentsData = (filters: InvestmentFilters) => {
         return result;
     }, [rawInvestments, filters]);
 
+    const aggregateTotal = useMemo(() => {
+        return filtered.reduce((sum, investment) => sum + investment.amount, 0);
+    }, [filtered]);
+
+    const monthSections = useMemo(() => {
+        return groupItemsByMonth(
+            filtered,
+            investment => investment.monthKey,
+            investment => investment.amount,
+        );
+    }, [filtered]);
+
     return {
         loading: initialLoding,
         investments: filtered,
+        aggregateTotal,
+        monthSections,
         typeMap,
     };
 };

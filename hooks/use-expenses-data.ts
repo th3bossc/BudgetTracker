@@ -6,6 +6,7 @@ import { ExpenseFilters } from "@/types/common";
 import { Expense, ExpenseCategory, Iou, PaymentMethod } from "@/types/schema";
 import { createLookupMap } from "@/utils/create-lookup-map";
 import { getIouOutstandingAmount, getIouRecoveredAmount } from "@/utils/iou";
+import { groupItemsByMonth } from "@/utils/month-utils";
 import { useEffect, useMemo, useState } from "react";
 
 export const useExpensesData = (filters: ExpenseFilters) => {
@@ -101,9 +102,26 @@ export const useExpensesData = (filters: ExpenseFilters) => {
         return result;
     }, [rawExpenses, filters]);
 
+    const aggregateTotal = useMemo(() => {
+        return filteredExpenses.reduce((sum, expense) => {
+            const recovered = expenseRecoveryMap[expense.id] ?? 0;
+            return sum + Math.max(expense.amount - recovered, 0);
+        }, 0);
+    }, [expenseRecoveryMap, filteredExpenses]);
+
+    const monthSections = useMemo(() => {
+        return groupItemsByMonth(
+            filteredExpenses,
+            expense => expense.monthKey,
+            expense => Math.max(expense.amount - (expenseRecoveryMap[expense.id] ?? 0), 0),
+        );
+    }, [expenseRecoveryMap, filteredExpenses]);
+
     return {
         loading: initialLoading,
         expenses: filteredExpenses,
+        aggregateTotal,
+        monthSections,
         categoriesMap,
         paymentMethodsMap,
         expenseRecoveryMap,

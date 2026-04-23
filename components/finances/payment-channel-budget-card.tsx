@@ -32,16 +32,18 @@ export default function PaymentChannelBudgetCard({
     }, [percentage, animatedValue]);
 
     const barColor = useMemo(() => {
+        if (amountUsed < 0) return theme.colors.primary;
         if (percentage >= 1) return theme.colors.error;
         if (percentage >= 0.9) return theme.colors.secondary;
         return theme.colors.primary;
-    }, [theme, percentage]);
+    }, [amountUsed, theme, percentage]);
 
     const barText = useMemo(() => {
+        if (amountUsed < 0) return "Net recovery exceeds this month's spend";
         if (percentage >= 1) return "Exceeded budget limit";
         if (percentage >= 0.9) return "Approaching budget limit";
         return "";
-    }, [percentage]);
+    }, [amountUsed, percentage]);
 
     return (
         <Card style={{ marginBottom: 16 }}>
@@ -53,14 +55,8 @@ export default function PaymentChannelBudgetCard({
                 <View style={{ marginTop: 6 }}>
                     <Text variant="bodySmall">
                         {formatCurrency(amountUsed)} / {formatCurrency(budgetAmount)} (
-                        {formatNumber(percentage * 100)}%)
+                        {formatNumber((budgetAmount > 0 ? amountUsed / budgetAmount : 0) * 100)}%)
                     </Text>
-
-                    {amountUsed < 0 && (
-                        <Text variant="bodySmall" style={{ color: theme.colors.primary }}>
-                            Credit balance: {formatCurrency(Math.abs(amountUsed))}
-                        </Text>
-                    )}
 
                     {amountPending > 0 && (
                         <Text variant="bodySmall">
@@ -68,10 +64,10 @@ export default function PaymentChannelBudgetCard({
                         </Text>
                     )}
 
-                    {percentage >= 0.9 && (
+                    {(amountUsed < 0 || percentage >= 0.9) && (
                         <Text
                             variant="bodySmall"
-                            style={{ color: theme.colors.error }}
+                            style={{ color: amountUsed < 0 ? theme.colors.primary : theme.colors.error }}
                         >
                             ⚠ {barText}
                         </Text>

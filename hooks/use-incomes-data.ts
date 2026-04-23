@@ -4,6 +4,7 @@ import { Income, IncomeSource } from "@/types/schema";
 import { subscribeToIncomes } from "@/services/income-service";
 import { subscribeToIncomeSources } from "@/services/income-source-service";
 import { createLookupMap } from "@/utils/create-lookup-map";
+import { groupItemsByMonth } from "@/utils/month-utils";
 
 export const useIncomesData = (filters: IncomeFilters) => {
     const [rawIncomes, setRawIncomes] = useState<Income[]>([])
@@ -71,9 +72,23 @@ export const useIncomesData = (filters: IncomeFilters) => {
         return result;
     }, [rawIncomes, filters]);
 
+    const aggregateTotal = useMemo(() => {
+        return filteredIncomes.reduce((sum, income) => sum + income.amount, 0);
+    }, [filteredIncomes]);
+
+    const monthSections = useMemo(() => {
+        return groupItemsByMonth(
+            filteredIncomes,
+            income => income.monthKey,
+            income => income.amount,
+        );
+    }, [filteredIncomes]);
+
     return {
         loading: initialLoading,
         incomes: filteredIncomes,
+        aggregateTotal,
+        monthSections,
         sourcesMap,
     };
 };

@@ -2,11 +2,16 @@ import React, { useMemo } from "react";
 import { View, useWindowDimensions } from "react-native";
 import { PieChart } from "react-native-chart-kit";
 import { Text, useTheme } from "react-native-paper";
+import { formatCurrency } from "@/utils/number";
 import SectionHeader from "../dashboard/section-header";
 
 type Props = {
     title: string;
     data: {
+        name: string;
+        amount: number;
+    }[];
+    negativeData?: {
         name: string;
         amount: number;
     }[];
@@ -23,7 +28,7 @@ function generateColors(count: number) {
     return colors;
 }
 
-export default function ExpensePieChart({ title, data }: Props) {
+export default function ExpensePieChart({ title, data, negativeData = [] }: Props) {
     const theme = useTheme();
     const { width } = useWindowDimensions();
     const visibleData = useMemo(
@@ -85,6 +90,19 @@ export default function ExpensePieChart({ title, data }: Props) {
 
                     </View>
                 ))}
+
+                {negativeData.length > 0 && (
+                    <View style={{ marginTop: 12, gap: 6 }}>
+                        <Text variant="titleSmall" style={{ color: theme.colors.primary }}>
+                            Net Negative Values
+                        </Text>
+                        {negativeData.map((item) => (
+                            <Text key={item.name} variant="bodySmall">
+                                {item.name}: {formatCurrency(item.amount)}
+                            </Text>
+                        ))}
+                    </View>
+                )}
             </View>
         </View>
     );

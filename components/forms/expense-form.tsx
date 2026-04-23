@@ -70,10 +70,12 @@ export default function ExpenseForm({
             return;
         }
 
+        const selectedCategory = categories.find(item => item.id === categoryId);
+
         await onSubmit({
             amount: Number(amount),
             description,
-            category: { id: categoryId },
+            category: { id: categoryId, name: selectedCategory?.name },
             paymentMethod: { id: paymentMethodId },
             date,
             monthKey: getMonthKey(date),

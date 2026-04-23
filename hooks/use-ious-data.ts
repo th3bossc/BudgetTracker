@@ -4,6 +4,7 @@ import { subscribeToPaymentMethods } from "@/services/payment-method-service";
 import type { IouFilters } from "@/types/common";
 import type { Expense, Iou, PaymentMethod } from "@/types/schema";
 import { createLookupMap } from "@/utils/create-lookup-map";
+import { groupItemsByMonth } from "@/utils/month-utils";
 import { useEffect, useMemo, useState } from "react";
 
 export const useIousData = (filters: IouFilters, showPaidItems: boolean) => {
@@ -98,9 +99,23 @@ export const useIousData = (filters: IouFilters, showPaidItems: boolean) => {
         return result;
     }, [rawIous, filters, showPaidItems]);
 
+    const aggregateTotal = useMemo(() => {
+        return filteredIous.reduce((sum, iou) => sum + iou.amountLeft, 0);
+    }, [filteredIous]);
+
+    const monthSections = useMemo(() => {
+        return groupItemsByMonth(
+            filteredIous,
+            iou => iou.createdMonthKey || iou.expenseMonthKey || "",
+            iou => iou.amountLeft,
+        );
+    }, [filteredIous]);
+
     return {
         loading: initialLoading,
         ious: filteredIous,
+        aggregateTotal,
+        monthSections,
         expensesMap,
         paymentMethodsMap,
     };

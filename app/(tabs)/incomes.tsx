@@ -1,5 +1,7 @@
+import AggregateSummary from "@/components/common/aggregate-summary";
 import Header from "@/components/common/header";
 import Loading from "@/components/common/loading";
+import MonthGroupedList from "@/components/common/month-grouped-list";
 import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
 import IncomeFiltersModal from "@/components/filter-modals/incomes-filters";
 import { useIncomesData } from "@/hooks/use-incomes-data";
@@ -8,8 +10,8 @@ import type { IncomeFilters } from "@/types/common";
 import { formatCurrency } from "@/utils/number";
 import { truncateText } from "@/utils/text";
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
-import { FlatList, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { ScrollView, View } from "react-native";
 import {
     Card,
     Chip,
@@ -37,8 +39,12 @@ export default function IncomeListPage() {
     const {
         loading,
         incomes,
+        aggregateTotal,
+        monthSections,
         sourcesMap,
     } = useIncomesData(filters);
+
+    const [expandedMonthKeys, setExpandedMonthKeys] = useState<string[]>([]);
 
     const showFiltersHandler = useCallback(() => {
         setFiltersVisible(true);
@@ -63,6 +69,27 @@ export default function IncomeListPage() {
 
     const handleCancelDelete = useCallback(() => setDeleteId(null), []);
 
+    useEffect(() => {
+        setExpandedMonthKeys(prev => {
+            const availableMonthKeys = new Set(monthSections.map(section => section.monthKey));
+            const stillExpanded = prev.filter(monthKey => availableMonthKeys.has(monthKey));
+
+            if (stillExpanded.length > 0) {
+                return stillExpanded;
+            }
+
+            return monthSections[0] ? [monthSections[0].monthKey] : [];
+        });
+    }, [monthSections]);
+
+    const toggleMonth = useCallback((monthKey: string) => {
+        setExpandedMonthKeys(prev =>
+            prev.includes(monthKey)
+                ? prev.filter(item => item !== monthKey)
+                : [...prev, monthKey]
+        );
+    }, []);
+
     if (loading || deleting) {
         return <Loading />
     }
@@ -80,11 +107,20 @@ export default function IncomeListPage() {
                 onPress={showFiltersHandler}
             />
 
-            <FlatList
-                contentContainerStyle={{ gap: 12 }}
-                data={incomes}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
+            <AggregateSummary
+                label="Filtered Income"
+                itemCount={incomes.length}
+                total={aggregateTotal}
+            />
+
+            <ScrollView contentContainerStyle={{ paddingBottom: 96 }}>
+                <MonthGroupedList
+                    sections={monthSections}
+                    expandedMonthKeys={expandedMonthKeys}
+                    onToggleMonth={toggleMonth}
+                    getItemKey={(item) => item.id}
+                    emptyLabel="No incomes found."
+                    renderItem={(item) => (
                     <Card onPress={() => router.push(`/income/${item.id}`)}>
                         <Card.Content>
 
@@ -128,8 +164,9 @@ export default function IncomeListPage() {
 
                         </Card.Content>
                     </Card>
-                )}
-            />
+                    )}
+                />
+            </ScrollView>
 
             <FAB
                 icon="plus"

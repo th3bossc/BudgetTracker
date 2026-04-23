@@ -19,37 +19,44 @@ export default function CategoryBudgetCard({
     amountYetToGetBack,
 }: Props) {
     const theme = useTheme();
+    const normalizedUsed = Math.max(amountUsed, 0);
 
     const percentage =
         budgetAmount > 0 ? amountUsed / budgetAmount : 0;
+    const visualPercentage =
+        budgetAmount > 0 ? normalizedUsed / budgetAmount : 0;
 
     const animatedValue = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         Animated.timing(animatedValue, {
-            toValue: Math.min(percentage, 1),
+            toValue: Math.min(visualPercentage, 1),
             duration: 600,
             useNativeDriver: true,
         }).start();
-    }, [percentage, animatedValue]);
+    }, [visualPercentage, animatedValue]);
 
     const barColor = useMemo(() => {
+        if (amountUsed < 0)
+            return theme.colors.primary;
         if (percentage >= 1)
             return theme.colors.error;
         else if (percentage >= 0.9)
             return theme.colors.secondary;
 
         return theme.colors.primary;
-    }, [theme, percentage]);
+    }, [amountUsed, theme, percentage]);
 
     const barText = useMemo(() => {
+        if (amountUsed < 0)
+            return 'Net recovery exceeds this month\'s spend';
         if (percentage >= 1)
             return 'Exceeded budget limit';
         else if (percentage >= 0.9)
             return 'Approaching budget limit';
 
         return '';
-    }, [percentage])
+    }, [amountUsed, percentage])
 
 
     return (
@@ -73,10 +80,10 @@ export default function CategoryBudgetCard({
                         </Text>
                     )}
 
-                    {percentage >= 0.9 && (
+                    {(amountUsed < 0 || percentage >= 0.9) && (
                         <Text
                             variant="bodySmall"
-                            style={{ color: theme.colors.error }}
+                            style={{ color: amountUsed < 0 ? theme.colors.primary : theme.colors.error }}
                         >
                             ⚠ {barText}
                         </Text>

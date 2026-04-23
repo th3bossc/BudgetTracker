@@ -4,6 +4,14 @@ export interface MonthlyAggregate {
     auxiliaryTotal?: number;
 }
 
+export interface MonthSection<T> {
+    monthKey: string;
+    label: string;
+    total: number;
+    count: number;
+    items: T[];
+}
+
 export interface ExpenseFilters {
     categoryId?: string;
     paymentMethodId?: string;
