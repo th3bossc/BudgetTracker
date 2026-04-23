@@ -9,6 +9,7 @@ import { getIouRecoveredAmount } from "@/utils/iou";
 
 export interface CreditCardComputed extends PaymentMethod {
     amountUsed: number;
+    creditBalance: number;
     liabilityBalance: number;
     availableCredit: number | null;
     isOverLimit: boolean;
@@ -61,6 +62,7 @@ export const useCreditCardData = (monthKey?: string) => {
                     .reduce((sum, item) => sum + getIouRecoveredAmount(item), 0);
                 const liabilityBalance = totalCharges - totalPayments - totalRecoveries;
                 const amountUsed = Math.max(liabilityBalance, 0);
+                const creditBalance = Math.max(-liabilityBalance, 0);
                 const availableCredit = typeof method.creditLimit === "number"
                     ? method.creditLimit - amountUsed
                     : null;
@@ -83,6 +85,7 @@ export const useCreditCardData = (monthKey?: string) => {
                 return {
                     ...method,
                     amountUsed,
+                    creditBalance,
                     liabilityBalance,
                     availableCredit,
                     isOverLimit: typeof method.creditLimit === "number"

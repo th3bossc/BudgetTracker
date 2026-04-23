@@ -75,6 +75,40 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
 
             try {
                 const getIouMonthKey = (iou: Iou) => iou.createdMonthKey || iou.expenseMonthKey;
+                const normalizeCategoryName = (name?: string) => name?.trim().toLowerCase() ?? "";
+
+                const categoryNameCount = categories.reduce<Record<string, number>>((acc, category) => {
+                    const normalizedName = normalizeCategoryName(category.name);
+                    if (!normalizedName)
+                        return acc;
+
+                    acc[normalizedName] = (acc[normalizedName] ?? 0) + 1;
+                    return acc;
+                }, {});
+
+                const categoryIds = new Set(categories.map(category => category.id));
+                const categoryByNormalizedName = categories.reduce<Record<string, ExpenseCategory>>((acc, category) => {
+                    const normalizedName = normalizeCategoryName(category.name);
+                    if (!normalizedName || categoryNameCount[normalizedName] !== 1)
+                        return acc;
+
+                    acc[normalizedName] = category;
+                    return acc;
+                }, {});
+
+                const resolveCategoryId = (categoryRef?: { id: string, name?: string }) => {
+                    if (!categoryRef)
+                        return null;
+
+                    if (categoryIds.has(categoryRef.id))
+                        return categoryRef.id;
+
+                    const normalizedName = normalizeCategoryName(categoryRef.name);
+                    if (!normalizedName)
+                        return null;
+
+                    return categoryByNormalizedName[normalizedName]?.id ?? null;
+                };
 
                 const currentIncome = incomes
                     .filter(i => i.monthKey == monthKey)
@@ -106,7 +140,11 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
                 })
 
                 const budgetsMap = budgets.reduce<Record<string, CategoryBudget>>((acc, item) => {
-                    acc[item.category.id] = item;
+                    const resolvedCategoryId = resolveCategoryId(item.category);
+                    if (!resolvedCategoryId)
+                        return acc;
+
+                    acc[resolvedCategoryId] = item;
                     return acc;
                 }, {});
 
@@ -123,8 +161,12 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
                     if (!expense)
                         return acc;
 
+                    const resolvedCategoryId = resolveCategoryId(expense.category);
+                    if (!resolvedCategoryId)
+                        return acc;
+
                     const outstanding = getIouOutstandingAmount(iou);
-                    acc[expense.category.id] = (acc[expense.category.id] ?? 0) + outstanding;
+                    acc[resolvedCategoryId] = (acc[resolvedCategoryId] ?? 0) + outstanding;
                     return acc;
                 }, {});
 
@@ -136,19 +178,23 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
                     if (!expense)
                         return acc;
 
+                    const resolvedCategoryId = resolveCategoryId(expense.category);
+                    if (!resolvedCategoryId)
+                        return acc;
+
                     const recovered = getIouRecoveredAmount(iou);
-                    acc[expense.category.id] = (acc[expense.category.id] ?? 0) + recovered;
+                    acc[resolvedCategoryId] = (acc[resolvedCategoryId] ?? 0) + recovered;
                     return acc;
                 }, {});
 
                 const budgetUsedInfo: BudgetUsed[] = categories.map(c => {
                     const totalSpent = expenses
-                        .filter(i => i.monthKey == monthKey && i.category.id == c.id)
+                        .filter(i => i.monthKey == monthKey && resolveCategoryId(i.category) == c.id)
                         .reduce((sum, i) => sum + i.amount, 0);
 
                     const amountYetToGetBack = iouOutstandingByCategory[c.id] ?? 0;
                     const totalRecovered = iouRecoveredByCategory[c.id] ?? 0;
-                    const amountUsed = Math.max(totalSpent - totalRecovered, 0);
+                    const amountUsed = totalSpent - totalRecovered;
                     const budget = budgetsMap[c.id]?.amount ?? 0;
                     return {
                         category: c,
@@ -169,7 +215,7 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
         }
 
         void fetchData();
-    }, [financeConfigLoadingStatus, monthKey, incomes, expenses, investments, ious, budgets]);
+    }, [financeConfigLoadingStatus, monthKey, incomes, expenses, investments, ious, budgets, categories]);
 
     return {
         loading,

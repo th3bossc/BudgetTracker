@@ -1,10 +1,9 @@
-import { CreditCardPayment, Expense, Iou, PaymentChannelBudget, PaymentMethod } from "@/types/schema";
+import { Expense, Iou, PaymentChannelBudget, PaymentMethod } from "@/types/schema";
 import { useEffect, useMemo, useState } from "react";
 import { useFinanceConfig } from "./use-finance-config";
 import { subscribeToExpenses } from "@/services/expense-service";
 import { subscribeToIous } from "@/services/iou-service";
 import { subscribeToMonthlyPaymentChannelBudgets } from "@/services/payment-channel-budget-service";
-import { subscribeToCreditCardPayments } from "@/services/credit-card-payment-service";
 import { getIouOutstandingAmount, getIouRecoveredAmount } from "@/utils/iou";
 
 export interface PaymentChannelBudgetUsed {
@@ -31,7 +30,6 @@ export const useMonthlyPaymentChannelBudgetData = (monthKey: string): MonthlyPay
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [ious, setIous] = useState<Iou[]>([]);
     const [budgets, setBudgets] = useState<PaymentChannelBudget[]>([]);
-    const [creditCardPayments, setCreditCardPayments] = useState<CreditCardPayment[]>([]);
 
     const loading = useMemo(() => computationLoading || configLoading, [computationLoading, configLoading]);
 
@@ -39,13 +37,11 @@ export const useMonthlyPaymentChannelBudgetData = (monthKey: string): MonthlyPay
         const expensesUnsub = subscribeToExpenses(setExpenses);
         const iousUnsub = subscribeToIous(setIous);
         const budgetsUnsub = subscribeToMonthlyPaymentChannelBudgets(monthKey, setBudgets);
-        const creditCardPaymentsUnsub = subscribeToCreditCardPayments(setCreditCardPayments);
 
         return () => {
             expensesUnsub();
             iousUnsub();
             budgetsUnsub();
-            creditCardPaymentsUnsub();
         };
     }, [monthKey]);
 
@@ -71,12 +67,8 @@ export const useMonthlyPaymentChannelBudgetData = (monthKey: string): MonthlyPay
                 if (getIouMonthKey(iou) !== monthKey)
                     return acc;
 
-                const expense = expensesById[iou.expense.id];
-                if (!expense)
-                    return acc;
-
                 const recovered = getIouRecoveredAmount(iou);
-                const methodId = expense.paymentMethod.id;
+                const methodId = iou.paymentMethod.id;
                 acc[methodId] = (acc[methodId] ?? 0) + recovered;
                 return acc;
             }, {});
@@ -95,30 +87,14 @@ export const useMonthlyPaymentChannelBudgetData = (monthKey: string): MonthlyPay
                 return acc;
             }, {});
 
-            const iouRecoveredToPaymentMethod = ious.reduce<Record<string, number>>((acc, iou) => {
-                const recovered = getIouRecoveredAmount(iou);
-                if (recovered <= 0 || iou.paymentMethod.id === undefined) {
-                    return acc;
-                }
-
-                acc[iou.paymentMethod.id] = (acc[iou.paymentMethod.id] ?? 0) + recovered;
-                return acc;
-            }, {});
-
             const computed: PaymentChannelBudgetUsed[] = paymentMethods.map(method => {
                 const totalSpent = expenses
                     .filter(item => item.monthKey === monthKey && item.paymentMethod.id === method.id)
                     .reduce((sum, item) => sum + item.amount, 0);
-                const totalPayments = creditCardPayments
-                    .filter(item => item.monthKey === monthKey && item.paymentMethod.id === method.id)
-                    .reduce((sum, item) => sum + item.amount, 0);
 
                 const recovered = iouRecoveredByMethod[method.id] ?? 0;
-                const recoveredToCard = iouRecoveredToPaymentMethod[method.id] ?? 0;
                 const pending = iouPendingByMethod[method.id] ?? 0;
-                const amountUsed = method.isCreditCard
-                    ? totalSpent - totalPayments - recoveredToCard
-                    : Math.max(totalSpent - recovered, 0);
+                const amountUsed = totalSpent - recovered;
 
                 return {
                     paymentMethod: method,
@@ -134,7 +110,7 @@ export const useMonthlyPaymentChannelBudgetData = (monthKey: string): MonthlyPay
         } finally {
             setComputationLoading(false);
         }
-    }, [configLoading, monthKey, budgets, creditCardPayments, expenses, ious, paymentMethods]);
+    }, [configLoading, monthKey, budgets, expenses, ious, paymentMethods]);
 
     return {
         budgetUsed,

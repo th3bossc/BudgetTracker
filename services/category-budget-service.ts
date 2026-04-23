@@ -73,6 +73,7 @@ export const getBudgetsByMonth = async (monthKey: string): Promise<CategoryBudge
 
 export const upsertBudget = async (
     categoryId: string,
+    categoryName: string | undefined,
     monthKey: string,
     amount: number
 ) => {
@@ -85,13 +86,19 @@ export const upsertBudget = async (
     if (existing) {
         await updateDoc(
             doc(db, "users", uid, TABLE_NAME, existing.id),
-            { amount }
+            {
+                amount,
+                category: {
+                    id: categoryId,
+                    name: categoryName,
+                },
+            }
         );
     } else {
         await addDoc(
             collection(db, "users", uid, TABLE_NAME),
             {
-                category: { id: categoryId },
+                category: { id: categoryId, name: categoryName },
                 monthKey,
                 amount,
                 createdAt: serverTimestamp(),
@@ -138,4 +145,3 @@ export const subscribeToMonthlyBudgets = (
 
     return unsubscribe;
 };
-

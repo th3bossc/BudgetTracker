@@ -1,5 +1,7 @@
+import AggregateSummary from "@/components/common/aggregate-summary";
 import Header from "@/components/common/header";
 import Loading from "@/components/common/loading";
+import MonthGroupedList from "@/components/common/month-grouped-list";
 import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
 import ExpenseFiltersModal from "@/components/filter-modals/expense-filter";
 import { useExpensesData } from "@/hooks/use-expenses-data";
@@ -8,8 +10,8 @@ import { ExpenseFilters } from "@/types/common";
 import { formatCurrency } from "@/utils/number";
 import { truncateText } from "@/utils/text";
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
-import { FlatList, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { ScrollView, View } from "react-native";
 import {
     Card,
     Chip,
@@ -37,11 +39,15 @@ export default function ExpenseListPage() {
     const {
         loading,
         expenses,
+        aggregateTotal,
+        monthSections,
         categoriesMap,
         paymentMethodsMap,
         expenseRecoveryMap,
         expenseOutstandingMap,
     } = useExpensesData(filters);
+
+    const [expandedMonthKeys, setExpandedMonthKeys] = useState<string[]>([]);
 
     const showFiltersHandler = useCallback(() => {
         setFiltersVisible(true);
@@ -67,6 +73,27 @@ export default function ExpenseListPage() {
         }
     }, [deleteId]);
 
+    useEffect(() => {
+        setExpandedMonthKeys(prev => {
+            const availableMonthKeys = new Set(monthSections.map(section => section.monthKey));
+            const stillExpanded = prev.filter(monthKey => availableMonthKeys.has(monthKey));
+
+            if (stillExpanded.length > 0) {
+                return stillExpanded;
+            }
+
+            return monthSections[0] ? [monthSections[0].monthKey] : [];
+        });
+    }, [monthSections]);
+
+    const toggleMonth = useCallback((monthKey: string) => {
+        setExpandedMonthKeys(prev =>
+            prev.includes(monthKey)
+                ? prev.filter(item => item !== monthKey)
+                : [...prev, monthKey]
+        );
+    }, []);
+
     if (loading || deleteing) {
         return <Loading />
     }
@@ -83,11 +110,20 @@ export default function ExpenseListPage() {
                 onPress={showFiltersHandler}
             />
 
-            <FlatList
-                contentContainerStyle={{ gap: 12 }}
-                data={expenses}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => {
+            <AggregateSummary
+                label="Filtered Net Expense"
+                itemCount={expenses.length}
+                total={aggregateTotal}
+            />
+
+            <ScrollView contentContainerStyle={{ paddingBottom: 96 }}>
+                <MonthGroupedList
+                    sections={monthSections}
+                    expandedMonthKeys={expandedMonthKeys}
+                    onToggleMonth={toggleMonth}
+                    getItemKey={(item) => item.id}
+                    emptyLabel="No expenses found."
+                    renderItem={(item) => {
                     const recoveredAmount = expenseRecoveryMap[item.id] ?? 0;
                     const amountYetToGetBack = expenseOutstandingMap[item.id] ?? 0;
                     const hasIouAttached = recoveredAmount > 0 || amountYetToGetBack > 0;
@@ -186,8 +222,9 @@ export default function ExpenseListPage() {
                             </Card.Content>
                         </Card>
                     )
-                }}
-            />
+                    }}
+                />
+            </ScrollView>
 
             <FAB
                 icon="plus"

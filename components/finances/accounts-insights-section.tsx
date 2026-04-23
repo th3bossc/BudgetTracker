@@ -173,8 +173,8 @@ export default function AccountsInsightsSection({
                                                     : theme.colors.primaryContainer,
                                             }}
                                         >
-                                            {card.liabilityBalance < 0
-                                                ? "Credit"
+                                            {card.creditBalance > 0
+                                                ? "Paid Off"
                                                 : card.isOverLimit
                                                     ? "Over Limit"
                                                     : "Active"}
@@ -192,6 +192,11 @@ export default function AccountsInsightsSection({
                                     <Text variant="bodySmall">
                                         This Month Payments: {formatCurrency(card.monthlyPayments)}
                                     </Text>
+                                    {card.creditBalance > 0 && (
+                                        <Text variant="bodySmall">
+                                            Credit Carried Forward: {formatCurrency(card.creditBalance)}
+                                        </Text>
+                                    )}
                                     <Text variant="bodySmall">
                                         Available Balance: {formatCurrency(card.availableCredit ?? 0)}
                                     </Text>

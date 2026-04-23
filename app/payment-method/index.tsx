@@ -50,7 +50,10 @@ export default function PaymentMethodListPage() {
                 contentContainerStyle={{ padding: 16, gap: 12 }}
                 data={paymentMethods}
                 keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
+                renderItem={({ item }) => {
+                    const creditCard = creditCardMap[item.id];
+
+                    return (
                     <Card
                         onPress={() =>
                             router.push(`/payment-method/${item.id}`)
@@ -77,16 +80,16 @@ export default function PaymentMethodListPage() {
                                             {bankAccountsMap[item.bankAccount.id] ?? "Unknown account"}
                                         </Text>
                                     ) : null}
-                                    {item.isCreditCard && creditCardMap[item.id] ? (
+                                    {item.isCreditCard && creditCard ? (
                                         <>
                                             <Text variant="bodySmall">
-                                                Used: {formatCurrency(creditCardMap[item.id].amountUsed)}
-                                                {typeof creditCardMap[item.id].creditLimit === "number"
-                                                    ? ` / ${formatCurrency(creditCardMap[item.id].creditLimit)}`
+                                                Used: {formatCurrency(creditCard.amountUsed)}
+                                                {typeof creditCard.creditLimit === "number"
+                                                    ? ` / ${formatCurrency(creditCard.creditLimit)}`
                                                     : ""}
                                             </Text>
                                             <Text variant="bodySmall">
-                                                Available: {formatCurrency(creditCardMap[item.id].availableCredit ?? 0)}
+                                                Available: {formatCurrency(creditCard.availableCredit ?? 0)}
                                             </Text>
                                         </>
                                     ) : null}
@@ -116,7 +119,7 @@ export default function PaymentMethodListPage() {
                             </View>
                         </Card.Content>
                     </Card>
-                )}
+                )}}
             />
 
             <FAB

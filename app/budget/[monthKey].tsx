@@ -33,7 +33,7 @@ export default function BulkBudgetEditPage() {
 
             if (!amount || amount <= 0) continue;
 
-            await upsertBudget(row.categoryId, monthKey, amount);
+            await upsertBudget(row.categoryId, row.categoryName, monthKey, amount);
         }
 
         router.back();
