@@ -40,14 +40,14 @@ export default function PaymentMethodListPage() {
     const backAction = useCallback(() => router.back(), [router]);
 
     return (
-        <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
             <Appbar.Header statusBarHeight={0}>
                 <Appbar.BackAction onPress={backAction} />
                 <Appbar.Content title="Payment Methods" />
             </Appbar.Header>
 
             <FlatList
-                contentContainerStyle={{ padding: 16, gap: 12 }}
+                contentContainerStyle={{ padding: 16, paddingBottom: 96, gap: 12 }}
                 data={paymentMethods}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => {

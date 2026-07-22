@@ -46,14 +46,14 @@ export default function BulkPaymentChannelBudgetEditPage() {
     }
 
     return (
-        <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
             <Appbar.Header statusBarHeight={0}>
                 <Appbar.BackAction onPress={() => router.back()} />
                 <Appbar.Content title="Edit Payment Channel Budgets" />
             </Appbar.Header>
 
             <FlatList
-                contentContainerStyle={{ padding: 16, gap: 16 }}
+                contentContainerStyle={{ padding: 16, paddingBottom: 96, gap: 16 }}
                 data={rows}
                 keyExtractor={(item) => item.paymentMethodId}
                 renderItem={({ item }) => (
