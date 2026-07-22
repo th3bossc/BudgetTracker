@@ -28,14 +28,14 @@ export default function InvestmentTypesListPage() {
     const backAction = useCallback(() => router.back(), [router]);
 
     return (
-        <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
             <Appbar.Header statusBarHeight={0}>
                 <Appbar.BackAction onPress={backAction} />
                 <Appbar.Content title="Investment Types" />
             </Appbar.Header>
 
             <FlatList
-                contentContainerStyle={{ padding: 16, gap: 12 }}
+                contentContainerStyle={{ padding: 16, paddingBottom: 96, gap: 12 }}
                 data={investmentTypes}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (

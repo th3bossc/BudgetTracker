@@ -46,14 +46,14 @@ export default function BulkBudgetEditPage() {
     }
 
     return (
-        <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
             <Appbar.Header statusBarHeight={0}>
                 <Appbar.BackAction onPress={() => router.back()} />
                 <Appbar.Content title="Edit Category Budgets" />
             </Appbar.Header>
 
             <FlatList
-                contentContainerStyle={{ padding: 16, gap: 16 }}
+                contentContainerStyle={{ padding: 16, paddingBottom: 96, gap: 16 }}
                 data={rows}
                 keyExtractor={(item) => item.categoryId}
                 renderItem={({ item }) => (
