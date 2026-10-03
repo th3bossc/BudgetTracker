@@ -12,6 +12,8 @@ import {
     useTheme
 } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { View } from "react-native";
+import { Text } from "react-native-paper";
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -32,7 +34,12 @@ export default function RegisterPage() {
 
     return (
         <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
-            <Surface style={{ flex: 1, padding: 20, gap: 20, justifyContent: 'center' }}>
+            <Surface style={{ flex: 1, padding: 24, gap: 18, justifyContent: 'center', backgroundColor: theme.colors.background }}>
+                <View style={{ marginBottom: 8, gap: 7 }}>
+                    <Text variant="labelLarge" style={{ color: theme.colors.primary, fontWeight: '800', letterSpacing: 1.4 }}>GET STARTED</Text>
+                    <Text variant="headlineMedium" style={{ fontWeight: '800', letterSpacing: -0.8 }}>Build a clearer money picture.</Text>
+                    <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant }}>Create an account to start tracking.</Text>
+                </View>
                 <Header
                     title="Register"
                     flushed
@@ -56,7 +63,7 @@ export default function RegisterPage() {
                     <HelperText type="error">{error}</HelperText>
                 ) : null}
 
-                <Button mode="contained" onPress={handleRegister}>
+                <Button mode="contained" onPress={handleRegister} contentStyle={{ paddingVertical: 7 }}>
                     Create Account
                 </Button>
             </Surface>

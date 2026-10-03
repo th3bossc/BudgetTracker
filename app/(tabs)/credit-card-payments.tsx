@@ -1,4 +1,5 @@
 import Header from "@/components/common/header";
+import TransactionRow from "@/components/common/transaction-row";
 import Loading from "@/components/common/loading";
 import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
@@ -12,7 +13,7 @@ import { truncateText } from "@/utils/text";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList, View } from "react-native";
-import { Card, Chip, FAB, IconButton, Text, useTheme } from "react-native-paper";
+import { Chip, FAB, IconButton, Text, useTheme } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CreditCardPaymentsPage() {
@@ -72,7 +73,7 @@ export default function CreditCardPaymentsPage() {
         <SafeAreaView
             style={{
                 flex: 1,
-                paddingHorizontal: 16,
+                paddingHorizontal: 20,
                 backgroundColor: theme.colors.background,
             }}
         >
@@ -92,19 +93,7 @@ export default function CreditCardPaymentsPage() {
                     const bankAccount = bankAccountsMap[item.bankAccount.id];
 
                     return (
-                        <Card>
-                            <Card.Content>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                                    <Text variant="titleMedium">{formatCurrency(item.amount)}</Text>
-                                    <Text variant="bodySmall">{item.date.toDateString()}</Text>
-                                </View>
-
-                                {item.description ? (
-                                    <Text variant="bodyMedium" style={{ marginTop: 6 }}>
-                                        {item.description}
-                                    </Text>
-                                ) : null}
-
+                        <TransactionRow amount={formatCurrency(item.amount)} date={item.date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })} title={item.description}>
                                 <Text variant="bodySmall" style={{ marginTop: 6 }}>
                                     Month: {item.monthKey}
                                 </Text>
@@ -142,8 +131,7 @@ export default function CreditCardPaymentsPage() {
                                         />
                                     </View>
                                 </View>
-                            </Card.Content>
-                        </Card>
+                        </TransactionRow>
                     );
                 }}
             />

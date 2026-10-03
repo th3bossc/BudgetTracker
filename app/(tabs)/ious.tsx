@@ -1,4 +1,5 @@
 import AggregateSummary from "@/components/common/aggregate-summary";
+import TransactionRow from "@/components/common/transaction-row";
 import Header from "@/components/common/header";
 import Loading from "@/components/common/loading";
 import MonthGroupedList from "@/components/common/month-grouped-list";
@@ -14,7 +15,6 @@ import { useCallback, useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 import {
     Button,
-    Card,
     Chip,
     IconButton,
     Switch,
@@ -110,7 +110,7 @@ export default function IousPage() {
     return (
         <SafeAreaView style={{
             flex: 1,
-            padding: 16,
+            paddingHorizontal: 20,
             backgroundColor: theme.colors.background,
         }}>
             <Header
@@ -141,7 +141,7 @@ export default function IousPage() {
                 total={aggregateTotal}
             />
 
-            <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
+            <ScrollView contentContainerStyle={{ paddingBottom: 112, paddingTop: 4 }} showsVerticalScrollIndicator={false}>
                 <MonthGroupedList
                     sections={monthSections}
                     expandedMonthKeys={expandedMonthKeys}
@@ -154,13 +154,8 @@ export default function IousPage() {
                     const amountPaid = Math.max(item.initialAmount - item.amountLeft, 0);
 
                     return (
-                        <Card onPress={() => router.push(`/iou/${item.id}`)}>
-                            <Card.Content>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                                    <Text variant="titleMedium">
-                                        Left: {formatCurrency(item.amountLeft)}
-                                    </Text>
-
+                        <TransactionRow amount={`Left ${formatCurrency(item.amountLeft)}`} date={item.createdAt.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })} title={expense?.description || `Expense #${item.expense.id}`} onPress={() => router.push(`/iou/${item.id}`)}>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                                     <Chip
                                         compact
                                         style={{
@@ -172,14 +167,6 @@ export default function IousPage() {
                                         {item.isPaid ? "Paid" : "Open"}
                                     </Chip>
                                 </View>
-
-                                <Text variant="bodyMedium" style={{ marginTop: 6 }}>
-                                    Expense: {expense?.description || `#${item.expense.id}`}
-                                </Text>
-
-                                <Text variant="bodySmall" style={{ marginTop: 2 }}>
-                                    Created: {item.createdAt.toDateString()}
-                                </Text>
 
                                 <Text variant="bodySmall" style={{ marginTop: 2 }}>
                                     Paid: {formatCurrency(amountPaid)} / {formatCurrency(item.initialAmount)}
@@ -222,8 +209,7 @@ export default function IousPage() {
                                         />
                                     </View>
                                 </View>
-                            </Card.Content>
-                        </Card>
+                        </TransactionRow>
                     );
                     }}
                 />

@@ -55,11 +55,12 @@ export default function FinancesPage() {
 
     return (
         <SafeAreaView style={{
-            padding: 16,
+            paddingHorizontal: 20,
+            paddingTop: 8,
             backgroundColor: theme.colors.background,
             flexGrow: 1,
         }}>
-            <ScrollView style={{ flex: 1 }}>
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 28 }} showsVerticalScrollIndicator={false}>
                 <Header
                     title="Finances"
                 />
@@ -72,7 +73,7 @@ export default function FinancesPage() {
                     onSelect={onSelectMonth}
                 />
 
-                <Divider style={{ marginVertical: 16 }} />
+                <Divider style={{ marginVertical: 18, opacity: 0.5 }} />
 
                 <SegmentedButtons
                     value={activeView}
@@ -96,7 +97,7 @@ export default function FinancesPage() {
                     ]}
                 />
 
-                <Divider style={{ marginVertical: 16 }} />
+                <Divider style={{ marginVertical: 18, opacity: 0.5 }} />
 
                 {activeView === "overview" ? (
                     <View style={{ gap: 20 }}>
@@ -106,7 +107,7 @@ export default function FinancesPage() {
 
                         <CategoryPieChart budgetUsed={budgetUsed} />
 
-                        <Divider />
+                        <Divider style={{ opacity: 0.5 }} />
 
                         <PaymentChannelPieChart budgetUsed={paymentChannelBudgetUsed} />
                     </View>
@@ -121,8 +122,8 @@ export default function FinancesPage() {
                     <View style={{ gap: 20 }}>
                         <View style={{ gap: 10 }}>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                                <Text variant="titleMedium">Category Budgets</Text>
-                                <Button compact onPress={() => router.push(`/budget/${monthKey}` as any)}>
+                                <Text variant="titleMedium" style={{ fontWeight: '800' }}>Category Budgets</Text>
+                                <Button compact mode="contained-tonal" onPress={() => router.push(`/budget/${monthKey}` as any)}>
                                     Edit
                                 </Button>
                             </View>
@@ -130,12 +131,12 @@ export default function FinancesPage() {
                             <CategoryPieChart budgetUsed={budgetUsed} />
                         </View>
 
-                        <Divider />
+                        <Divider style={{ opacity: 0.5 }} />
 
                         <View style={{ gap: 10 }}>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                                <Text variant="titleMedium">Payment Channels</Text>
-                                <Button compact onPress={() => router.push(`/payment-channel-budget/${monthKey}` as any)}>
+                                <Text variant="titleMedium" style={{ fontWeight: '800' }}>Payment Channels</Text>
+                                <Button compact mode="contained-tonal" onPress={() => router.push(`/payment-channel-budget/${monthKey}` as any)}>
                                     Edit
                                 </Button>
                             </View>

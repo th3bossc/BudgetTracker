@@ -188,7 +188,7 @@ export default function BankAccountsPage() {
         <SafeAreaView
             style={{
                 flex: 1,
-                paddingHorizontal: 16,
+                paddingHorizontal: 20,
                 backgroundColor: theme.colors.background,
             }}
         >

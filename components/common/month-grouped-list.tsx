@@ -32,14 +32,16 @@ export default function MonthGroupedList<T>({
     }
 
     return (
-        <View style={{ gap: 12 }}>
+        <View style={{ gap: 16 }}>
             {sections.map((section) => (
-                <View key={section.monthKey} style={{ gap: 12 }}>
+                <View key={section.monthKey} style={{ gap: 10 }}>
                     <Pressable onPress={() => onToggleMonth(section.monthKey)}>
                         <Card
                             style={{
-                                borderRadius: 16,
+                                borderRadius: 12,
                                 backgroundColor: theme.colors.surface,
+                                borderWidth: 1,
+                                borderColor: theme.colors.outlineVariant,
                             }}
                         >
                             <Card.Content
@@ -51,11 +53,11 @@ export default function MonthGroupedList<T>({
                                 }}
                             >
                                 <View style={{ flexDirection: "row", alignItems: "center", gap: 12, flex: 1 }}>
-                                    <Icon source="calendar-month-outline" size={22} />
+                                    <Icon source="calendar-month-outline" size={22} color={theme.colors.primary} />
                                     <View style={{ flex: 1 }}>
                                         <Text variant="titleMedium">{section.label}</Text>
-                                        <Text variant="bodySmall">
-                                            {section.count} item(s) • {formatCurrency(section.total)}
+                                        <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginTop: 3 }}>
+                                            {section.count} transactions · {formatCurrency(section.total)}
                                         </Text>
                                     </View>
                                 </View>
@@ -68,7 +70,7 @@ export default function MonthGroupedList<T>({
                     </Pressable>
 
                     {expandedMonthKeys.includes(section.monthKey) && (
-                        <View style={{ gap: 12 }}>
+                        <View style={{ gap: 10 }}>
                             {section.items.map((item) => (
                                 <View key={getItemKey(item)}>
                                     {renderItem(item)}

@@ -1,4 +1,5 @@
 import Header from "@/components/common/header";
+import TransactionRow from "@/components/common/transaction-row";
 import Loading from "@/components/common/loading";
 import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
 import { useAccountTransfersData } from "@/hooks/use-account-transfers-data";
@@ -8,7 +9,7 @@ import { truncateText } from "@/utils/text";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { FlatList, ScrollView, View } from "react-native";
-import { Card, Chip, FAB, Icon, IconButton, Text, useTheme } from "react-native-paper";
+import { Chip, FAB, Icon, IconButton, Text, useTheme } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TransfersPage() {
@@ -46,7 +47,7 @@ export default function TransfersPage() {
         <SafeAreaView
             style={{
                 flex: 1,
-                paddingHorizontal: 16,
+                paddingHorizontal: 20,
                 backgroundColor: theme.colors.background,
             }}
         >
@@ -66,18 +67,7 @@ export default function TransfersPage() {
                     const toAccount = bankAccountsMap[item.toBankAccount.id];
 
                     return (
-                        <Card onPress={() => router.push(`/account-transfer/${item.id}`)}>
-                            <Card.Content>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                                    <Text variant="titleMedium">{formatCurrency(item.amount)}</Text>
-                                    <Text variant="bodySmall">{item.date.toDateString()}</Text>
-                                </View>
-
-                                {item.description ? (
-                                    <Text variant="bodyMedium" style={{ marginTop: 6 }}>
-                                        {item.description}
-                                    </Text>
-                                ) : null}
+                        <TransactionRow amount={formatCurrency(item.amount)} date={item.date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })} title={item.description} onPress={() => router.push(`/account-transfer/${item.id}`)}>
 
                                 <View
                                     style={{
@@ -128,8 +118,7 @@ export default function TransfersPage() {
                                         />
                                     </View>
                                 </View>
-                            </Card.Content>
-                        </Card>
+                        </TransactionRow>
                     );
                 }}
             />

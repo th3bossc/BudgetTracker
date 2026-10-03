@@ -1,4 +1,5 @@
 import AggregateSummary from "@/components/common/aggregate-summary";
+import TransactionRow from "@/components/common/transaction-row";
 import Header from "@/components/common/header";
 import Loading from "@/components/common/loading";
 import MonthGroupedList from "@/components/common/month-grouped-list";
@@ -13,7 +14,6 @@ import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 import {
-    Card,
     Chip,
     FAB,
     IconButton,
@@ -98,7 +98,7 @@ export default function IncomeListPage() {
     return (
         <SafeAreaView style={{ 
             flex: 1,
-            paddingHorizontal: 16,
+            paddingHorizontal: 20,
             backgroundColor: theme.colors.background,
         }}>
             <Header
@@ -113,7 +113,7 @@ export default function IncomeListPage() {
                 total={aggregateTotal}
             />
 
-            <ScrollView contentContainerStyle={{ paddingBottom: 96 }}>
+            <ScrollView contentContainerStyle={{ paddingBottom: 112, paddingTop: 4 }} showsVerticalScrollIndicator={false}>
                 <MonthGroupedList
                     sections={monthSections}
                     expandedMonthKeys={expandedMonthKeys}
@@ -121,24 +121,7 @@ export default function IncomeListPage() {
                     getItemKey={(item) => item.id}
                     emptyLabel="No incomes found."
                     renderItem={(item) => (
-                    <Card onPress={() => router.push(`/income/${item.id}`)}>
-                        <Card.Content>
-
-                            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                                <Text variant="titleMedium">
-                                    {formatCurrency(item.amount)}
-                                </Text>
-
-                                <Text variant="bodySmall">
-                                    {item.date.toDateString()}
-                                </Text>
-                            </View>
-
-                            {item.description && (
-                                <Text variant="bodyMedium">
-                                    {item.description}
-                                </Text>
-                            )}
+                    <TransactionRow amount={formatCurrency(item.amount)} date={item.date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })} title={item.description} onPress={() => router.push(`/income/${item.id}`)}>
                             <View style={{ marginTop: 8, justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
                                 <Chip
                                     style={{
@@ -160,10 +143,7 @@ export default function IncomeListPage() {
                                     }}
                                 />
                             </View>
-
-
-                        </Card.Content>
-                    </Card>
+                    </TransactionRow>
                     )}
                 />
             </ScrollView>

@@ -1,4 +1,4 @@
-import { Appbar, Divider } from "react-native-paper";
+import { Appbar, Divider, useTheme } from "react-native-paper";
 import { IconSource } from "react-native-paper/lib/typescript/components/Icon";
 
 interface Props {
@@ -9,10 +9,11 @@ interface Props {
 }
 
 const Header = ({ title, icon, onPress, flushed = false }: Props) => {
+    const theme = useTheme();
     return (
         <>
-            <Appbar.Header elevated={!flushed} style={{ borderRadius: 16 }} statusBarHeight={0}>
-                <Appbar.Content title={title} />
+            <Appbar.Header elevated={false} style={{ borderRadius: 0, backgroundColor: theme.colors.background, minHeight: 60 }} statusBarHeight={0}>
+                <Appbar.Content title={title} titleStyle={{ fontSize: 25, fontWeight: '800', letterSpacing: -0.6, color: theme.colors.onBackground }} />
                 {
                     icon && (
                         <Appbar.Action
@@ -23,7 +24,7 @@ const Header = ({ title, icon, onPress, flushed = false }: Props) => {
                 }
             </Appbar.Header>
 
-            <Divider style={{ marginVertical: 16}} />
+            <Divider style={{ marginVertical: 12, opacity: 0.45 }} />
         </>
     )
 }

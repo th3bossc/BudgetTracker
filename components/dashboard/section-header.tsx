@@ -20,23 +20,25 @@ export default function SectionHeader({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        margin: 8,
+        marginTop: 4,
+        marginBottom: 10,
+        paddingHorizontal: 2,
       }}
     >
-      <Text variant="headlineSmall">{title}</Text>
+      <Text variant="titleLarge" style={{ fontWeight: '800', letterSpacing: -0.3 }}>{title}</Text>
 
       {
         showButtons && (
           <View style={{ flexDirection: "row", gap: 8 }}>
             {
               onCreate && 
-              <Button compact onPress={onCreate}>
-                Create
+              <Button compact mode="contained-tonal" onPress={onCreate} icon="plus">
+                Add
               </Button>
             }
             {
               onViewAll && (
-                <Button compact onPress={onViewAll}>
+              <Button compact onPress={onViewAll}>
                   View All
                 </Button>
               )
