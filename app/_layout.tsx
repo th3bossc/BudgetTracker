@@ -8,14 +8,10 @@ import { PaperProvider, MD3LightTheme, MD3DarkTheme } from "react-native-paper";
 import "react-native-reanimated";
 import { registerTranslation } from "react-native-paper-dates";
 import { DATE_PICKER_TRANSLATIONS } from "@/translations/root";
+import { PaperThemes } from "@/constants/theme";
 
-const lightTheme = {
-  ...MD3LightTheme,
-};
-
-const darkTheme = {
-  ...MD3DarkTheme,
-}
+const lightTheme = { ...MD3LightTheme, ...PaperThemes.light, fonts: MD3LightTheme.fonts };
+const darkTheme = { ...MD3DarkTheme, ...PaperThemes.dark, fonts: MD3DarkTheme.fonts };
 
 registerTranslation('en', DATE_PICKER_TRANSLATIONS.en)
 

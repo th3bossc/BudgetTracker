@@ -133,13 +133,13 @@ export default function DataSourcesPage() {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }}>
-            <View style={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 }}>
+            <View style={{ paddingHorizontal: 20, paddingTop: 10, paddingBottom: 12 }}>
                 <ScrollView
                     ref={tabsScrollRef}
                     horizontal
                     style={{ flexGrow: 0 }}
                     showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+                    contentContainerStyle={{ flexDirection: "row", alignItems: "center", gap: 9 }}
                 >
                     {tabs.map(tab => (
                         <Pressable
@@ -156,16 +156,16 @@ export default function DataSourcesPage() {
                                 alignItems: "center",
                                 justifyContent: "center",
                                 gap: 8,
-                                minWidth: 118,
-                                paddingHorizontal: 14,
-                                paddingVertical: 10,
-                                borderRadius: 999,
-                                borderWidth: 1,
+                                minWidth: 112,
+                                paddingHorizontal: 15,
+                                paddingVertical: 11,
+                                borderRadius: 12,
+                                borderWidth: activeTab === tab.key ? 0 : 1,
                                 borderColor: activeTab === tab.key
                                     ? theme.colors.primary
                                     : theme.colors.outlineVariant,
                                 backgroundColor: activeTab === tab.key
-                                    ? theme.colors.primaryContainer
+                                    ? theme.colors.primary
                                     : theme.colors.surface,
                             }}
                         >
@@ -173,14 +173,14 @@ export default function DataSourcesPage() {
                                 source={tab.icon}
                                 size={18}
                                 color={activeTab === tab.key
-                                    ? theme.colors.onPrimaryContainer
+                                    ? theme.colors.onPrimary
                                     : theme.colors.onSurfaceVariant}
                             />
                             <Text
                                 variant="labelLarge"
                                 style={{
                                     color: activeTab === tab.key
-                                        ? theme.colors.onPrimaryContainer
+                                        ? theme.colors.onPrimary
                                         : theme.colors.onSurfaceVariant,
                                 }}
                             >

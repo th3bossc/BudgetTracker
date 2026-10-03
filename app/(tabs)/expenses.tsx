@@ -1,4 +1,5 @@
 import AggregateSummary from "@/components/common/aggregate-summary";
+import TransactionRow from "@/components/common/transaction-row";
 import Header from "@/components/common/header";
 import Loading from "@/components/common/loading";
 import MonthGroupedList from "@/components/common/month-grouped-list";
@@ -13,7 +14,6 @@ import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 import {
-    Card,
     Chip,
     FAB,
     IconButton,
@@ -101,7 +101,7 @@ export default function ExpenseListPage() {
     return (
         <SafeAreaView style={{
             flex: 1,
-            paddingHorizontal: 16,
+            paddingHorizontal: 20,
             backgroundColor: theme.colors.background,
         }}>
             <Header
@@ -116,7 +116,7 @@ export default function ExpenseListPage() {
                 total={aggregateTotal}
             />
 
-            <ScrollView contentContainerStyle={{ paddingBottom: 96 }}>
+            <ScrollView contentContainerStyle={{ paddingBottom: 112, paddingTop: 4 }} showsVerticalScrollIndicator={false}>
                 <MonthGroupedList
                     sections={monthSections}
                     expandedMonthKeys={expandedMonthKeys}
@@ -130,22 +130,7 @@ export default function ExpenseListPage() {
                     const netCost = Math.max(item.amount - recoveredAmount, 0);
 
                     return (
-                        <Card onPress={() => router.push(`/expense/${item.id}`)}>
-                            <Card.Content>
-
-                                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                                    <Text variant="titleMedium">
-                                        {formatCurrency(netCost)}
-                                    </Text>
-
-                                    <Text variant="bodySmall">
-                                        {item.date.toDateString()}
-                                    </Text>
-                                </View>
-
-                                <Text variant="bodyMedium">
-                                    {item.description}
-                                </Text>
+                        <TransactionRow amount={formatCurrency(netCost)} date={item.date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })} title={item.description} onPress={() => router.push(`/expense/${item.id}`)}>
 
                                 {
                                     hasIouAttached && (
@@ -219,8 +204,7 @@ export default function ExpenseListPage() {
 
 
 
-                            </Card.Content>
-                        </Card>
+                        </TransactionRow>
                     )
                     }}
                 />

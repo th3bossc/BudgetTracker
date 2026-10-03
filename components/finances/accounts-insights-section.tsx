@@ -3,7 +3,7 @@ import type { CreditCardComputed } from "@/hooks/use-credit-card-data";
 import { formatCurrency } from "@/utils/number";
 import { useMemo } from "react";
 import { View } from "react-native";
-import { Card, Chip, Divider, List, Text, useTheme } from "react-native-paper";
+import { Chip, Divider, List, Text, useTheme } from "react-native-paper";
 import SectionHeader from "../dashboard/section-header";
 
 interface Props {
@@ -51,18 +51,15 @@ export default function AccountsInsightsSection({
         <View style={{ gap: 16 }}>
             <SectionHeader title="Cash & Accounts" />
 
-            <Card>
-                <Card.Content style={{ gap: 8 }}>
-                    <Text variant="titleMedium">Net Cash Position</Text>
-                    <Text variant="headlineSmall">{formatCurrency(totalLiquidBalance)}</Text>
+            <View style={{ gap: 8, paddingVertical: 8 }}>
+                    <Text variant="labelLarge" style={{ color: theme.colors.onSurfaceVariant }}>NET CASH POSITION</Text>
+                    <Text variant="headlineMedium" style={{ fontWeight: "800" }}>{formatCurrency(totalLiquidBalance)}</Text>
                     <Text variant="bodyMedium" style={{ color: monthNetFlow >= 0 ? theme.colors.primary : theme.colors.error }}>
                         {monthKey} Net Flow: {formatCurrency(monthNetFlow)}
                     </Text>
-                </Card.Content>
-            </Card>
+            </View>
 
-            <Card>
-                <Card.Content style={{ gap: 8 }}>
+            <View style={{ gap: 8, paddingVertical: 8 }}>
                     <Text variant="titleMedium">Risk Alerts</Text>
                     {riskAccounts.length === 0 ? (
                         <Text variant="bodyMedium">All accounts are above minimum balance.</Text>
@@ -83,11 +80,9 @@ export default function AccountsInsightsSection({
                             </View>
                         </>
                     )}
-                </Card.Content>
-            </Card>
+            </View>
 
-            <Card>
-                <Card.Content style={{ gap: 12 }}>
+            <View style={{ gap: 12, paddingVertical: 8 }}>
                     <Text variant="titleMedium">Accounts</Text>
                     {accounts.length === 0 ? (
                         <Text variant="bodyMedium">No bank accounts yet.</Text>
@@ -99,7 +94,7 @@ export default function AccountsInsightsSection({
                                     key={account.id}
                                     title={account.name}
                                     description={`Balance: ${formatCurrency(account.currentBalance)}`}
-                                    style={{ backgroundColor: theme.colors.backdrop }}
+                                    style={{ backgroundColor: theme.colors.surfaceVariant, borderRadius: 0, marginBottom: 1 }}
                                 >
                                     <View style={{ gap: 10, paddingHorizontal: 16, paddingVertical: 12 }}>
                                         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
@@ -146,11 +141,9 @@ export default function AccountsInsightsSection({
                             );
                         })
                     )}
-                </Card.Content>
-            </Card>
+            </View>
 
-            <Card>
-                <Card.Content style={{ gap: 12 }}>
+            <View style={{ gap: 12, paddingVertical: 8 }}>
                     <Text variant="titleMedium">Credit Cards</Text>
                     {creditCards.length === 0 ? (
                         <Text variant="bodyMedium">No credit cards yet.</Text>
@@ -160,7 +153,7 @@ export default function AccountsInsightsSection({
                                 key={card.id}
                                 title={card.name}
                                 description={`Used: ${formatCurrency(card.amountUsed)}`}
-                                style={{ backgroundColor: theme.colors.backdrop }}
+                                style={{ backgroundColor: theme.colors.surfaceVariant, borderRadius: 0, marginBottom: 1 }}
                             >
                                 <View style={{ gap: 10, paddingHorizontal: 16, paddingVertical: 12 }}>
                                     <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
@@ -208,8 +201,7 @@ export default function AccountsInsightsSection({
                             </List.Accordion>
                         ))
                     )}
-                </Card.Content>
-            </Card>
+            </View>
         </View>
     );
 }

@@ -27,13 +27,17 @@ export default function TabLayout() {
                 tabBarStyle: {
                     backgroundColor: theme.colors.surface,
                     borderTopColor: theme.colors.outlineVariant,
-                    height: 60,
-                    paddingBottom: 6,
-                    elevation: 4,
+                    height: 72,
+                    paddingTop: 9,
+                    paddingBottom: 8,
+                    elevation: 0,
+                    borderTopWidth: 1,
                 },
 
                 tabBarLabelStyle: {
-                    fontWeight: '600'
+                    fontWeight: '700',
+                    fontSize: 11,
+                    marginTop: 2,
                 }
 
             }}

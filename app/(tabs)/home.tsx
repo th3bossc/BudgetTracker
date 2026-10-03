@@ -65,11 +65,12 @@ export default function HomeScreen() {
     return (
         <SafeAreaView style={{
             flex: 1,
-            padding: 16,
+            paddingHorizontal: 20,
+            paddingTop: 8,
             backgroundColor: theme.colors.background,
         }}
         >
-            <ScrollView style={{ flex: 1 }}>
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 28 }} showsVerticalScrollIndicator={false}>
                 <Header
                     title="Dashboard"
                     icon="face-man-profile"

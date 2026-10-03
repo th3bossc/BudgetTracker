@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { View, Animated } from "react-native";
-import { Card, Text, useTheme } from "react-native-paper";
+import { Divider, Text, useTheme } from "react-native-paper";
 import type { ExpenseCategory } from "@/types/schema";
 import { formatCurrency, formatNumber } from "@/utils/number";
 import AnimatedProgress from "../common/animated-progress";
@@ -60,16 +60,15 @@ export default function CategoryBudgetCard({
 
 
     return (
-        <Card style={{ marginBottom: 16 }}>
-            <Card.Content>
-                <Text variant="titleMedium">{category.name}</Text>
+        <View style={{ gap: 8, paddingVertical: 12 }}>
+                <Text variant="titleSmall" style={{ fontWeight: "700" }}>{category.name}</Text>
 
                 <AnimatedProgress
                     progress={animatedValue}
                     color={barColor}
                 />
 
-                <View style={{ marginTop: 6 }}>
+                <View style={{ gap: 4 }}>
                     <Text variant="bodySmall">
                         {formatCurrency(amountUsed)} / {formatCurrency(budgetAmount)} (
                         {formatNumber(percentage * 100)}%)
@@ -89,7 +88,7 @@ export default function CategoryBudgetCard({
                         </Text>
                     )}
                 </View>
-            </Card.Content>
-        </Card>
+            <Divider style={{ opacity: 0.6 }} />
+        </View>
     );
 }

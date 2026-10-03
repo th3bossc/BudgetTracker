@@ -5,6 +5,7 @@ import { auth } from "@/services/firebase";
 import { useRouter } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
+import { View } from "react-native";
 import {
     Button,
     HelperText,
@@ -41,7 +42,12 @@ export default function LoginPage() {
 
     return (
         <SafeAreaView style={{ flexGrow: 1, backgroundColor: theme.colors.background }}>
-            <Surface style={{ flex: 1, padding: 20, gap: 20, justifyContent: 'center' }}>
+            <Surface style={{ flex: 1, padding: 24, gap: 18, justifyContent: 'center', backgroundColor: theme.colors.background }}>
+                <View style={{ marginBottom: 12, gap: 7 }}>
+                    <Text variant="labelLarge" style={{ color: theme.colors.primary, fontWeight: '800', letterSpacing: 1.4 }}>MONEY, IN FOCUS</Text>
+                    <Text variant="headlineMedium" style={{ fontWeight: '800', letterSpacing: -0.8 }}>Make every month count.</Text>
+                    <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant }}>Sign in to see where your money is going.</Text>
+                </View>
                 <Header 
                     title="Login"
                     flushed
@@ -65,7 +71,7 @@ export default function LoginPage() {
                     <HelperText type="error">{error}</HelperText>
                 ) : null}
 
-                <Button mode="contained" onPress={handleLogin}>
+                <Button mode="contained" onPress={handleLogin} contentStyle={{ paddingVertical: 7 }}>
                     Login
                 </Button>
 
@@ -74,7 +80,7 @@ export default function LoginPage() {
                 </Button>
 
                 
-                <Button onPress={() => promptAsync()} style={{ gap: 8 }}>
+                <Button mode="outlined" onPress={() => promptAsync()} style={{ borderColor: theme.colors.outlineVariant }} contentStyle={{ paddingVertical: 4 }}>
                     <Icon source="google" size={14} />
                     <Text> Continue with Google </Text>
                 </Button>

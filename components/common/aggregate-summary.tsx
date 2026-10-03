@@ -19,17 +19,20 @@ export default function AggregateSummary({
         <Surface
             style={{
                 paddingHorizontal: 16,
-                paddingVertical: 12,
-                borderRadius: 16,
-                backgroundColor: theme.colors.surfaceVariant,
+                paddingVertical: 16,
+                borderRadius: 12,
+                backgroundColor: theme.colors.surface,
+                marginBottom: 18,
+                borderWidth: 1,
+                borderColor: theme.colors.outlineVariant,
             }}
         >
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
                 <View style={{ flex: 1 }}>
-                    <Text variant="titleSmall">{label}</Text>
-                    <Text variant="bodySmall">{itemCount} item(s)</Text>
+                    <Text variant="labelLarge" style={{ fontWeight: '700' }}>{label}</Text>
+                    <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginTop: 3 }}>{itemCount} transactions</Text>
                 </View>
-                <Text variant="titleMedium">{formatCurrency(total)}</Text>
+                <Text variant="titleMedium" numberOfLines={1} adjustsFontSizeToFit style={{ fontWeight: '800', color: theme.colors.primary }}>{formatCurrency(total)}</Text>
             </View>
         </Surface>
     );
