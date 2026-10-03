@@ -87,7 +87,22 @@ export const useMonthlyPaymentChannelBudgetData = (monthKey: string): MonthlyPay
                 return acc;
             }, {});
 
-            const computed: PaymentChannelBudgetUsed[] = paymentMethods.map(method => {
+            const referencedMethodIds = new Set<string>();
+            budgets.forEach(budget => referencedMethodIds.add(budget.paymentMethod.id));
+            expenses
+                .filter(expense => expense.monthKey === monthKey)
+                .forEach(expense => referencedMethodIds.add(expense.paymentMethod.id));
+            ious
+                .filter(iou => getIouMonthKey(iou) === monthKey)
+                .forEach(iou => {
+                    referencedMethodIds.add(iou.paymentMethod.id);
+                    const expense = expensesById[iou.expense.id];
+                    if (expense) referencedMethodIds.add(expense.paymentMethod.id);
+                });
+
+            const computed: PaymentChannelBudgetUsed[] = paymentMethods
+                .filter(method => !method.isArchived || referencedMethodIds.has(method.id))
+                .map(method => {
                 const totalSpent = expenses
                     .filter(item => item.monthKey === monthKey && item.paymentMethod.id === method.id)
                     .reduce((sum, item) => sum + item.amount, 0);
@@ -102,7 +117,7 @@ export const useMonthlyPaymentChannelBudgetData = (monthKey: string): MonthlyPay
                     budget: budgetsByMethod[method.id] ?? 0,
                     amountPending: pending,
                 };
-            });
+                });
 
             setBudgetUsed(computed);
         } catch (error) {

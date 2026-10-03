@@ -7,12 +7,13 @@ import {
     Divider,
 } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Dropdown } from "react-native-paper-dropdown";
+import { Dropdown } from "@/components/form-fields/keyboard-aware-dropdown";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
 import { useRouter } from "expo-router";
 import { getMonthKey } from "@/utils/date";
 import type { Income } from "@/types/schema";
 import type { IncomeCreateInput, IncomeUpdateInput } from "@/types/create";
+import { getSelectableOptions } from "@/utils/archived-options";
 
 interface Props {
     initialData?: Income;
@@ -48,18 +49,12 @@ export default function IncomeForm({
     const [error, setError] = useState<string | null>(null);
 
     const sourceOptions = [
-        ...incomeSources.map(s => ({
-            label: s.name,
-            value: s.id,
-        })),
+        ...getSelectableOptions(incomeSources, sourceId),
         { label: "+ Add New Income Source", value: "__add_new__" },
     ];
 
     const bankAccountOptions = [
-        ...bankAccounts.map(account => ({
-            label: account.name,
-            value: account.id,
-        })),
+        ...getSelectableOptions(bankAccounts, bankAccountId),
         { label: "+ Add New Bank Account", value: "__add_new__" },
     ];
 

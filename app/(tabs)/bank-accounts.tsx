@@ -4,7 +4,7 @@ import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
 import { useBankAccountsData } from "@/hooks/use-bank-accounts-data";
 import { useCreditCardData } from "@/hooks/use-credit-card-data";
 import { addBankAccountBalanceAdjustment } from "@/services/bank-account-balance-adjustment-service";
-import { deleteBankAccount } from "@/services/bank-account-service";
+import { deleteBankAccount, updateBankAccount } from "@/services/bank-account-service";
 import type { BankAccountComputed } from "@/hooks/use-bank-accounts-data";
 import { getMonthKey } from "@/utils/date";
 import { formatCurrency } from "@/utils/number";
@@ -124,8 +124,8 @@ export default function BankAccountsPage() {
     const theme = useTheme();
     const router = useRouter();
 
-    const { loading, accounts } = useBankAccountsData();
-    const { loading: creditCardsLoading, creditCards } = useCreditCardData(getMonthKey(new Date()));
+    const { loading, accounts, archivedAccounts } = useBankAccountsData();
+    const { loading: creditCardsLoading, visibleCreditCards } = useCreditCardData(getMonthKey(new Date()));
 
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState<boolean>(false);
@@ -176,6 +176,10 @@ export default function BankAccountsPage() {
         }
     }, [selectedAdjustAccount]);
 
+    const toggleArchive = useCallback(async (accountId: string, isArchived: boolean) => {
+        await updateBankAccount(accountId, { isArchived: !isArchived });
+    }, []);
+
     if (loading || creditCardsLoading || deleting) {
         return <Loading />;
     }
@@ -203,9 +207,9 @@ export default function BankAccountsPage() {
                     <View style={{ gap: 12 }}>
                         <Divider style={{ marginVertical: 4 }} />
                         <Text variant="titleMedium">Credit Cards</Text>
-                        {creditCards.length === 0 ? (
+                        {visibleCreditCards.length === 0 ? (
                             <Text variant="bodyMedium">No credit cards yet.</Text>
-                        ) : creditCards.map((card) => (
+                        ) : visibleCreditCards.map((card) => (
                             <Card key={card.id}>
                                 <Card.Content style={{ gap: 4 }}>
                                     <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
@@ -248,6 +252,28 @@ export default function BankAccountsPage() {
                                 </Card.Content>
                             </Card>
                         ))}
+                        {archivedAccounts.length > 0 ? (
+                            <>
+                                <Divider style={{ marginVertical: 4 }} />
+                                <Text variant="titleMedium">Archived Accounts</Text>
+                                {archivedAccounts.map((account) => (
+                                    <Card key={account.id} onPress={() => router.push(`/bank-account/${account.id}`)}>
+                                        <Card.Content style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                                            <View>
+                                                <Text variant="titleMedium" style={{ opacity: 0.55 }}>{account.name}</Text>
+                                                <Text variant="bodySmall">Archived · Balance: {formatCurrency(account.currentBalance)}</Text>
+                                            </View>
+                                            <Button compact onPress={(event) => {
+                                                event.stopPropagation();
+                                                void toggleArchive(account.id, true);
+                                            }}>
+                                                Restore
+                                            </Button>
+                                        </Card.Content>
+                                    </Card>
+                                ))}
+                            </>
+                        ) : null}
                     </View>
                 }
                 renderItem={({ item }) => (
@@ -278,6 +304,15 @@ export default function BankAccountsPage() {
                             </Text>
 
                             <View style={{ marginTop: 10, flexDirection: "row", justifyContent: "flex-end", alignItems: "center" }}>
+                                <Button
+                                    compact
+                                    onPress={(e) => {
+                                        e.stopPropagation();
+                                        void toggleArchive(item.id, false);
+                                    }}
+                                >
+                                    Archive
+                                </Button>
                                 <Button
                                     compact
                                     onPress={(e) => {

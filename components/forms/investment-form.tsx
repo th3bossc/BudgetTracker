@@ -7,12 +7,13 @@ import {
     Divider,
 } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Dropdown } from "react-native-paper-dropdown";
+import { Dropdown } from "@/components/form-fields/keyboard-aware-dropdown";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
 import { useRouter } from "expo-router";
 import { getMonthKey } from "@/utils/date";
 import type { Investment } from "@/types/schema";
 import { InvestmentCreateInput, InvestmentUpdateInput } from "@/types/create";
+import { getSelectableOptions } from "@/utils/archived-options";
 
 interface Props {
     initialData?: Investment;
@@ -51,19 +52,13 @@ export default function InvestmentForm({
     const [error, setError] = useState<string | null>(null);
 
     const typeOptions = [
-        ...investmentTypes.map(t => ({
-            label: t.name,
-            value: t.id,
-        })),
+        ...getSelectableOptions(investmentTypes, typeId),
         { label: "+ Add New Investment Type", value: "__add_new__" },
     ];
 
     const paymentMethodOptions = [
         { label: "No Payment Method", value: "__none__" },
-        ...paymentMethods.map(method => ({
-            label: method.name,
-            value: method.id,
-        })),
+        ...getSelectableOptions(paymentMethods, paymentMethodId),
         { label: "+ Add New Payment Method", value: "__add_new__" },
     ];
 

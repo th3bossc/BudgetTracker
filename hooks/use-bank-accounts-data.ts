@@ -307,9 +307,65 @@ export const useBankAccountsData = (monthKey?: string) => {
         transfers,
     ]);
 
+    const visibleAccounts = useMemo(() => {
+        if (!monthKey) {
+            return accountsWithBalance.filter(account => !account.isArchived);
+        }
+
+        const referencedAccountIds = new Set<string>();
+        incomes
+            .filter(income => income.monthKey === monthKey && income.bankAccount?.id)
+            .forEach(income => referencedAccountIds.add(income.bankAccount!.id));
+        creditCardPayments
+            .filter(payment => payment.monthKey === monthKey)
+            .forEach(payment => referencedAccountIds.add(payment.bankAccount.id));
+        transfers
+            .filter(transfer => transfer.monthKey === monthKey)
+            .forEach(transfer => {
+                referencedAccountIds.add(transfer.fromBankAccount.id);
+                referencedAccountIds.add(transfer.toBankAccount.id);
+            });
+        adjustments
+            .filter(adjustment => adjustment.monthKey === monthKey)
+            .forEach(adjustment => referencedAccountIds.add(adjustment.bankAccount.id));
+        expenses
+            .filter(expense => expense.monthKey === monthKey)
+            .forEach(expense => {
+                const accountId = paymentMethodToAccountIdMap[expense.paymentMethod.id];
+                if (accountId) referencedAccountIds.add(accountId);
+            });
+        investments
+            .filter(investment => investment.monthKey === monthKey && investment.paymentMethod?.id)
+            .forEach(investment => {
+                const accountId = paymentMethodToAccountIdMap[investment.paymentMethod!.id];
+                if (accountId) referencedAccountIds.add(accountId);
+            });
+        ious.forEach(iou => {
+            const iouMonthKey = iou.createdMonthKey || iou.expenseMonthKey;
+            if (iouMonthKey !== monthKey) return;
+
+            const accountId = paymentMethodToAccountIdMap[iou.paymentMethod.id];
+            if (accountId) referencedAccountIds.add(accountId);
+        });
+
+        return accountsWithBalance.filter(account => !account.isArchived || referencedAccountIds.has(account.id));
+    }, [
+        accountsWithBalance,
+        adjustments,
+        creditCardPayments,
+        expenses,
+        incomes,
+        investments,
+        ious,
+        monthKey,
+        paymentMethodToAccountIdMap,
+        transfers,
+    ]);
+
     return {
         loading: initialLoading,
-        accounts: accountsWithBalance,
+        accounts: visibleAccounts,
+        archivedAccounts: accountsWithBalance.filter(account => account.isArchived),
         monthlyFlowByAccountId,
     };
 };

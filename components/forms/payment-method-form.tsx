@@ -2,7 +2,7 @@ import { PaymentMethodCreateInput, PaymentMethodUpdateInput } from "@/types/crea
 import { PaymentMethod } from "@/types/schema";
 import { useState } from "react";
 import { View } from "react-native";
-import { Dropdown } from "react-native-paper-dropdown";
+import { Dropdown } from "@/components/form-fields/keyboard-aware-dropdown";
 import {
     TextInput,
     Button,
@@ -15,6 +15,7 @@ import ColorPicker from "../form-fields/color-picker";
 import IconPicker from "../form-fields/icon-picker";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
 import { useRouter } from "expo-router";
+import { getSelectableOptions } from "@/utils/archived-options";
 
 interface Props {
     initialData?: PaymentMethod;
@@ -52,10 +53,7 @@ export default function PaymentMethodForm({
     );
     const [error, setError] = useState<string | null>(null);
     const bankAccountOptions = [
-        ...bankAccounts.map(account => ({
-            label: account.name,
-            value: account.id,
-        })),
+        ...getSelectableOptions(bankAccounts, bankAccountId),
         { label: "+ Add New Bank Account", value: "__add_new__" },
     ];
 

@@ -27,7 +27,9 @@ export const useBulkCategoryBudgets = (monthKey: string) => {
   useEffect(() => {
     const load = async () => {
       setComputationLoadingStatus(true);
-      const mapped = categories.map(cat => {
+      const mapped = categories
+        .filter(cat => !cat.isArchived || budgets.some(budget => budget.category.id === cat.id))
+        .map(cat => {
         const existing = budgets.find(
           b => b.category.id === cat.id
         );
@@ -38,10 +40,10 @@ export const useBulkCategoryBudgets = (monthKey: string) => {
           amount: existing ? String(existing.amount) : "",
           budgetId: existing?.id,
         };
-      });
+        });
       setRows(mapped);
       setComputationLoadingStatus(false);
-      setNoCategories(false);
+      setNoCategories(mapped.length === 0);
     };
 
     const handleNoCategories = () => {
@@ -56,7 +58,7 @@ export const useBulkCategoryBudgets = (monthKey: string) => {
       load();
     else
       handleNoCategories()
-  }, [fetchCategoriesLoadingStatus, budgets]);
+  }, [fetchCategoriesLoadingStatus, categories, budgets]);
 
   const updateAmount = useCallback((categoryId: string, value: string) => {
     setRows(prev =>

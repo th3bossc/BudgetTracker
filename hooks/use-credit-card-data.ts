@@ -121,9 +121,33 @@ export const useCreditCardData = (monthKey?: string) => {
         }, {});
     }, [monthKey, payments]);
 
+    const visibleCreditCards = useMemo(() => {
+        if (!monthKey) {
+            return creditCards.filter(card => !card.isArchived);
+        }
+
+        const getIouMonthKey = (iou: Iou) => iou.createdMonthKey || iou.expenseMonthKey;
+        const referencedCardIds = new Set<string>();
+        expenses
+            .filter(expense => expense.monthKey === monthKey)
+            .forEach(expense => referencedCardIds.add(expense.paymentMethod.id));
+        investments
+            .filter(investment => investment.monthKey === monthKey && investment.paymentMethod?.id)
+            .forEach(investment => referencedCardIds.add(investment.paymentMethod!.id));
+        payments
+            .filter(payment => payment.monthKey === monthKey)
+            .forEach(payment => referencedCardIds.add(payment.paymentMethod.id));
+        ious
+            .filter(iou => getIouMonthKey(iou) === monthKey)
+            .forEach(iou => referencedCardIds.add(iou.paymentMethod.id));
+
+        return creditCards.filter(card => !card.isArchived || referencedCardIds.has(card.id));
+    }, [creditCards, expenses, investments, ious, monthKey, payments]);
+
     return {
         loading,
         creditCards,
+        visibleCreditCards,
         payments,
         paymentsByBankAccountId,
         monthlyPaymentsByBankAccountId,

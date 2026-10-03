@@ -26,14 +26,18 @@ export const useBulkPaymentChannelBudgets = (monthKey: string) => {
     if (configLoading)
       return;
 
-    if (paymentMethods.length === 0) {
+    const visiblePaymentMethods = paymentMethods.filter(method => (
+      !method.isArchived || budgets.some(budget => budget.paymentMethod.id === method.id)
+    ));
+
+    if (visiblePaymentMethods.length === 0) {
       setNoPaymentMethods(true);
       setComputationLoading(false);
       return;
     }
 
     setComputationLoading(true);
-    const mapped = paymentMethods.map(method => {
+    const mapped = visiblePaymentMethods.map(method => {
       const existing = budgets.find(
         b => b.paymentMethod.id === method.id
       );

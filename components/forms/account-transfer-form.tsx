@@ -2,12 +2,13 @@ import { useState } from "react";
 import { View, Platform } from "react-native";
 import { Button, Divider, HelperText, TextInput } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Dropdown } from "react-native-paper-dropdown";
+import { Dropdown } from "@/components/form-fields/keyboard-aware-dropdown";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
 import { useRouter } from "expo-router";
 import { getMonthKey } from "@/utils/date";
 import type { AccountTransfer } from "@/types/schema";
 import type { AccountTransferCreateInput, AccountTransferUpdateInput } from "@/types/create";
+import { getSelectableOptions } from "@/utils/archived-options";
 
 interface Props {
     initialData?: AccountTransfer;
@@ -35,11 +36,8 @@ export default function AccountTransferForm({
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const bankAccountOptions = [
-        ...bankAccounts.map(account => ({
-            label: account.name,
-            value: account.id,
-        })),
+    const getBankAccountOptions = (selectedId: string) => [
+        ...getSelectableOptions(bankAccounts, selectedId),
         { label: "+ Add New Bank Account", value: "__add_new__" },
     ];
 
@@ -79,7 +77,7 @@ export default function AccountTransferForm({
                 label="From Account"
                 mode="outlined"
                 value={fromBankAccountId}
-                options={bankAccountOptions}
+                options={getBankAccountOptions(fromBankAccountId)}
                 onSelect={(val?: string) => {
                     if (!val) {
                         return;
@@ -98,7 +96,7 @@ export default function AccountTransferForm({
                 label="To Account"
                 mode="outlined"
                 value={toBankAccountId}
-                options={bankAccountOptions}
+                options={getBankAccountOptions(toBankAccountId)}
                 onSelect={(val?: string) => {
                     if (!val) {
                         return;

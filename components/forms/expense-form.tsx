@@ -7,12 +7,13 @@ import {
     Divider,
 } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Dropdown } from "react-native-paper-dropdown";
+import { Dropdown } from "@/components/form-fields/keyboard-aware-dropdown";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
 import { useRouter } from "expo-router";
 import { getMonthKey } from "@/utils/date";
 import { Expense } from "@/types/schema";
 import { ExpenseCreateInput, ExpenseUpdateInput } from "@/types/create";
+import { getSelectableOptions } from "@/utils/archived-options";
 
 interface Props {
     initialData?: Expense,
@@ -49,18 +50,12 @@ export default function ExpenseForm({
     const [error, setError] = useState<string | null>(null);
 
     const categoryOptions = [
-        ...categories.map(c => ({
-            label: c.name,
-            value: c.id,
-        })),
+        ...getSelectableOptions(categories, categoryId),
         { label: "+ Add New Category", value: "__add_new__" },
     ];
 
     const paymentMethodOptions = [
-        ...paymentMethods.map(p => ({
-            label: p.name,
-            value: p.id,
-        })),
+        ...getSelectableOptions(paymentMethods, paymentMethodId),
         { label: "+ Add New Payment Method", value: "__add_new__"}
     ]
 

@@ -16,7 +16,7 @@ import { router } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { Button, Divider, SegmentedButtons, Text, useTheme } from "react-native-paper";
-import { Dropdown } from "react-native-paper-dropdown";
+import { Dropdown } from "@/components/form-fields/keyboard-aware-dropdown";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type FinancesView = "overview" | "accounts" | "budgets";
@@ -37,7 +37,7 @@ export default function FinancesPage() {
     } = useBankAccountsData(monthKey);
     const {
         loading: creditCardsLoading,
-        creditCards,
+        visibleCreditCards,
     } = useCreditCardData(monthKey);
 
     const monthOptions = useMemo(() => generateMonthOptions(24), []);
@@ -113,7 +113,7 @@ export default function FinancesPage() {
                 ) : activeView === "accounts" ? (
                     <AccountsInsightsSection
                         accounts={accounts}
-                        creditCards={creditCards}
+                            creditCards={visibleCreditCards}
                         monthKey={monthKey}
                         monthlyFlowByAccountId={monthlyFlowByAccountId}
                     />

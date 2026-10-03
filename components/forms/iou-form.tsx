@@ -6,12 +6,13 @@ import {
     HelperText,
     TextInput,
 } from "react-native-paper";
-import { Dropdown } from "react-native-paper-dropdown";
+import { Dropdown } from "@/components/form-fields/keyboard-aware-dropdown";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
 import { useRouter } from "expo-router";
 import type { IouCreateInput, IouUpdateInput } from "@/types/create";
 import type { Iou } from "@/types/schema";
 import { formatNumber } from "@/utils/number";
+import { getSelectableOptions } from "@/utils/archived-options";
 
 interface Props {
     expenseId: string;
@@ -55,10 +56,7 @@ export default function IouForm({
     const [error, setError] = useState<string | null>(null);
 
     const paymentMethodOptions = [
-        ...paymentMethods.map(p => ({
-            label: p.name,
-            value: p.id,
-        })),
+        ...getSelectableOptions(paymentMethods, paymentMethodId),
         { label: "+ Add New Payment Method", value: "__add_new__" },
     ];
 

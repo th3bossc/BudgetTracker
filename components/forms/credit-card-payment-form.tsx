@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Platform, View } from "react-native";
 import { Button, Divider, HelperText, TextInput } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Dropdown } from "react-native-paper-dropdown";
+import { Dropdown } from "@/components/form-fields/keyboard-aware-dropdown";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
 import { useRouter } from "expo-router";
 import { getMonthKey } from "@/utils/date";
@@ -11,6 +11,7 @@ import type {
     CreditCardPaymentCreateInput,
     CreditCardPaymentUpdateInput,
 } from "@/types/create";
+import { getSelectableOptions } from "@/utils/archived-options";
 
 interface Props {
     initialData?: CreditCardPayment;
@@ -41,19 +42,14 @@ export default function CreditCardPaymentForm({
     const [error, setError] = useState<string | null>(null);
 
     const creditCardOptions = [
-        ...paymentMethods
-            .filter(method => method.isCreditCard)
-            .map(method => ({
-                label: method.name,
-                value: method.id,
-            })),
+        ...getSelectableOptions(
+            paymentMethods.filter(method => method.isCreditCard),
+            paymentMethodId,
+        ),
         { label: "+ Add New Payment Method", value: "__add_new__" },
     ];
     const bankAccountOptions = [
-        ...bankAccounts.map(account => ({
-            label: account.name,
-            value: account.id,
-        })),
+        ...getSelectableOptions(bankAccounts, bankAccountId),
         { label: "+ Add New Bank Account", value: "__add_new__" },
     ];
 

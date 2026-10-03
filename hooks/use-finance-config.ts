@@ -13,6 +13,11 @@ export interface FinanceFilterData {
     investmentTypes: InvestmentType[];
     paymentMethods: PaymentMethod[];
     bankAccounts: BankAccount[];
+    activeCategories: ExpenseCategory[];
+    activeIncomeSources: IncomeSource[];
+    activeInvestmentTypes: InvestmentType[];
+    activePaymentMethods: PaymentMethod[];
+    activeBankAccounts: BankAccount[];
 }
 
 export const useFinanceConfig = (): FinanceFilterData => {
@@ -43,12 +48,30 @@ export const useFinanceConfig = (): FinanceFilterData => {
         }
     }, []);
 
+    const sortByNewest = <T extends { createdAt: Date }>(items: T[]) => (
+        [...items].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    );
+    const activeOnly = <T extends { isArchived?: boolean }>(items: T[]) => (
+        items.filter(item => !item.isArchived)
+    );
+
+    const sortedCategories = sortByNewest(categories);
+    const sortedIncomeSources = sortByNewest(incomeSources);
+    const sortedInvestmentTypes = sortByNewest(investmentTypes);
+    const sortedPaymentMethods = sortByNewest(paymentMethods);
+    const sortedBankAccounts = sortByNewest(bankAccounts);
+
     return {
         loading,
-        categories: [...categories].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
-        incomeSources: [...incomeSources].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
-        investmentTypes: [...investmentTypes].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
-        paymentMethods: [...paymentMethods].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
-        bankAccounts: [...bankAccounts].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
+        categories: sortedCategories,
+        incomeSources: sortedIncomeSources,
+        investmentTypes: sortedInvestmentTypes,
+        paymentMethods: sortedPaymentMethods,
+        bankAccounts: sortedBankAccounts,
+        activeCategories: activeOnly(sortedCategories),
+        activeIncomeSources: activeOnly(sortedIncomeSources),
+        activeInvestmentTypes: activeOnly(sortedInvestmentTypes),
+        activePaymentMethods: activeOnly(sortedPaymentMethods),
+        activeBankAccounts: activeOnly(sortedBankAccounts),
     };
 };

@@ -8,7 +8,7 @@ import {
     Switch,
     Text,
 } from "react-native-paper";
-import { Dropdown } from "react-native-paper-dropdown";
+import { Dropdown } from "@/components/form-fields/keyboard-aware-dropdown";
 import {
     InvestmentType,
     InvestmentRiskLevel,

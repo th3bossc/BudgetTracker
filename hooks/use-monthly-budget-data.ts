@@ -187,7 +187,28 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
                     return acc;
                 }, {});
 
-                const budgetUsedInfo: BudgetUsed[] = categories.map(c => {
+                const referencedCategoryIds = new Set<string>();
+                budgets.forEach(budget => {
+                    const categoryId = resolveCategoryId(budget.category);
+                    if (categoryId) referencedCategoryIds.add(categoryId);
+                });
+                expenses
+                    .filter(expense => expense.monthKey === monthKey)
+                    .forEach(expense => {
+                        const categoryId = resolveCategoryId(expense.category);
+                        if (categoryId) referencedCategoryIds.add(categoryId);
+                    });
+                ious
+                    .filter(iou => getIouMonthKey(iou) === monthKey)
+                    .forEach(iou => {
+                        const expense = expensesById[iou.expense.id];
+                        const categoryId = expense ? resolveCategoryId(expense.category) : null;
+                        if (categoryId) referencedCategoryIds.add(categoryId);
+                    });
+
+                const budgetUsedInfo: BudgetUsed[] = categories
+                    .filter(category => !category.isArchived || referencedCategoryIds.has(category.id))
+                    .map(c => {
                     const totalSpent = expenses
                         .filter(i => i.monthKey == monthKey && resolveCategoryId(i.category) == c.id)
                         .reduce((sum, i) => sum + i.amount, 0);
@@ -202,7 +223,7 @@ export const useMonthlyBudgetData = (monthKey: string): MonthlyBudgetData => {
                         budget,
                         amountYetToGetBack,
                     }
-                })
+                    });
 
                 setBudgetUsed(budgetUsedInfo);
             }
