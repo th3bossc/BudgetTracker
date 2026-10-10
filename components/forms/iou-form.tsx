@@ -6,6 +6,7 @@ import {
     HelperText,
     TextInput,
 } from "react-native-paper";
+import { useTheme } from "react-native-paper";
 import { Dropdown } from "@/components/form-fields/keyboard-aware-dropdown";
 import { useFinanceConfig } from "@/hooks/use-finance-config";
 import { useRouter } from "expo-router";
@@ -34,6 +35,7 @@ export default function IouForm({
     loading,
 }: Props) {
     const router = useRouter();
+    const theme = useTheme();
     const { paymentMethods } = useFinanceConfig();
 
     const [initialAmount, setInitialAmount] = useState(
@@ -136,6 +138,7 @@ export default function IouForm({
                 })()}
                 mode="outlined"
                 disabled
+                theme={{ colors: { onSurfaceDisabled: theme.colors.onSurface } }}
             />
 
             <Dropdown
